@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PRISM Phase 2 — SPED Command Center</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Figtree:wght@300;400;500;600;700&family=Inter:wght@400;500;600&family=Nunito:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F0F9FF;--card-bg:#FFFFFF;--text:#1E293B;--subtext:#64748B;--border:#E2E8F0;--shadow:rgba(44,62,80,0.08);--accent:#2563EB;--nav-active:#2563EB;--nav-active-txt:#FFFFFF;--nav-inactive:#E2E8F0;--nav-inactive-txt:#64748B;--sky:#AEE4FF;--mint:#B8F2C8;--coral:#FF9A8B;--sun:#FFD86B;--lav:#D7C7FF;--softorange:#FFB085;--pink:#FF7EB9;--slate:#C5D0E6;--header-bg:#1E3A5F;--header-txt:#fff;--font-heading:'Poppins',sans-serif;--font-body:'Figtree',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);overflow-x:hidden}
+h1,h2,h3,h4,h5,h6{font-family:var(--font-heading);font-weight:700}
+.topbar{position:fixed;top:0;left:0;right:0;height:64px;background:var(--header-bg);color:var(--header-txt);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:1000}
+.prism-logo{display:flex;align-items:center;gap:4px;font-family:var(--font-heading);font-weight:800;font-size:26px;letter-spacing:-0.5px}
+.prism-pr{background:linear-gradient(135deg,#F472B6,#FB923C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.prism-sm{background:linear-gradient(135deg,#60A5FA,#A78BFA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.prism-icon{width:28px;height:28px;margin:0 1px}
+.tagline{font-size:9px;color:#94A3B8;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:6px;margin-left:12px;font-family:var(--font-body)}
+.tagline::before,.tagline::after{content:'';width:16px;height:1px;background:linear-gradient(90deg,#60A5FA,#A78BFA)}
+.tab-strip{position:fixed;top:64px;left:0;right:0;height:52px;background:var(--card-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;padding:0 12px;overflow-x:auto;z-index:999;scrollbar-width:none}
+.tab-strip::-webkit-scrollbar{display:none}
+.tab-pill{white-space:nowrap;padding:8px 16px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:var(--nav-inactive);color:var(--nav-inactive-txt);transition:all .2s;min-height:36px;font-family:var(--font-body)}
+.tab-pill.active{background:var(--nav-active);color:var(--nav-active-txt)}
+.tab-pill:hover:not(.active){background:#CBD5E1}
+.main-content{margin-top:130px;max-width:1100px;margin-left:auto;margin-right:auto;padding:0 16px 60px}
+.tab-section{display:none}
+.tab-section.active{display:block}
+.card{background:var(--card-bg);border-radius:12px;box-shadow:0 6px 18px var(--shadow);border:1px solid var(--border);padding:20px;margin-bottom:16px}
+.btn{min-height:44px;border-radius:10px;padding:10px 20px;font-weight:600;font-size:13px;cursor:pointer;border:none;font-family:var(--font-body);transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-filled{background:var(--accent);color:#fff}
+.btn-filled:hover{opacity:.9;transform:translateY(-1px)}
+.btn-outlined{background:transparent;border:2px solid var(--accent);color:var(--accent)}
+.btn-outlined:hover{background:var(--accent);color:#fff}
+.btn-sm{min-height:34px;padding:6px 14px;font-size:12px;border-radius:8px}
+.badge{border-radius:999px;font-size:11px;padding:3px 10px;font-weight:600;display:inline-block}
+.badge-green{background:#D1FAE5;color:#065F46}
+.badge-amber{background:#FEF3C7;color:#92400E}
+.badge-red{background:#FEE2E2;color:#991B1B}
+.badge-blue{background:#DBEAFE;color:#1E40AF}
+.badge-lav{background:#EDE9FE;color:#5B21B6}
+.badge-sky{background:var(--sky);color:#0C4A6E}
+.data-table{width:100%;text-align:left;border-collapse:collapse;font-size:13px}
+.data-table th{text-transform:uppercase;letter-spacing:.05em;font-size:11px;font-weight:700;color:var(--subtext);padding:10px 12px;border-bottom:2px solid var(--border);background:var(--bg)}
+.data-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.data-table tbody tr:hover{background:#F8FAFC}
+.filter-pill{border-radius:999px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:var(--card-bg);color:var(--subtext);transition:all .2s}
+.filter-pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.footer-bar{position:fixed;bottom:0;left:0;right:0;height:36px;background:var(--header-bg);color:#94A3B8;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:11px;z-index:1000}
+.footer-bar .version-badge{background:rgba(255,255,255,.15);border-radius:4px;padding:2px 8px;font-size:10px;color:#CBD5E1}
+.autosave-pulse{animation:pulse-save 1.5s ease-in-out}
+@keyframes pulse-save{0%{color:#34D399;transform:scale(1.05)}100%{color:#94A3B8;transform:scale(1)}}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;display:none;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.modal{background:var(--card-bg);border-radius:16px;max-width:700px;width:95%;max-height:85vh;overflow-y:auto;padding:24px;position:relative}
+.side-panel{position:fixed;right:0;top:64px;bottom:36px;width:520px;max-width:95vw;background:var(--card-bg);box-shadow:-4px 0 30px rgba(0,0,0,.15);z-index:1500;transform:translateX(100%);transition:transform .3s ease;overflow-y:auto;padding:20px}
+.side-panel.open{transform:translateX(0)}
+.ticker-bar{overflow:hidden;white-space:nowrap;background:linear-gradient(90deg,#FEF3C7,#FFEDD5);border-radius:10px;padding:10px 0;margin-bottom:16px}
+.ticker-content{display:inline-block;animation:scroll-ticker 30s linear infinite}
+@keyframes scroll-ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.sub-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px}
+.sub-tab{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--card-bg);color:var(--subtext);transition:all .15s}
+.sub-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.upload-zone{border:2px dashed var(--border);border-radius:12px;padding:40px;text-align:center;color:var(--subtext);transition:all .2s;cursor:pointer}
+.upload-zone:hover{border-color:var(--accent);background:#EFF6FF}
+.stat-card{text-align:center;padding:16px}
+.stat-card .stat-num{font-size:28px;font-weight:800;font-family:var(--font-heading);color:var(--accent)}
+.stat-card .stat-label{font-size:11px;color:var(--subtext);text-transform:uppercase;letter-spacing:.04em;margin-top:4px}
+input[type="text"],input[type="date"],input[type="time"],input[type="url"],textarea,select{font-family:var(--font-body);font-size:14px;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;background:var(--card-bg);color:var(--text);width:100%;transition:border-color .2s}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.avatar-circle{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0}
+.pipeline-stage{padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;text-align:center;flex:1;transition:all .2s;border:2px solid transparent}
+.pipeline-stage.active-stage{border-color:var(--accent);box-shadow:0 2px 10px rgba(37,99,235,.2)}
+.theme-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:3000;display:none;justify-content:center;align-items:center}
+.theme-overlay.show{display:flex}
+.theme-panel{background:var(--card-bg);border-radius:16px;max-width:680px;width:95%;max-height:85vh;overflow-y:auto;padding:28px}
+.theme-card{border:2px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s}
+.theme-card.selected{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+.mini-preview{width:100%;height:80px;border-radius:8px;display:flex;gap:4px;padding:6px;align-items:flex-end}
+.mini-preview div{flex:1;border-radius:4px}
+.soap-section textarea{min-height:60px;margin-bottom:8px}
+.blinking-dot{width:12px;height:12px;background:#EF4444;border-radius:50%;display:inline-block;animation:blink-dot 1s infinite}
+@keyframes blink-dot{0%,100%{opacity:1}50%{opacity:.3}}
+.icon-grid-item{width:70px;height:70px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border:1.5px solid var(--border);transition:all .15s;font-size:10px;gap:4px;padding:4px}
+.icon-grid-item:hover{border-color:var(--accent);background:#EFF6FF;transform:translateY(-2px)}
+.token-spot{width:56px;height:56px;border-radius:50%;border:3px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;transition:all .15s}
+.token-spot.filled{border-style:solid;border-color:var(--accent);background:#EFF6FF}
+@media(max-width:767px){.main-content{margin-top:126px;padding:0 10px 60px}.side-panel{width:100%}.tab-pill{padding:6px 12px;font-size:12px}}
+.expand-content{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.expand-content.expanded{max-height:2000px}
+</style>
+</head>
+<body data-id="0">
+<app-icon data-id="1" hidden data-icon="layout-dashboard" data-palette="Blue"></app-icon>
+
+<!-- TOPBAR -->
+<header data-id="2" class="topbar" id="topbar-a1b2">
+<div data-id="3" style="display:flex;align-items:center;gap:2px">
+<span data-id="4" class="prism-logo">
+<span data-id="5" class="prism-pr">PR</span>
+<svg data-id="6" class="prism-icon" viewBox="0 0 40 40"><defs data-id="7"><linearGradient data-id="8" id="pg1" x1="0" y1="0" x2="1" y2="1"><stop data-id="9" offset="0%" stop-color="#60A5FA"/><stop data-id="10" offset="100%" stop-color="#A78BFA"/></linearGradient></defs><polygon data-id="11" points="20,4 36,34 4,34" fill="url(#pg1)" opacity=".85"/></svg>
+<span data-id="12" class="prism-sm">SM</span>
+</span>
+<span data-id="13" class="tagline">Reflect the Whole Child</span>
+</div>
+<div data-id="14" style="display:flex;align-items:center;gap:12px">
+<button data-id="15" class="btn btn-outlined" id="theme-btn-x1" style="padding:6px 14px;min-height:36px;font-size:12px;color:#fff;border-color:rgba(255,255,255,.3)"><i data-id="16" data-lucide="palette" class="w-4 h-4"></i> Theme Studio</button>
+<div data-id="17" class="avatar-circle" style="width:36px;height:36px;background:linear-gradient(135deg,#60A5FA,#A78BFA);font-size:13px">SK</div>
+</div>
+</header>
+
+<!-- TAB STRIP -->
+<nav data-id="18" class="tab-strip" id="tab-strip-z1">
+<button data-id="19" class="tab-pill active" data-tab="dashboard">🏠 Dashboard</button>
+<button data-id="20" class="tab-pill" data-tab="students">🧩 Student Tiles</button>
+<button data-id="21" class="tab-pill" data-tab="caseload">👤 My Caseload</button>
+<button data-id="22" class="tab-pill" data-tab="mtss">📋 MTSS / RTI</button>
+<button data-id="23" class="tab-pill" data-tab="evals">📊 Eval Tracker</button>
+<button data-id="24" class="tab-pill" data-tab="access">♿ Accessibility</button>
+<button data-id="25" class="tab-pill" data-tab="templates">🎨 Templates</button>
+<button data-id="26" class="tab-pill" data-tab="resources">📚 Resources</button>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div data-id="27" class="main-content" id="main-wrap-q1">
+
+<!-- ==================== TAB 1: DASHBOARD ==================== -->
+<section data-id="28" class="tab-section active" id="sec-dashboard">
+<!-- Date/Time Header -->
+<div data-id="29" class="card" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:120px;z-index:50">
+<div data-id="30">
+<div data-id="31" id="live-clock-d1" style="font-size:22px;font-weight:800;font-family:var(--font-heading);tabular-nums:true" class="tabular-nums"></div>
+</div>
+<div data-id="32" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+<span data-id="33" class="badge" style="background:linear-gradient(135deg,#FBBF24,#F59E0B);color:#fff;font-size:12px;padding:6px 14px">🍂 Next Day Off: Fall Break in 67 days</span>
+<button data-id="34" class="btn btn-filled btn-sm" id="open-meeting-timer-btn"><i data-id="35" data-lucide="timer" class="w-4 h-4"></i> Meeting Timer</button>
+</div>
+</div>
+
+<!-- Mandate Ticker -->
+<div data-id="36" class="ticker-bar">
+<div data-id="37" class="ticker-content" id="ticker-c1">
+<span data-id="38" style="margin-right:60px">📋 IDEA 2004 — 60-day evaluation timeline in effect</span>
+<span data-id="39" style="margin-right:60px">🔒 FERPA: All records are protected — verify access before sharing</span>
+<span data-id="40" style="margin-right:60px">📅 Annual IEP review deadlines are tracked in the Evaluation Tracker</span>
+<span data-id="41" style="margin-right:60px">🔔 2024-25 District Policy Update: NOM must be sent 10 days prior to meeting</span>
+<span data-id="42" style="margin-right:60px">⚖️ HIPAA: Protected health information must remain confidential at all times</span>
+<span data-id="43" style="margin-right:60px">📋 IDEA 2004 — 60-day evaluation timeline in effect</span>
+<span data-id="44" style="margin-right:60px">🔒 FERPA: All records are protected — verify access before sharing</span>
+<span data-id="45" style="margin-right:60px">📅 Annual IEP review deadlines are tracked in the Evaluation Tracker</span>
+<span data-id="46" style="margin-right:60px">🔔 2024-25 District Policy Update: NOM must be sent 10 days prior to meeting</span>
+<span data-id="47" style="margin-right:60px">⚖️ HIPAA: Protected health information must remain confidential at all times</span>
+</div>
+</div>
+
+<!-- Quick Links -->
+<div data-id="48" class="card">
+<h3 data-id="49" style="font-size:14px;margin-bottom:12px;color:var(--subtext)">Quick Links</h3>
+<div data-id="50" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px" id="quick-links-row">
+<div data-id="51" class="quick-tile" style="min-width:110px;padding:14px;border-radius:12px;background:linear-gradient(135deg,#DBEAFE,#EFF6FF);text-align:center;cursor:pointer">
+<div data-id="52" style="font-size:24px;margin-bottom:4px">📅</div><div data-id="53" style="font-size:11px;font-weight:600">Team Scheduling</div>
+</div>
+<div data-id="54" class="quick-tile" style="min-width:110px;padding:14px;border-radius:12px;background:linear-gradient(135deg,#FCE7F3,#FDF2F8);text-align:center;cursor:pointer">
+<div data-id="55" style="font-size:24px;margin-bottom:4px">📧</div><div data-id="56" style="font-size:11px;font-weight:600">Email (Outlook)</div>
+</div>
+<div data-id="57" class="quick-tile" style="min-width:110px;padding:14px;border-radius:12px;background:linear-gradient(135deg,#D1FAE5,#ECFDF5);text-align:center;cursor:pointer">
+<div data-id="58" style="font-size:24px;margin-bottom:4px">📋</div><div data-id="59" style="font-size:11px;font-weight:600">Enrich IEP</div>
+</div>
+<div data-id="60" class="quick-tile" style="min-width:110px;padding:14px;border-radius:12px;background:linear-gradient(135deg,#FEF3C7,#FFFBEB);text-align:center;cursor:pointer">
+<div data-id="61" style="font-size:24px;margin-bottom:4px">🏫</div><div data-id="62" style="font-size:11px;font-weight:600">MyCherry Creek</div>
+</div>
+<div data-id="63" class="quick-tile" style="min-width:110px;padding:14px;border-radius:12px;background:linear-gradient(135deg,#E0E7FF,#EEF2FF);text-align:center;cursor:pointer">
+<div data-id="64" style="font-size:24px;margin-bottom:4px">💾</div><div data-id="65" style="font-size:11px;font-weight:600">OneDrive</div>
+</div>
+<div data-id="66" class="quick-tile" style="min-width:110px;padding:14px;border-radius:12px;background:linear-gradient(135deg,var(--lav),#F3E8FF);text-align:center;cursor:pointer" id="add-fav-tile">
+<div data-id="67" style="font-size:24px;margin-bottom:4px">⭐</div><div data-id="68" style="font-size:11px;font-weight:600">Add Favorite</div>
+</div>
+</div>
+</div>
+
+<!-- Weekly/Monthly Toggle -->
+<div data-id="69" class="card">
+<div data-id="70" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+<h3 data-id="71" style="font-size:16px"><i data-id="72" data-lucide="calendar-days" class="w-5 h-5" style="display:inline;vertical-align:middle;margin-right:4px"></i> Schedule</h3>
+<div data-id="73" style="display:flex;background:var(--bg);border-radius:8px;overflow:hidden">
+<button data-id="74" class="cal-toggle active" data-view="week" style="padding:6px 16px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:var(--accent);color:#fff">Week</button>
+<button data-id="75" class="cal-toggle" data-view="month" style="padding:6px 16px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:transparent;color:var(--subtext)">Month</button>
+</div>
+</div>
+<div data-id="76" id="cal-week-view">
+<div data-id="77" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px" id="week-grid-d1"></div>
+</div>
+<div data-id="78" id="cal-month-view" style="display:none">
+<div data-id="79" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:12px" id="month-grid-d1"></div>
+</div>
+<!-- To-do List -->
+<div data-id="80" style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px">
+<h4 data-id="81" style="font-size:14px;margin-bottom:10px"><i data-id="82" data-lucide="list-checks" class="w-4 h-4" style="display:inline;vertical-align:middle"></i> To-Do Today</h4>
+<div data-id="83" id="todo-list-d1"></div>
+</div>
+</div>
+
+<!-- Who Are You Seeing Today -->
+<div data-id="84" class="card">
+<h3 data-id="85" style="font-size:16px;margin-bottom:12px"><i data-id="86" data-lucide="users" class="w-5 h-5" style="display:inline;vertical-align:middle;margin-right:4px"></i> Who Are You Seeing Today?</h3>
+<div data-id="87" id="session-groups-d1"></div>
+<button data-id="88" class="btn btn-outlined btn-sm" id="sub-packet-btn" style="margin-top:12px"><i data-id="89" data-lucide="file-text" class="w-4 h-4"></i> Download Sub Packet</button>
+</div>
+
+<!-- Team Caseload Overview -->
+<div data-id="90" class="card">
+<div data-id="91" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" id="team-caseload-toggle">
+<h3 data-id="92" style="font-size:16px"><i data-id="93" data-lucide="users-round" class="w-5 h-5" style="display:inline;vertical-align:middle;margin-right:4px"></i> Team Caseload Overview</h3>
+<i data-id="94" data-lucide="chevron-down" class="w-5 h-5" id="team-caseload-chevron"></i>
+</div>
+<div data-id="95" class="expand-content" id="team-caseload-content">
+<div data-id="96" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+<select data-id="97" style="width:auto;padding:6px 10px;font-size:12px" id="tc-filter-grade"><option data-id="98" value="">All Grades</option><option data-id="99">Gr1</option><option data-id="100">Gr2</option><option data-id="101">Gr3</option><option data-id="102">Gr4</option><option data-id="103">Gr5</option></select>
+<select data-id="104" style="width:auto;padding:6px 10px;font-size:12px" id="tc-filter-disc"><option data-id="105" value="">All Disciplines</option><option data-id="106">SLP</option><option data-id="107">OT</option><option data-id="108">Behavior</option><option data-id="109">Academic</option></select>
+</div>
+<div data-id="110" class="overflow-x-auto"><table data-id="111" class="data-table" id="team-caseload-table"><thead data-id="112"><tr data-id="113"><th data-id="114">Student</th><th data-id="115">Grade</th><th data-id="116">Provider</th><th data-id="117">Discipline</th><th data-id="118">IEP Due</th><th data-id="119">Status</th></tr></thead><tbody data-id="120" id="tc-tbody"></tbody></table></div>
+</div>
+</div>
+</section>
+
+<!-- ==================== TAB 2: STUDENT TILES ==================== -->
+<section data-id="121" class="tab-section" id="sec-students">
+<div data-id="122" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
+<input data-id="123" type="text" placeholder="Search students…" id="stu-search" style="max-width:260px">
+<div data-id="124" style="display:flex;gap:4px;flex-wrap:wrap" id="stu-filters">
+<button data-id="125" class="filter-pill active" data-sf="all">All</button>
+<button data-id="126" class="filter-pill" data-sf="SLP">SLP</button>
+<button data-id="127" class="filter-pill" data-sf="OT">OT</button>
+<button data-id="128" class="filter-pill" data-sf="Behavior">Behavior</button>
+<button data-id="129" class="filter-pill" data-sf="Academic">Academic</button>
+</div>
+<button data-id="130" class="btn btn-filled btn-sm" id="add-student-btn"><i data-id="131" data-lucide="plus" class="w-4 h-4"></i> New Student</button>
+</div>
+<div data-id="132" id="student-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px"></div>
+</section>
+
+<!-- Student Detail Side Panel -->
+<div data-id="133" class="side-panel" id="student-panel">
+<div data-id="134" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+<h3 data-id="135" id="sp-name" style="font-size:18px"></h3>
+<button data-id="136" id="sp-close" style="background:none;border:none;cursor:pointer;padding:8px"><i data-id="137" data-lucide="x" class="w-5 h-5"></i></button>
+</div>
+<div data-id="138" class="sub-tabs" id="sp-sub-tabs">
+<button data-id="139" class="sub-tab active" data-spt="profile">📋 Profile</button>
+<button data-id="140" class="sub-tab" data-spt="history">📄 History</button>
+<button data-id="141" class="sub-tab" data-spt="materials">📁 Materials</button>
+<button data-id="142" class="sub-tab" data-spt="continuum">🌀 Continuum</button>
+</div>
+<div data-id="143" id="sp-content"></div>
+</div>
+
+<!-- ==================== TAB 3: MY CASELOAD ==================== -->
+<section data-id="144" class="tab-section" id="sec-caseload">
+<div data-id="145" class="card" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border:none">
+<h2 data-id="146" style="font-size:20px">Good evening, Samantha 👋</h2>
+<p data-id="147" style="color:var(--subtext);font-size:13px;margin-top:4px">Sunday, July 19, 2026 — Cherry Creek School District</p>
+</div>
+<div data-id="148" style="display:flex;gap:16px;flex-wrap:wrap">
+<div data-id="149" style="min-width:200px;flex:0 0 220px">
+<div data-id="150" class="card">
+<h4 data-id="151" style="font-size:13px;margin-bottom:10px">Filters</h4>
+<label data-id="152" style="font-size:12px;color:var(--subtext);display:block;margin-bottom:4px">Provider</label>
+<input data-id="153" type="text" value="Samantha Kessler" disabled style="margin-bottom:10px;background:#F1F5F9">
+<label data-id="154" style="font-size:12px;color:var(--subtext);display:block;margin-bottom:4px">Discipline</label>
+<select data-id="155" id="cl-filter-disc" style="margin-bottom:10px"><option data-id="156" value="">All</option><option data-id="157">SLP</option><option data-id="158">OT</option><option data-id="159">Behavior</option><option data-id="160">Academic</option></select>
+<label data-id="161" style="font-size:12px;color:var(--subtext);display:block;margin-bottom:4px">Grade</label>
+<select data-id="162" id="cl-filter-grade" style="margin-bottom:10px"><option data-id="163" value="">All</option><option data-id="164">Gr1</option><option data-id="165">Gr2</option><option data-id="166">Gr3</option><option data-id="167">Gr4</option><option data-id="168">Gr5</option></select>
+<div data-id="169" style="display:flex;gap:6px;margin-top:6px">
+<button data-id="170" class="btn btn-filled btn-sm" id="cl-apply-btn">Apply</button>
+<button data-id="171" class="btn btn-outlined btn-sm" id="cl-reset-btn">Reset</button>
+</div>
+</div>
+</div>
+<div data-id="172" style="flex:1;min-width:0">
+<div data-id="173" class="card">
+<div data-id="174" class="overflow-x-auto"><table data-id="175" class="data-table"><thead data-id="176"><tr data-id="177"><th data-id="178">Student</th><th data-id="179">Grade</th><th data-id="180">Discipline</th><th data-id="181">IEP Due</th><th data-id="182">Status</th><th data-id="183">Session Log</th></tr></thead><tbody data-id="184" id="cl-tbody"></tbody></table></div>
+</div>
+<!-- Session Tracking -->
+<div data-id="185" class="card">
+<h3 data-id="186" style="font-size:16px;margin-bottom:12px"><i data-id="187" data-lucide="clipboard-check" class="w-5 h-5" style="display:inline;vertical-align:middle;margin-right:4px"></i> Session Tracking & SOAP Notes</h3>
+<div data-id="188" style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+<label data-id="189" style="font-size:13px;font-weight:600">Session Date:</label>
+<input data-id="190" type="date" id="soap-date" value="2026-07-20" style="width:auto">
+</div>
+<div data-id="191" id="soap-students-list"></div>
+</div>
+<!-- Session History -->
+<div data-id="192" class="card">
+<h4 data-id="193" style="font-size:14px;margin-bottom:10px"><i data-id="194" data-lucide="history" class="w-4 h-4" style="display:inline;vertical-align:middle;margin-right:4px"></i> Session History</h4>
+<select data-id="195" id="soap-history-student" style="max-width:200px;margin-bottom:10px"><option data-id="196" value="">All Students</option></select>
+<div data-id="197" id="soap-history-list" style="font-size:13px;color:var(--subtext)">No saved sessions yet.</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ==================== TAB 4: MTSS / RTI ==================== -->
+<section data-id="198" class="tab-section" id="sec-mtss">
+<div data-id="199" class="sub-tabs" id="mtss-sub-tabs">
+<button data-id="200" class="sub-tab active" data-mt="overview">Overview</button>
+<button data-id="201" class="sub-tab" data-mt="toolkit">Toolkit</button>
+<button data-id="202" class="sub-tab" data-mt="calendar">Calendar</button>
+<button data-id="203" class="sub-tab" data-mt="district">District Assessment</button>
+<button data-id="204" class="sub-tab" data-mt="eligibility">Eligibility Prep</button>
+</div>
+
+<div data-id="205" id="mt-overview">
+<!-- Alert -->
+<div data-id="206" class="card" style="background:linear-gradient(90deg,#FEF3C7,#FFFBEB);border-color:#FCD34D">
+<span data-id="207" style="font-size:13px;font-weight:600">⚠️ Intervention ending in 4 days — Aiden M. — Cycle ends July 24, 2026</span>
+</div>
+<!-- Pyramid -->
+<div data-id="208" class="card" style="text-align:center">
+<svg data-id="209" viewBox="0 0 400 240" style="max-width:380px;margin:0 auto" id="mtss-pyramid">
+<polygon data-id="210" points="200,20 340,200 60,200" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" style="cursor:pointer" data-tier="1"/>
+<line data-id="211" x1="110,130" y1="130" x2="290" y2="130" stroke="#2563EB" stroke-width="1.5"/>
+<line data-id="212" x1="140" y1="170" x2="260" y2="170" stroke="#2563EB" stroke-width="1.5"/>
+<text data-id="213" x="200" y="110" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF" style="cursor:pointer" data-tier="3">Tier 3 — Intensive</text>
+<text data-id="214" x="200" y="155" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF" style="cursor:pointer" data-tier="2">Tier 2 — Strategic</text>
+<text data-id="215" x="200" y="192" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF" style="cursor:pointer" data-tier="1">Tier 1 — Core</text>
+</svg>
+</div>
+<!-- Tier Cards -->
+<div data-id="216" id="mtss-tier-cards"></div>
+</div>
+
+<div data-id="217" id="mt-toolkit" style="display:none">
+<div data-id="218" class="card" style="background:#EFF6FF;border:none;margin-bottom:12px"><p data-id="219" style="font-size:12px">📣 Teachers can access and generate these without contacting the SPED team</p></div>
+<div data-id="220" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px" id="toolkit-grid"></div>
+</div>
+
+<div data-id="221" id="mt-calendar" style="display:none">
+<div data-id="222" class="card">
+<h3 data-id="223" style="font-size:16px;margin-bottom:12px">MTSS Calendar — July 2026</h3>
+<div data-id="224" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:11px" id="mtss-cal-grid"></div>
+</div>
+<div data-id="225" id="mtss-cal-alerts"></div>
+</div>
+
+<div data-id="226" id="mt-district" style="display:none">
+<div data-id="227" class="card">
+<div data-id="228" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+<h3 data-id="229" style="font-size:16px">District Assessment Team</h3>
+<button data-id="230" class="btn btn-filled btn-sm" id="add-dat-btn"><i data-id="231" data-lucide="plus" class="w-4 h-4"></i> Add Student</button>
+</div>
+<div data-id="232" class="overflow-x-auto"><table data-id="233" class="data-table"><thead data-id="234"><tr data-id="235"><th data-id="236">Student</th><th data-id="237">Assessment Type</th><th data-id="238">Invitation</th><th data-id="239">Meeting Planned</th><th data-id="240">Report Status</th><th data-id="241">Timeline</th></tr></thead><tbody data-id="242" id="dat-tbody"></tbody></table></div>
+</div>
+</div>
+
+<div data-id="243" id="mt-eligibility" style="display:none">
+<div data-id="244" class="card">
+<h3 data-id="245" style="font-size:16px;margin-bottom:12px">Eligibility Prep Generator</h3>
+<select data-id="246" id="elig-student" style="max-width:260px;margin-bottom:12px"><option data-id="247" value="">Select Student…</option></select>
+<button data-id="248" class="btn btn-filled" id="gen-elig-btn"><i data-id="249" data-lucide="sparkles" class="w-4 h-4"></i> Generate Eligibility Packet</button>
+<div data-id="250" id="elig-output" style="margin-top:16px"></div>
+</div>
+</div>
+</section>
+
+<!-- ==================== TAB 5: EVAL TRACKER ==================== -->
+<section data-id="251" class="tab-section" id="sec-evals">
+<!-- Stats Row -->
+<div data-id="252" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px">
+<div data-id="253" class="card stat-card"><div data-id="254" class="stat-num">5</div><div data-id="255" class="stat-label">Total Evals</div></div>
+<div data-id="256" class="card stat-card"><div data-id="257" class="stat-num" style="color:#F59E0B">2</div><div data-id="258" class="stat-label">Upcoming (7d)</div></div>
+<div data-id="259" class="card stat-card"><div data-id="260" class="stat-num" style="color:#EF4444">1</div><div data-id="261" class="stat-label">Missing Forms</div></div>
+<div data-id="262" class="card stat-card"><div data-id="263" class="stat-num" style="color:#8B5CF6">1</div><div data-id="264" class="stat-label">Annual Reviews</div></div>
+</div>
+<!-- Pipeline -->
+<div data-id="265" class="card">
+<h3 data-id="266" style="font-size:14px;margin-bottom:12px">Evaluation Pipeline</h3>
+<div data-id="267" style="display:flex;gap:6px;flex-wrap:wrap" id="eval-pipeline"></div>
+</div>
+<!-- Filter tabs -->
+<div data-id="268" style="display:flex;gap:6px;margin-bottom:12px" id="eval-type-tabs">
+<button data-id="269" class="filter-pill active" data-et="all">All</button>
+<button data-id="270" class="filter-pill" data-et="Initial">Initial</button>
+<button data-id="271" class="filter-pill" data-et="Annual Review">Annual</button>
+<button data-id="272" class="filter-pill" data-et="Reevaluation">Re-eval</button>
+</div>
+<!-- Main Table -->
+<div data-id="273" class="card">
+<div data-id="274" class="overflow-x-auto"><table data-id="275" class="data-table"><thead data-id="276"><tr data-id="277"><th data-id="278">Student</th><th data-id="279">Eval Type</th><th data-id="280">Stage</th><th data-id="281">Evaluator</th><th data-id="282">Referral</th><th data-id="283">Consent</th><th data-id="284">60-Day</th><th data-id="285">Days Left</th><th data-id="286">Status</th></tr></thead><tbody data-id="287" id="eval-tbody"></tbody></table></div>
+</div>
+<!-- Eval Calendar -->
+<div data-id="288" class="card">
+<h3 data-id="289" style="font-size:14px;margin-bottom:12px">Evaluation Calendar — July 2026</h3>
+<div data-id="290" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:11px" id="eval-cal-grid"></div>
+</div>
+</section>
+
+<!-- Eval Checklist Side Panel -->
+<div data-id="291" class="side-panel" id="eval-panel">
+<div data-id="292" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+<h3 data-id="293" id="ep-name" style="font-size:18px"></h3>
+<button data-id="294" id="ep-close" style="background:none;border:none;cursor:pointer;padding:8px"><i data-id="295" data-lucide="x" class="w-5 h-5"></i></button>
+</div>
+<div data-id="296" id="ep-content"></div>
+</div>
+
+<!-- ==================== TAB 6: ACCESSIBILITY ==================== -->
+<section data-id="297" class="tab-section" id="sec-access">
+<div data-id="298" class="sub-tabs" id="acc-sub-tabs">
+<button data-id="299" class="sub-tab active" data-ac="audio">Audio Forms</button>
+<button data-id="300" class="sub-tab" data-ac="multi">Multilingual</button>
+<button data-id="301" class="sub-tab" data-ac="contrast">High Contrast</button>
+<button data-id="302" class="sub-tab" data-ac="braille">Braille Ready</button>
+<button data-id="303" class="sub-tab" data-ac="visual">Visual Retooling</button>
+</div>
+
+<div data-id="304" id="ac-audio">
+<div data-id="305" class="card">
+<h3 data-id="306" style="font-size:16px;margin-bottom:14px">🔊 Audio Form Generator</h3>
+<div data-id="307" class="upload-zone" id="audio-upload-zone"><i data-id="308" data-lucide="upload-cloud" class="w-8 h-8" style="margin:0 auto 8px;display:block;color:var(--subtext)"></i>Drag & drop or click to upload document</div>
+<div data-id="309" style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div data-id="310"><label data-id="311" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Read Options</label>
+<select data-id="312" id="audio-read-opt"><option data-id="313">Read all questions</option><option data-id="314">Questions + answer choices</option><option data-id="315">Questions only</option></select></div>
+<div data-id="316"><label data-id="317" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Voice</label>
+<select data-id="318" id="audio-voice"><option data-id="319" value="brook">🎈 Child-Friendly</option><option data-id="320" value="dan">🌙 Calm</option><option data-id="321" value="jazz">⚡ Energetic</option></select></div>
+</div>
+<div data-id="322" style="margin-top:12px"><label data-id="323" style="font-size:12px;font-weight:600">Speed</label>
+<input data-id="324" type="range" min="1" max="3" value="2" id="audio-speed" style="width:100%">
+<div data-id="325" style="display:flex;justify-content:space-between;font-size:10px;color:var(--subtext)"><span data-id="326">Slow</span><span data-id="327">Normal</span><span data-id="328">Fast</span></div>
+</div>
+<div data-id="329" style="margin-top:12px;display:flex;align-items:center;gap:8px"><input data-id="330" type="checkbox" id="audio-batch"><label data-id="331" for="audio-batch" style="font-size:12px">Batch generate for multiple students</label></div>
+<button data-id="332" class="btn btn-filled" style="margin-top:14px" id="gen-audio-btn"><i data-id="333" data-lucide="volume-2" class="w-4 h-4"></i> Generate Audio Version</button>
+<div data-id="334" id="audio-output" style="margin-top:16px"></div>
+</div>
+</div>
+
+<div data-id="335" id="ac-multi" style="display:none">
+<div data-id="336" class="card">
+<h3 data-id="337" style="font-size:16px;margin-bottom:14px">🌐 Multilingual Generator</h3>
+<div data-id="338" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+<div data-id="339"><label data-id="340" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Source</label><input data-id="341" type="text" value="English" disabled style="background:#F1F5F9"></div>
+<div data-id="342"><label data-id="343" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Target Language</label>
+<select data-id="344" id="multi-lang"><option data-id="345">Spanish</option><option data-id="346">Amharic</option><option data-id="347">Korean</option><option data-id="348">Vietnamese</option><option data-id="349">Arabic</option><option data-id="350">Other</option></select></div>
+</div>
+<div data-id="351" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+<div data-id="352"><label data-id="353" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Simplification Level</label>
+<select data-id="354" id="multi-level"><option data-id="355">Grade 1-3</option><option data-id="356">Grade 4-6</option><option data-id="357">Grade 7-9</option><option data-id="358">Adult</option></select></div>
+<div data-id="359" style="display:flex;flex-direction:column;gap:6px;padding-top:20px">
+<label data-id="360" style="font-size:12px;display:flex;align-items:center;gap:6px"><input data-id="361" type="checkbox" id="multi-visual"> Add Visual Supports</label>
+<label data-id="362" style="font-size:12px;display:flex;align-items:center;gap:6px"><input data-id="363" type="checkbox" id="multi-audio-gen"> Generate Audio in Target Language</label>
+</div>
+</div>
+<div data-id="364" class="upload-zone" style="padding:24px;margin-bottom:12px"><i data-id="365" data-lucide="upload-cloud" class="w-6 h-6" style="display:inline;vertical-align:middle;margin-right:6px"></i> Upload document to translate</div>
+<button data-id="366" class="btn btn-filled" id="gen-multi-btn"><i data-id="367" data-lucide="globe" class="w-4 h-4"></i> Translate & Generate</button>
+<div data-id="368" id="multi-output" style="margin-top:16px"></div>
+</div>
+</div>
+
+<div data-id="369" id="ac-contrast" style="display:none">
+<div data-id="370" class="card">
+<h3 data-id="371" style="font-size:16px;margin-bottom:14px">🎨 High Contrast Generator</h3>
+<div data-id="372" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px" id="contrast-options">
+<label data-id="373" class="filter-pill" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input data-id="374" type="checkbox" checked> Increased contrast (4.5:1)</label>
+<label data-id="375" class="filter-pill" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input data-id="376" type="checkbox"> Dyslexia-friendly font</label>
+<label data-id="377" class="filter-pill" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input data-id="378" type="checkbox"> Large icons (2×)</label>
+<label data-id="379" class="filter-pill" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input data-id="380" type="checkbox" checked> Colorblind-safe palette</label>
+<label data-id="381" class="filter-pill" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input data-id="382" type="checkbox"> Bold outlines</label>
+<label data-id="383" class="filter-pill" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input data-id="384" type="checkbox"> Reduced visual clutter</label>
+<label data-id="385" class="filter-pill" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input data-id="386" type="checkbox"> Tactile-friendly spacing</label>
+</div>
+<div data-id="387" class="upload-zone" style="padding:24px;margin-bottom:12px"><i data-id="388" data-lucide="upload-cloud" class="w-6 h-6" style="display:inline;vertical-align:middle;margin-right:6px"></i> Upload document</div>
+<button data-id="389" class="btn btn-filled" id="gen-contrast-btn"><i data-id="390" data-lucide="palette" class="w-4 h-4"></i> Generate High-Contrast Version</button>
+<div data-id="391" id="contrast-output" style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
+</div>
+</div>
+
+<div data-id="392" id="ac-braille" style="display:none">
+<div data-id="393" class="card">
+<h3 data-id="394" style="font-size:16px;margin-bottom:14px">⚡ Braille Ready Converter</h3>
+<div data-id="395" class="upload-zone" style="padding:24px;margin-bottom:12px"><i data-id="396" data-lucide="upload-cloud" class="w-6 h-6" style="display:inline;vertical-align:middle;margin-right:6px"></i> Upload any text document to convert</div>
+<div data-id="397" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+<div data-id="398"><label data-id="399" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Output Format</label>
+<select data-id="400" id="braille-fmt"><option data-id="401">BRF (Grade 1)</option><option data-id="402">BRF (Grade 2)</option><option data-id="403">Plain TXT</option></select></div>
+<div data-id="404"><label data-id="405" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Store in Student Folder</label>
+<select data-id="406" id="braille-student"><option data-id="407" value="">Select Student…</option></select></div>
+</div>
+<label data-id="408" style="font-size:12px;display:flex;align-items:center;gap:6px;margin-bottom:12px"><input data-id="409" type="checkbox" id="braille-vis-sep"> Package visuals separately</label>
+<button data-id="410" class="btn btn-filled" id="gen-braille-btn"><i data-id="411" data-lucide="zap" class="w-4 h-4"></i> Convert to Braille-Ready Format</button>
+<div data-id="412" id="braille-output" style="margin-top:16px"></div>
+</div>
+</div>
+
+<div data-id="413" id="ac-visual" style="display:none">
+<div data-id="414" class="card">
+<h3 data-id="415" style="font-size:16px;margin-bottom:14px">📸 Visual Retooling</h3>
+<p data-id="416" style="font-size:13px;color:var(--subtext);margin-bottom:14px">Simplify any document with visual supports so students can understand it.</p>
+<div data-id="417" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+<label data-id="418" class="filter-pill" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input data-id="419" type="checkbox" checked> Add pictograms</label>
+<label data-id="420" class="filter-pill" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input data-id="421" type="checkbox" checked> Simplify language</label>
+<label data-id="422" class="filter-pill" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input data-id="423" type="checkbox"> "How to Use" for teacher/para</label>
+<label data-id="424" class="filter-pill" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input data-id="425" type="checkbox"> Larger font + whitespace</label>
+</div>
+<div data-id="426" class="upload-zone" style="padding:24px;margin-bottom:12px"><i data-id="427" data-lucide="upload-cloud" class="w-6 h-6" style="display:inline;vertical-align:middle;margin-right:6px"></i> Upload document</div>
+<button data-id="428" class="btn btn-filled" id="gen-visual-btn"><i data-id="429" data-lucide="image" class="w-4 h-4"></i> Retool with Visuals</button>
+<div data-id="430" id="visual-output" style="margin-top:16px"></div>
+</div>
+</div>
+</section>
+
+<!-- ==================== TAB 7: TEMPLATES & FORMS ==================== -->
+<section data-id="431" class="tab-section" id="sec-templates">
+<div data-id="432" class="sub-tabs" id="tpl-sub-tabs">
+<button data-id="433" class="sub-tab active" data-tp="forms">Forms Library</button>
+<button data-id="434" class="sub-tab" data-tp="creator">Template Creator</button>
+<button data-id="435" class="sub-tab" data-tp="icons">Icon Library</button>
+<button data-id="436" class="sub-tab" data-tp="tokens">Token Boards</button>
+<button data-id="437" class="sub-tab" data-tp="schedules">Visual Schedules</button>
+<button data-id="438" class="sub-tab" data-tp="comm">Comm Boards</button>
+<button data-id="439" class="sub-tab" data-tp="social">Social Stories</button>
+</div>
+
+<div data-id="440" id="tp-forms">
+<div data-id="441" class="card" style="background:#EFF6FF;border:none;margin-bottom:12px"><p data-id="442" style="font-size:12px">📁 All student-related forms are auto-stored in the student's folder</p></div>
+<div data-id="443" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px" id="forms-filter">
+<button data-id="444" class="filter-pill active" data-ff="All">All</button>
+<button data-id="445" class="filter-pill" data-ff="Teacher">Teacher Input</button>
+<button data-id="446" class="filter-pill" data-ff="Parent">Parent</button>
+<button data-id="447" class="filter-pill" data-ff="Health">Health</button>
+<button data-id="448" class="filter-pill" data-ff="BIP">BIP/FBA</button>
+<button data-id="449" class="filter-pill" data-ff="District">District</button>
+</div>
+<div data-id="450" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px" id="forms-grid"></div>
+</div>
+
+<div data-id="451" id="tp-creator" style="display:none">
+<div data-id="452" class="card">
+<h3 data-id="453" style="font-size:16px;margin-bottom:14px">✨ Template Creator</h3>
+<div data-id="454" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div data-id="455">
+<label data-id="456" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Student</label>
+<select data-id="457" id="tpl-student" style="margin-bottom:10px"><option data-id="458" value="">Select Student…</option></select>
+<label data-id="459" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Describe the template</label>
+<textarea data-id="460" id="tpl-prompt" rows="3" placeholder="e.g., 'A bathroom routine visual for a 1st grader who loves dinosaurs'"></textarea>
+<label data-id="461" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;margin-top:10px">Content Type</label>
+<select data-id="462" id="tpl-content-type"><option data-id="463">Social Story</option><option data-id="464">Worksheet</option><option data-id="465">Behavior Script</option><option data-id="466">Teacher One-Pager</option><option data-id="467">Parent Summary</option><option data-id="468">Accommodation Sheet</option></select>
+<div data-id="469" style="margin-top:10px;display:flex;flex-direction:column;gap:4px">
+<label data-id="470" style="font-size:12px"><input data-id="471" type="checkbox" id="tpl-photo"> Include student photo placeholder</label>
+<label data-id="472" style="font-size:12px"><input data-id="473" type="checkbox" id="tpl-goals" checked> Include goals</label>
+<label data-id="474" style="font-size:12px"><input data-id="475" type="checkbox" id="tpl-schedule"> Include schedule</label>
+<label data-id="476" style="font-size:12px"><input data-id="477" type="checkbox" id="tpl-howto"> Include "How to Use" page</label>
+</div>
+<button data-id="478" class="btn btn-filled" style="margin-top:14px" id="gen-tpl-btn"><i data-id="479" data-lucide="sparkles" class="w-4 h-4"></i> Generate Template</button>
+</div>
+<div data-id="480">
+<label data-id="481" style="font-size:12px;font-weight:600;display:block;margin-bottom:8px">Style</label>
+<div data-id="482" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<div data-id="483" class="card style-card selected" data-style="kid" style="cursor:pointer;padding:14px;text-align:center"><div data-id="484" style="font-size:24px">🧒</div><div data-id="485" style="font-size:12px;font-weight:600;margin-top:4px">Kid/Student</div><div data-id="486" style="font-size:10px;color:var(--subtext)">Fun & colorful</div></div>
+<div data-id="487" class="card style-card" data-style="formal" style="cursor:pointer;padding:14px;text-align:center"><div data-id="488" style="font-size:24px">📄</div><div data-id="489" style="font-size:12px;font-weight:600;margin-top:4px">Formal</div><div data-id="490" style="font-size:10px;color:var(--subtext)">Professional</div></div>
+<div data-id="491" class="card style-card" data-style="minimal" style="cursor:pointer;padding:14px;text-align:center"><div data-id="492" style="font-size:24px">📝</div><div data-id="493" style="font-size:12px;font-weight:600;margin-top:4px">Minimal</div><div data-id="494" style="font-size:10px;color:var(--subtext)">Bare-bones</div></div>
+<div data-id="495" class="card style-card" data-style="ai" style="cursor:pointer;padding:14px;text-align:center"><div data-id="496" style="font-size:24px">🤖</div><div data-id="497" style="font-size:12px;font-weight:600;margin-top:4px">AI Created</div><div data-id="498" style="font-size:10px;color:var(--subtext)">Smart style</div></div>
+</div>
+<div data-id="499" id="tpl-preview" style="margin-top:16px"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div data-id="500" id="tp-icons" style="display:none">
+<div data-id="501" class="card">
+<h3 data-id="502" style="font-size:16px;margin-bottom:10px">Icon Library</h3>
+<input data-id="503" type="text" placeholder="Search icons…" id="icon-search" style="max-width:280px;margin-bottom:10px">
+<div data-id="504" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px" id="icon-category-filters"></div>
+<div data-id="505" id="icon-grid-wrap" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+</div>
+</div>
+
+<div data-id="506" id="tp-tokens" style="display:none">
+<div data-id="507" class="card">
+<h3 data-id="508" style="font-size:16px;margin-bottom:14px">⭐ Token Board Maker</h3>
+<div data-id="509" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div data-id="510">
+<label data-id="511" style="font-size:12px;font-weight:600;display:block;margin-bottom:6px">Board Size</label>
+<div data-id="512" style="display:flex;gap:10px;margin-bottom:12px">
+<label data-id="513" style="font-size:13px;cursor:pointer"><input data-id="514" type="radio" name="token-size" value="3"> 3-spot</label>
+<label data-id="515" style="font-size:13px;cursor:pointer"><input data-id="516" type="radio" name="token-size" value="4"> 4-spot</label>
+<label data-id="517" style="font-size:13px;cursor:pointer"><input data-id="518" type="radio" name="token-size" value="5" checked> 5-spot</label>
+</div>
+<label data-id="519" style="font-size:12px;font-weight:600;display:block;margin-bottom:6px">Token Style</label>
+<div data-id="520" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px" id="token-style-picker">
+<button data-id="521" class="filter-pill active" data-ts="⭐">⭐ Stars</button>
+<button data-id="522" class="filter-pill" data-ts="❤️">❤️ Hearts</button>
+<button data-id="523" class="filter-pill" data-ts="🚀">🚀 Rockets</button>
+<button data-id="524" class="filter-pill" data-ts="🐾">🐾 Paws</button>
+<button data-id="525" class="filter-pill" data-ts="⚡">⚡ Lightning</button>
+</div>
+<label data-id="526" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Student Name</label>
+<input data-id="527" type="text" id="token-student-name" placeholder="Enter name…" style="margin-bottom:10px">
+<label data-id="528" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Reward</label>
+<input data-id="529" type="text" id="token-reward" placeholder="My reward is…" style="margin-bottom:10px">
+<label data-id="530" style="font-size:12px;font-weight:600;display:block;margin-bottom:6px">Background Color</label>
+<div data-id="531" style="display:flex;gap:6px;margin-bottom:12px" id="token-bg-colors">
+<div data-id="532" style="width:32px;height:32px;border-radius:8px;background:#AEE4FF;cursor:pointer;border:2px solid var(--accent)" data-tc="#AEE4FF"></div>
+<div data-id="533" style="width:32px;height:32px;border-radius:8px;background:#B8F2C8;cursor:pointer;border:2px solid transparent" data-tc="#B8F2C8"></div>
+<div data-id="534" style="width:32px;height:32px;border-radius:8px;background:#FFD86B;cursor:pointer;border:2px solid transparent" data-tc="#FFD86B"></div>
+<div data-id="535" style="width:32px;height:32px;border-radius:8px;background:#D7C7FF;cursor:pointer;border:2px solid transparent" data-tc="#D7C7FF"></div>
+<div data-id="536" style="width:32px;height:32px;border-radius:8px;background:#FF9A8B;cursor:pointer;border:2px solid transparent" data-tc="#FF9A8B"></div>
+<div data-id="537" style="width:32px;height:32px;border-radius:8px;background:#FFB085;cursor:pointer;border:2px solid transparent" data-tc="#FFB085"></div>
+</div>
+</div>
+<div data-id="538">
+<label data-id="539" style="font-size:12px;font-weight:600;display:block;margin-bottom:8px">Live Preview</label>
+<div data-id="540" id="token-preview" class="card" style="min-height:180px"></div>
+<div data-id="541" style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+<button data-id="542" class="btn btn-filled btn-sm" id="token-print-btn"><i data-id="543" data-lucide="printer" class="w-4 h-4"></i> Print</button>
+<button data-id="544" class="btn btn-outlined btn-sm" id="token-save-btn"><i data-id="545" data-lucide="save" class="w-4 h-4"></i> Add to Student Tile</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div data-id="546" id="tp-schedules" style="display:none">
+<div data-id="547" class="card">
+<h3 data-id="548" style="font-size:16px;margin-bottom:14px">📅 Visual Schedule Maker</h3>
+<div data-id="549" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div data-id="550">
+<label data-id="551" style="font-size:12px;font-weight:600;display:block;margin-bottom:6px">Type</label>
+<div data-id="552" style="display:flex;gap:10px;margin-bottom:12px">
+<label data-id="553" style="font-size:13px;cursor:pointer"><input data-id="554" type="radio" name="vs-type" value="numbered" checked> Numbered tasks</label>
+<label data-id="555" style="font-size:13px;cursor:pointer"><input data-id="556" type="radio" name="vs-type" value="timed"> Timed slots</label>
+</div>
+<label data-id="557" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Number of tasks: <span data-id="558" id="vs-task-count">6</span></label>
+<input data-id="559" type="range" min="1" max="10" value="6" id="vs-tasks-slider" style="width:100%;margin-bottom:12px">
+<div data-id="560" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+<div data-id="561"><label data-id="562" style="font-size:11px">Start</label><select data-id="563" id="vs-start" style="font-size:12px;padding:6px"></select></div>
+<div data-id="564"><label data-id="565" style="font-size:11px">End</label><select data-id="566" id="vs-end" style="font-size:12px;padding:6px"></select></div>
+</div>
+<label data-id="567" style="font-size:12px;margin-bottom:8px;display:flex;align-items:center;gap:6px"><input data-id="568" type="checkbox" id="vs-firstthen"> Include First/Then board</label>
+<label data-id="569" style="font-size:12px;margin-bottom:8px;display:flex;align-items:center;gap:6px"><input data-id="570" type="checkbox" id="vs-needs"> Include "Needs" icons (bathroom, water, help)</label>
+<label data-id="571" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Style</label>
+<select data-id="572" id="vs-style"><option data-id="573">Full Color</option><option data-id="574">B&W Printable</option><option data-id="575">High Contrast</option></select>
+<button data-id="576" class="btn btn-filled" style="margin-top:14px" id="gen-vs-btn"><i data-id="577" data-lucide="sparkles" class="w-4 h-4"></i> Generate Schedule</button>
+</div>
+<div data-id="578">
+<label data-id="579" style="font-size:12px;font-weight:600;display:block;margin-bottom:8px">Live Preview</label>
+<div data-id="580" id="vs-preview" class="card" style="min-height:200px"></div>
+<div data-id="581" style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+<button data-id="582" class="btn btn-filled btn-sm" id="vs-print-btn"><i data-id="583" data-lucide="printer" class="w-4 h-4"></i> Print</button>
+<button data-id="584" class="btn btn-outlined btn-sm" id="vs-save-btn"><i data-id="585" data-lucide="save" class="w-4 h-4"></i> Save to Student Tile</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div data-id="586" id="tp-comm" style="display:none">
+<div data-id="587" class="card">
+<h3 data-id="588" style="font-size:16px;margin-bottom:14px">💬 Communication Board Maker</h3>
+<div data-id="589" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div data-id="590">
+<label data-id="591" style="font-size:12px;font-weight:600;display:block;margin-bottom:6px">Board Mode</label>
+<div data-id="592" style="display:flex;gap:10px;margin-bottom:12px">
+<label data-id="593" style="font-size:13px;cursor:pointer"><input data-id="594" type="radio" name="cb-mode" value="template" checked> Template</label>
+<label data-id="595" style="font-size:13px;cursor:pointer"><input data-id="596" type="radio" name="cb-mode" value="custom"> Fully Custom</label>
+</div>
+<label data-id="597" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Size</label>
+<select data-id="598" id="cb-size" style="margin-bottom:10px"><option data-id="599">Standard</option><option data-id="600">Large (2ft×3ft)</option><option data-id="601">Banner (3ft×4ft)</option></select>
+<div data-id="602" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+<div data-id="603"><label data-id="604" style="font-size:11px">Rows: <span data-id="605" id="cb-rows-val">3</span></label><input data-id="606" type="range" min="2" max="8" value="3" id="cb-rows"></div>
+<div data-id="607"><label data-id="608" style="font-size:11px">Columns: <span data-id="609" id="cb-cols-val">4</span></label><input data-id="610" type="range" min="2" max="8" value="4" id="cb-cols"></div>
+</div>
+<button data-id="611" class="btn btn-outlined btn-sm" id="cb-voice-prompt-btn" style="margin-bottom:10px"><i data-id="612" data-lucide="message-square" class="w-4 h-4"></i> Voice Prompt Mode</button>
+<div data-id="613" id="cb-voice-prompt-area" style="display:none;margin-bottom:12px">
+<textarea data-id="614" id="cb-voice-prompt" rows="2" placeholder="Describe the lesson, e.g. 'Life cycle of pumpkins'"></textarea>
+<button data-id="615" class="btn btn-filled btn-sm" id="cb-gen-vocab-btn" style="margin-top:6px"><i data-id="616" data-lucide="sparkles" class="w-4 h-4"></i> Auto-populate</button>
+</div>
+<div data-id="617" style="display:flex;gap:8px;flex-wrap:wrap">
+<button data-id="618" class="btn btn-filled btn-sm" id="cb-print-btn"><i data-id="619" data-lucide="printer" class="w-4 h-4"></i> Print</button>
+<button data-id="620" class="btn btn-outlined btn-sm" id="cb-tablet-btn"><i data-id="621" data-lucide="monitor" class="w-4 h-4"></i> Live Tablet Mode</button>
+<button data-id="622" class="btn btn-outlined btn-sm" id="cb-save-btn"><i data-id="623" data-lucide="save" class="w-4 h-4"></i> Save</button>
+</div>
+</div>
+<div data-id="624">
+<label data-id="625" style="font-size:12px;font-weight:600;display:block;margin-bottom:8px">Board Preview</label>
+<div data-id="626" id="cb-preview" class="card" style="min-height:220px"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div data-id="627" id="tp-social" style="display:none">
+<div data-id="628" class="card">
+<h3 data-id="629" style="font-size:16px;margin-bottom:14px">📖 Social Story Generator</h3>
+<div data-id="630" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div data-id="631">
+<label data-id="632" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Student</label>
+<select data-id="633" id="ss-student" style="margin-bottom:10px"><option data-id="634" value="">Select Student…</option></select>
+<div data-id="635" id="ss-auto-data" style="font-size:12px;color:var(--subtext);margin-bottom:10px;padding:8px;background:var(--bg);border-radius:8px;display:none"></div>
+<label data-id="636" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Story Topic</label>
+<input data-id="637" type="text" id="ss-topic" placeholder="e.g., fire drills, using the bathroom, cafeteria" style="margin-bottom:12px">
+<label data-id="638" style="font-size:12px;font-weight:600;display:block;margin-bottom:8px">Style</label>
+<div data-id="639" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+<div data-id="640" class="card ss-style-card selected" data-ss="basic" style="cursor:pointer;padding:12px;text-align:center"><div data-id="641" style="font-size:20px">📄</div><div data-id="642" style="font-size:11px;font-weight:600">Basic Minimalist</div></div>
+<div data-id="643" class="card ss-style-card" data-ss="colored" style="cursor:pointer;padding:12px;text-align:center"><div data-id="644" style="font-size:20px">🎨</div><div data-id="645" style="font-size:11px;font-weight:600">Custom Colored</div></div>
+<div data-id="646" class="card ss-style-card" data-ss="bw" style="cursor:pointer;padding:12px;text-align:center"><div data-id="647" style="font-size:20px">✏️</div><div data-id="648" style="font-size:11px;font-weight:600">B&W Coloring</div></div>
+<div data-id="649" class="card ss-style-card" data-ss="animated" style="cursor:pointer;padding:12px;text-align:center"><div data-id="650" style="font-size:20px">📱</div><div data-id="651" style="font-size:11px;font-weight:600">Animated</div></div>
+</div>
+<button data-id="652" class="btn btn-filled" id="gen-ss-btn"><i data-id="653" data-lucide="sparkles" class="w-4 h-4"></i> Generate Social Story</button>
+</div>
+<div data-id="654">
+<label data-id="655" style="font-size:12px;font-weight:600;display:block;margin-bottom:8px">Story Preview</label>
+<div data-id="656" id="ss-preview" class="card" style="min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--subtext);font-size:13px">
+<i data-id="657" data-lucide="book-open" class="w-8 h-8" style="margin-bottom:8px"></i>
+Select a student and topic, then generate
+</div>
+<div data-id="658" style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+<button data-id="659" class="btn btn-filled btn-sm" id="ss-print-btn"><i data-id="660" data-lucide="printer" class="w-4 h-4"></i> Print</button>
+<button data-id="661" class="btn btn-outlined btn-sm" id="ss-fullscreen-btn"><i data-id="662" data-lucide="maximize" class="w-4 h-4"></i> Fullscreen</button>
+<button data-id="663" class="btn btn-outlined btn-sm" id="ss-save-btn"><i data-id="664" data-lucide="save" class="w-4 h-4"></i> Save to Student Tile</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ==================== TAB 8: RESOURCES ==================== -->
+<section data-id="665" class="tab-section" id="sec-resources">
+<div data-id="666" class="card">
+<h3 data-id="667" style="font-size:16px;margin-bottom:12px"><i data-id="668" data-lucide="search" class="w-5 h-5" style="display:inline;vertical-align:middle;margin-right:4px"></i> AI Research Search</h3>
+<input data-id="669" type="text" id="res-search" placeholder="Search for evidence-based research… (e.g., 'phonemic awareness,' 'AAC autism')" style="margin-bottom:10px">
+<div data-id="670" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px" id="res-discipline-filters">
+<button data-id="671" class="filter-pill active" data-rd="All">All</button>
+<button data-id="672" class="filter-pill" data-rd="SLP">SLP</button>
+<button data-id="673" class="filter-pill" data-rd="OT">OT</button>
+<button data-id="674" class="filter-pill" data-rd="Behavior">Behavior</button>
+<button data-id="675" class="filter-pill" data-rd="Academic">Academic</button>
+<button data-id="676" class="filter-pill" data-rd="Mental Health">Mental Health</button>
+<button data-id="677" class="filter-pill" data-rd="AAC">AAC</button>
+</div>
+<div data-id="678" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<select data-id="679" id="res-date-range" style="width:auto;padding:6px 10px;font-size:12px"><option data-id="680">Last 5 years</option><option data-id="681">Last 10 years</option><option data-id="682">All</option></select>
+<button data-id="683" class="btn btn-filled" id="res-search-btn"><i data-id="684" data-lucide="search" class="w-4 h-4"></i> Search Research</button>
+</div>
+<div data-id="685" id="res-recent-chips" style="margin-top:10px;display:flex;gap:4px;flex-wrap:wrap"></div>
+</div>
+<div data-id="686" id="res-results" style="margin-bottom:16px"></div>
+
+<!-- District Info -->
+<div data-id="687" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:16px">
+<div data-id="688" class="card" style="cursor:pointer" id="district-parental"><div data-id="689" style="font-size:24px;margin-bottom:6px">📜</div><h4 data-id="690" style="font-size:14px">Parental Rights</h4><p data-id="691" style="font-size:12px;color:var(--subtext)">Know your rights under IDEA and state law</p><button data-id="692" class="btn btn-outlined btn-sm" style="margin-top:8px">View</button></div>
+<div data-id="693" class="card" style="cursor:pointer" id="district-ferpa"><div data-id="694" style="font-size:24px;margin-bottom:6px">🔒</div><h4 data-id="695" style="font-size:14px">FERPA Notice</h4><p data-id="696" style="font-size:12px;color:var(--subtext)">Family Educational Rights and Privacy Act</p><button data-id="697" class="btn btn-outlined btn-sm" style="margin-top:8px">View</button></div>
+<div data-id="698" class="card" style="cursor:pointer" id="district-policies"><div data-id="699" style="font-size:24px;margin-bottom:6px">📋</div><h4 data-id="700" style="font-size:14px">District SPED Policies</h4><p data-id="701" style="font-size:12px;color:var(--subtext)">Cherry Creek School District policies & procedures</p><button data-id="702" class="btn btn-outlined btn-sm" style="margin-top:8px">View</button></div>
+</div>
+
+<!-- Community Resources -->
+<h3 data-id="703" style="font-size:16px;margin-bottom:12px">Community Resources</h3>
+<div data-id="704" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
+<div data-id="705" class="card"><div data-id="706" style="font-size:20px;margin-bottom:6px">🏫</div><h4 data-id="707" style="font-size:13px">Cherry Creek SPED Dept</h4><p data-id="708" style="font-size:11px;color:var(--subtext)">District special education department — programs, contacts, and support</p></div>
+<div data-id="709" class="card"><div data-id="710" style="font-size:20px;margin-bottom:6px">🏛️</div><h4 data-id="711" style="font-size:13px">Colorado Dept of Education</h4><p data-id="712" style="font-size:11px;color:var(--subtext)">State resources, guidelines, and SPED compliance information</p></div>
+<div data-id="713" class="card"><div data-id="714" style="font-size:20px;margin-bottom:6px">🤝</div><h4 data-id="715" style="font-size:13px">Parent Advocacy Groups</h4><p data-id="716" style="font-size:11px;color:var(--subtext)">Local and national advocacy organizations for families</p></div>
+<div data-id="717" class="card"><div data-id="718" style="font-size:20px;margin-bottom:6px">💬</div><h4 data-id="719" style="font-size:13px">AAC Lending Library</h4><p data-id="720" style="font-size:11px;color:var(--subtext)">Borrow AAC devices and communication tools</p></div>
+<div data-id="721" class="card"><div data-id="722" style="font-size:20px;margin-bottom:6px">🖥️</div><h4 data-id="723" style="font-size:13px">Assistive Technology</h4><p data-id="724" style="font-size:11px;color:var(--subtext)">AT resources, assessments, and device lending programs</p></div>
+</div>
+</section>
+
+</div><!-- /main-content -->
+
+<!-- MEETING TIMER MODAL -->
+<div data-id="725" class="overlay" id="meeting-timer-overlay">
+<div data-id="726" style="background:var(--card-bg);width:95%;max-width:800px;max-height:90vh;overflow-y:auto;border-radius:16px;padding:0;position:relative">
+<div data-id="727" style="background:linear-gradient(135deg,#1E3A5F,#2563EB);padding:20px 24px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;color:#fff">
+<div data-id="728" style="display:flex;align-items:center;gap:12px">
+<span data-id="729" class="blinking-dot" id="mt-rec-dot"></span>
+<span data-id="730" style="font-weight:700;font-size:16px">PRISM Meeting Recorder</span>
+<span data-id="731" id="mt-elapsed" style="font-family:'Space Grotesk',monospace;font-size:20px;font-weight:700;tabular-nums:true">00:00:00</span>
+</div>
+<button data-id="732" id="mt-close" style="background:none;border:none;color:#fff;cursor:pointer;padding:8px"><i data-id="733" data-lucide="x" class="w-6 h-6"></i></button>
+</div>
+<div data-id="734" style="padding:24px">
+<div data-id="735" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+<div data-id="736"><label data-id="737" style="font-size:12px;font-weight:600">Date</label><input data-id="738" type="date" id="mt-date" value="2026-07-20" style="width:auto"></div>
+<div data-id="739"><label data-id="740" style="font-size:12px;font-weight:600">Time</label><input data-id="741" type="time" id="mt-time" value="09:00" style="width:auto"></div>
+<div data-id="742"><label data-id="743" style="font-size:12px;font-weight:600">Length</label>
+<select data-id="744" id="mt-length" style="width:auto"><option data-id="745">30 min</option><option data-id="746" selected>1 hr</option><option data-id="747">1.5 hr</option><option data-id="748">2 hr</option></select></div>
+</div>
+<div data-id="749" id="mt-disciplines"></div>
+<div data-id="750" style="margin-top:16px;text-align:center">
+<button data-id="751" class="btn" id="mt-stop-btn" style="background:linear-gradient(135deg,#EF4444,#F97316);color:#fff;font-size:15px;padding:12px 32px"><i data-id="752" data-lucide="square" class="w-5 h-5"></i> Stop & Generate Summary</button>
+</div>
+<div data-id="753" id="mt-summary" style="display:none;margin-top:16px"></div>
+</div>
+</div>
+</div>
+
+<!-- THEME STUDIO OVERLAY -->
+<div data-id="754" class="theme-overlay" id="theme-overlay">
+<div data-id="755" class="theme-panel">
+<div data-id="756" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+<h2 data-id="757" style="font-size:20px"><i data-id="758" data-lucide="palette" class="w-5 h-5" style="display:inline;vertical-align:middle;margin-right:6px"></i> Theme Studio</h2>
+<button data-id="759" id="theme-close-btn" style="background:none;border:none;cursor:pointer;padding:8px"><i data-id="760" data-lucide="x" class="w-6 h-6"></i></button>
+</div>
+<div data-id="761" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px" id="theme-main-cards"></div>
+<h4 data-id="762" style="font-size:14px;margin-bottom:10px" id="theme-sub-label">Sub-palettes</h4>
+<div data-id="763" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:20px" id="theme-sub-cards"></div>
+<div data-id="764" style="margin-bottom:16px">
+<label data-id="765" style="font-size:12px;font-weight:600;display:block;margin-bottom:6px">Live Preview</label>
+<div data-id="766" id="theme-mini-preview" class="mini-preview" style="border:1px solid var(--border);border-radius:10px"></div>
+</div>
+<button data-id="767" class="btn btn-filled" id="theme-apply-btn" style="width:100%">Apply Theme</button>
+</div>
+</div>
+
+<!-- ADD FAVORITE MODAL -->
+<div data-id="768" class="overlay" id="fav-overlay">
+<div data-id="769" class="modal" style="max-width:400px">
+<h3 data-id="770" style="font-size:16px;margin-bottom:14px">⭐ Add Favorite</h3>
+<label data-id="771" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Label</label>
+<input data-id="772" type="text" id="fav-label" placeholder="e.g., Google Forms" style="margin-bottom:10px">
+<label data-id="773" style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">URL</label>
+<input data-id="774" type="url" id="fav-url" placeholder="https://…" style="margin-bottom:14px">
+<div data-id="775" style="display:flex;gap:8px;justify-content:flex-end">
+<button data-id="776" class="btn btn-outlined btn-sm" id="fav-cancel-btn">Cancel</button>
+<button data-id="777" class="btn btn-filled btn-sm" id="fav-save-btn">Save</button>
+</div>
+</div>
+</div>
+
+<!-- DISTRICT INFO MODAL -->
+<div data-id="778" class="overlay" id="district-overlay">
+<div data-id="779" class="modal">
+<div data-id="780" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+<h3 data-id="781" id="district-modal-title" style="font-size:18px"></h3>
+<button data-id="782" id="district-modal-close" style="background:none;border:none;cursor:pointer;padding:8px"><i data-id="783" data-lucide="x" class="w-5 h-5"></i></button>
+</div>
+<div data-id="784" id="district-modal-body" style="font-size:13px;line-height:1.7;color:var(--text)"></div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer data-id="785" class="footer-bar">
+<div data-id="786" style="display:flex;align-items:center;gap:8px">
+<span data-id="787">PRISM Platform — Phase 2 Build</span>
+<span data-id="788" class="version-badge">v2.0.0-phase2</span>
+</div>
+<div data-id="789" style="display:flex;align-items:center;gap:12px">
+<span data-id="790" id="autosave-indicator" style="font-size:10px">💾 Ready</span>
+<span data-id="791">© 2026 Samantha Kessler · Cherry Creek School District</span>
+</div>
+</footer>
+
+<script>
+// ============================================================
+// PRISM Phase 2 — Full JavaScript
+// ============================================================
+
+// ---- Guard Lucide ----
+if(typeof lucide!=="undefined"&&typeof lucide.createIcons==="function"){lucide.createIcons();}
+
+// ---- DATA ----
+const STUDENTS=[
+{id:'aiden',name:'Aiden M.',grade:'Gr3',teacher:'Ms. Thompson',discipline:['SLP','Behavior'],provider:'Samantha',tier:3,iepDue:'2026-11-15',status:'On Track',color:'#AEE4FF',interests:'Dinosaurs, Minecraft, the color blue',triggers:'Loud noises, unexpected transitions',calming:'Deep breathing, fidget cube, quiet corner',goals:['Produce /r/ in sentences 80%','Follow 2-step directions 75%'],accommodations:['Preferential seating','Visual schedule','Noise-canceling headphones']},
+{id:'bella',name:'Bella R.',grade:'Gr4',teacher:'Mr. Davis',discipline:['Academic'],provider:'Samantha',tier:2,iepDue:'2026-09-30',status:'On Track',color:'#B8F2C8',interests:'Harry Potter, drawing, cats',triggers:'Written tasks, timed tests',calming:'Drawing break, reading corner',goals:['Read grade-level text 90 wpm','Written expression 3+ sentences'],accommodations:['Extended time','Graphic organizers','Text-to-speech']},
+{id:'carlos',name:'Carlos T.',grade:'Gr2',teacher:'Ms. Rivera',discipline:['SLP'],provider:'Samantha',tier:2,iepDue:'2026-10-20',status:'Upcoming',color:'#AEE4FF',interests:'Soccer, superheroes, the color red',triggers:'Peer conflict',calming:'Movement break, counting',goals:['Produce /s/ blends 80%','Use complete sentences in conversation'],accommodations:['Visual cues','Sentence starters']},
+{id:'diana',name:'Diana S.',grade:'Gr5',teacher:'Ms. Chen',discipline:['OT'],provider:'Samantha',tier:1,iepDue:'2027-01-15',status:'On Track',color:'#D7C7FF',interests:'Art, horses, Taylor Swift',triggers:'Fine motor tasks, handwriting',calming:'Hand stretches, art activities',goals:['Legible handwriting 80%','Independent self-care skills'],accommodations:['Slant board','Pencil grip','Modified worksheets']},
+{id:'maya',name:'Maya P.',grade:'Gr1',teacher:'Ms. Johnson',discipline:['Behavior','SLP'],provider:'Samantha',tier:3,iepDue:'2026-08-25',status:'Overdue',color:'#FF9A8B',interests:'Princesses, glitter, the color pink',triggers:'Transitions, denied requests',calming:'Token board, first-then board, calm corner',goals:['Stay in assigned area 80% of session','Use 3-word requests independently'],accommodations:['Visual schedule','Token economy','1:1 para support']},
+{id:'jordan',name:'Jordan K.',grade:'Gr3',teacher:'Mr. Park',discipline:['Academic'],provider:'Samantha',tier:2,iepDue:'2026-12-10',status:'On Track',color:'#B8F2C8',interests:'Legos, video games, science',triggers:'Reading aloud, new social situations',calming:'Lego break, quiet workspace',goals:['Decode CVC words 90%','Math facts to 20 fluently'],accommodations:['Audio books','Manipulatives','Small group testing']},
+{id:'sofia',name:'Sofia G.',grade:'Gr4',teacher:'Ms. Anderson',discipline:['SLP'],provider:'Samantha',tier:1,iepDue:'2027-02-28',status:'On Track',color:'#AEE4FF',interests:'Dancing, unicorns, the color purple',triggers:'Large group activities',calming:'Drawing, listening to music',goals:['Produce /l/ in conversation 85%','Narrative retell with 5 elements'],accommodations:['Small group instruction','Visual supports']}
+];
+
+const TODAY_SESSIONS=[
+{time:'8:30 AM',name:'1st Grade Language Group',students:['aiden','maya','carlos'],goals:['Follow directions','3-word requests','Complete sentences']},
+{time:'10:00 AM',name:'Articulation Pull-out',students:['jordan','sofia'],goals:['CVC decoding','/l/ in conversation']},
+{time:'1:30 PM',name:'Social Skills',students:['bella','diana'],goals:['Peer interaction','Turn taking']}
+];
+
+const EVAL_STUDENTS=[
+{name:'Emma Thompson',type:'Initial',category:'SLD',stage:3,evaluator:'Dr. Martinez',referral:'2026-05-15',consent:'2026-06-27',dayUsed:23,daysTotal:60,status:'In Progress'},
+{name:'Marcus Lee',type:'Reevaluation',category:'AUT',stage:2,evaluator:'Dr. Patel',referral:'2026-06-20',consent:'2026-07-12',dayUsed:8,daysTotal:60,status:'In Progress'},
+{name:'Lily Santos',type:'Initial',category:'EBD',stage:4,evaluator:'Ms. Kessler',referral:'2026-04-10',consent:'2026-05-30',dayUsed:51,daysTotal:60,status:'⚠️ Urgent'},
+{name:'Jordan Kim',type:'Annual Review',category:'SLD',stage:1,evaluator:'Ms. Kessler',referral:'2026-07-10',consent:'2026-07-17',dayUsed:3,daysTotal:60,status:'In Progress'},
+{name:'Sofia Garcia',type:'Initial',category:'DLD',stage:2,evaluator:'Ms. Kessler',referral:'2026-06-01',consent:'2026-07-05',dayUsed:15,daysTotal:60,status:'In Progress'}
+];
+
+const EVAL_STAGES=['Referral Received','Consent Obtained','Assessment Underway','Report Writing','IEP Meeting Scheduled'];
+
+const TODOS=[
+{text:'Send NOM – Aiden M.',done:false},{text:'Complete progress note – Maya P.',done:false},
+{text:'Schedule re-eval consent – Emma T.',done:false},{text:'Upload assessment – Lily S.',done:false},
+{text:'Call parent – Carlos T.',done:false}
+];
+
+const FORMS=[
+{name:'Teacher Input for Meetings',cat:'Teacher',status:'Not Opened',desc:'Collect teacher observations and data before IEP meetings'},
+{name:'Parent Information Questionnaire',cat:'Parent',status:'Not Opened',desc:'Gather family history, concerns, and priorities'},
+{name:'Health Update Form',cat:'Health',status:'In Progress',desc:'Update student health information and medication records'},
+{name:'BIP Generation Form',cat:'BIP',status:'Not Opened',desc:'Behavior intervention plan data collection'},
+{name:'FBA Data Tracking Form',cat:'BIP',status:'Finished',desc:'Functional behavior assessment tracking sheet'},
+{name:'Consent for Evaluation',cat:'District',status:'In Progress',desc:'Parental consent for initial or re-evaluation'},
+{name:'Notice of Meeting (NOM)',cat:'District',status:'Not Opened',desc:'Official notice sent 10 days prior to IEP meeting'},
+{name:'Annual Review Checklist',cat:'District',status:'Not Opened',desc:'Comprehensive annual review preparation checklist'}
+];
+
+const ICON_CATEGORIES=['Communication','Activities','Emotions','School','Home','Food','Transport','Animals'];
+const ICON_DATA={
+'Communication':['🗣️ Speaking','👂 Listening','✅ Yes','❌ No','🙋 Help','🛑 Stop','🟢 Go','⏳ Wait','➕ More','✔️ Done','🙏 Please','💛 Thank You'],
+'Activities':['📖 Reading','✏️ Writing','🔢 Math','🎨 Art','🎵 Music','⚽ PE','🍽️ Lunch','🎠 Recess','💻 Computer','🗣️ Speech','🤲 OT','🎲 Game'],
+'Emotions':['😊 Happy','😢 Sad','😠 Angry','😨 Scared','😌 Calm','🤩 Excited','😕 Confused','😴 Tired','🤒 Sick','😍 Love','😤 Frustrated','🥺 Worried'],
+'School':['📚 Books','🎒 Backpack','📏 Ruler','✂️ Scissors','📐 Protractor','🖍️ Crayon','📓 Notebook','🏫 School','👩‍🏫 Teacher','👫 Friends','📝 Test','🔔 Bell'],
+'Home':['🏠 Home','🛏️ Bed','🚿 Shower','🪥 Brush','👕 Clothes','🧹 Clean','📺 TV','🧸 Toys','🐕 Pet','🍳 Cook','🚗 Car','💡 Light'],
+'Food':['🍎 Apple','🍌 Banana','🥪 Sandwich','🥛 Milk','💧 Water','🍪 Cookie','🍕 Pizza','🥗 Salad','🍇 Grapes','🧃 Juice','🥜 Snack','🍦 Treat'],
+'Transport':['🚌 Bus','🚗 Car','🚶 Walk','🚲 Bike','✈️ Plane','🚂 Train','🛴 Scooter','🚑 Ambulance'],
+'Animals':['🐕 Dog','🐈 Cat','🐟 Fish','🐰 Rabbit','🐴 Horse','🦋 Butterfly','🐢 Turtle','🦜 Bird']
+};
+
+const TOOLKIT_ITEMS=[
+{name:'Progress Monitoring Sheets',cat:'📝',desc:'Track student progress across intervention cycles'},
+{name:'Meeting Templates',cat:'📋',desc:'Structured agendas for IEP, MTSS, and team meetings'},
+{name:'Parent Communication Letters',cat:'✉️',desc:'Templates for progress updates, invitations, and notices'},
+{name:'SLP-Specific RTI Guide',cat:'🗣️',desc:'Speech-language RTI intervention strategies and forms'},
+{name:'Behavior RTI Templates',cat:'🧠',desc:'FBA, BIP, and behavior tracking intervention forms'},
+{name:'Academic RTI Templates',cat:'📊',desc:'Reading, writing, and math intervention tracking'}
+];
+
+const MTSS_TIERS={
+3:[{student:'Aiden M.',intervention:'Intensive Articulation + Behavior',start:'2026-06-15',progress:85,lastData:'78% accuracy',lastReview:'2026-07-14'},
+   {student:'Maya P.',intervention:'Intensive Language + Behavior',start:'2026-06-22',progress:60,lastData:'3/5 trials',lastReview:'2026-07-10'}],
+2:[{student:'Bella R.',intervention:'Strategic Reading',start:'2026-06-01',progress:70,lastData:'88 wpm',lastReview:'2026-07-12'},
+   {student:'Carlos T.',intervention:'Strategic Articulation',start:'2026-06-08',progress:55,lastData:'72% in convo',lastReview:'2026-07-14'},
+   {student:'Jordan K.',intervention:'Strategic Decoding',start:'2026-06-01',progress:65,lastData:'85% CVC',lastReview:'2026-07-11'}],
+1:[{student:'Diana S.',intervention:'Core + OT Consult',start:'2026-05-15',progress:90,lastData:'80% legible',lastReview:'2026-07-08'},
+   {student:'Sofia G.',intervention:'Core + SLP Consult',start:'2026-05-20',progress:88,lastData:'82% /l/',lastReview:'2026-07-09'}]
+};
+
+// ---- THEMES ----
+const THEMES={
+main:['Calm & Clinical','Soft Pastel Pro','Dark Mode Elite'],
+subs:[
+[{name:'Classic Blue',bg:'#F0F9FF',card:'#FFFFFF',header:'#1E3A5F',headerTxt:'#FFFFFF',primary:'#2563EB',accent:'#3B82F6',text:'#1E293B',subtext:'#64748B',navActive:'#2563EB',navActiveTxt:'#fff',navInactive:'#E2E8F0',navInactiveTxt:'#64748B',border:'#E2E8F0'},
+{name:'Slate & Silver',bg:'#F8FAFC',card:'#FFFFFF',header:'#334155',headerTxt:'#F1F5F9',primary:'#475569',accent:'#64748B',text:'#1E293B',subtext:'#94A3B8',navActive:'#475569',navActiveTxt:'#fff',navInactive:'#E2E8F0',navInactiveTxt:'#64748B',border:'#CBD5E1'},
+{name:'Teal Clinic',bg:'#F0FDFA',card:'#FFFFFF',header:'#134E4A',headerTxt:'#F0FDFA',primary:'#0D9488',accent:'#14B8A6',text:'#134E4A',subtext:'#5EEAD4',navActive:'#0D9488',navActiveTxt:'#fff',navInactive:'#CCFBF1',navInactiveTxt:'#5EEAD4',border:'#99F6E4'},
+{name:'Sage & Stone',bg:'#F5F5F4',card:'#FFFFFF',header:'#44403C',headerTxt:'#FAFAF9',primary:'#78716C',accent:'#A8A29E',text:'#292524',subtext:'#A8A29E',navActive:'#78716C',navActiveTxt:'#fff',navInactive:'#E7E5E4',navInactiveTxt:'#A8A29E',border:'#D6D3D1'},
+{name:'Dusty Rose',bg:'#FFF1F2',card:'#FFFFFF',header:'#881337',headerTxt:'#FFF1F2',primary:'#E11D48',accent:'#FB7185',text:'#4C0519',subtext:'#FDA4AF',navActive:'#E11D48',navActiveTxt:'#fff',navInactive:'#FFE4E6',navInactiveTxt:'#FDA4AF',border:'#FECDD3'}],
+[{name:'Lavender Dream',bg:'#FAF5FF',card:'#FFFFFF',header:'#581C87',headerTxt:'#FAF5FF',primary:'#9333EA',accent:'#A855F7',text:'#3B0764',subtext:'#C084FC',navActive:'#9333EA',navActiveTxt:'#fff',navInactive:'#F3E8FF',navInactiveTxt:'#C084FC',border:'#E9D5FF'},
+{name:'Peach Blossom',bg:'#FFF7ED',card:'#FFFFFF',header:'#9A3412',headerTxt:'#FFF7ED',primary:'#EA580C',accent:'#FB923C',text:'#431407',subtext:'#FDBA74',navActive:'#EA580C',navActiveTxt:'#fff',navInactive:'#FFEDD5',navInactiveTxt:'#FDBA74',border:'#FED7AA'},
+{name:'Mint Breeze',bg:'#ECFDF5',card:'#FFFFFF',header:'#064E3B',headerTxt:'#ECFDF5',primary:'#059669',accent:'#34D399',text:'#022C22',subtext:'#6EE7B7',navActive:'#059669',navActiveTxt:'#fff',navInactive:'#D1FAE5',navInactiveTxt:'#6EE7B7',border:'#A7F3D0'},
+{name:'Rose Garden',bg:'#FDF2F8',card:'#FFFFFF',header:'#831843',headerTxt:'#FDF2F8',primary:'#DB2777',accent:'#F472B6',text:'#500724',subtext:'#F9A8D4',navActive:'#DB2777',navActiveTxt:'#fff',navInactive:'#FCE7F3',navInactiveTxt:'#F9A8D4',border:'#FBCFE8'},
+{name:'Sky & Cloud',bg:'#F0F9FF',card:'#FFFFFF',header:'#075985',headerTxt:'#F0F9FF',primary:'#0284C7',accent:'#38BDF8',text:'#0C4A6E',subtext:'#7DD3FC',navActive:'#0284C7',navActiveTxt:'#fff',navInactive:'#E0F2FE',navInactiveTxt:'#7DD3FC',border:'#BAE6FD'}],
+[{name:'Indigo Glow',bg:'#1E1B4B',card:'#312E81',header:'#0F0D3E',headerTxt:'#C7D2FE',primary:'#818CF8',accent:'#6366F1',text:'#E0E7FF',subtext:'#A5B4FC',navActive:'#6366F1',navActiveTxt:'#fff',navInactive:'#3730A3',navInactiveTxt:'#A5B4FC',border:'#4338CA'},
+{name:'Emerald Night',bg:'#022C22',card:'#064E3B',header:'#012117',headerTxt:'#A7F3D0',primary:'#34D399',accent:'#10B981',text:'#D1FAE5',subtext:'#6EE7B7',navActive:'#10B981',navActiveTxt:'#fff',navInactive:'#065F46',navInactiveTxt:'#6EE7B7',border:'#047857'},
+{name:'Amber Dark',bg:'#1C1917',card:'#292524',header:'#0C0A09',headerTxt:'#FDE68A',primary:'#F59E0B',accent:'#FBBF24',text:'#FEFCE8',subtext:'#FCD34D',navActive:'#F59E0B',navActiveTxt:'#1C1917',navInactive:'#44403C',navInactiveTxt:'#FCD34D',border:'#57534E'},
+{name:'Rose Noir',bg:'#1A0A14',card:'#2D1125',header:'#0F0510',headerTxt:'#FBCFE8',primary:'#EC4899',accent:'#F472B6',text:'#FDF2F8',subtext:'#F9A8D4',navActive:'#EC4899',navActiveTxt:'#fff',navInactive:'#500724',navInactiveTxt:'#F9A8D4',border:'#831843'},
+{name:'Cyan Storm',bg:'#0B1A2B',card:'#132F4C',header:'#05101E',headerTxt:'#A5F3FC',primary:'#06B6D4',accent:'#22D3EE',text:'#ECFEFF',subtext:'#67E8F9',navActive:'#06B6D4',navActiveTxt:'#fff',navInactive:'#164E63',navInactiveTxt:'#67E8F9',border:'#155E75'}]
+]
+};
+
+let currentMain=parseInt(localStorage.getItem('prism-main'))||0;
+let currentSub=parseInt(localStorage.getItem('prism-sub'))||0;
+let activeTab=localStorage.getItem('prism-p2-active-tab')||'dashboard';
+let meetingTimerInterval=null;
+let meetingStartTime=null;
+let meetingAgenda={SLP:[],OT:[],MentalHealth:[],Behavior:[],Admin:[]};
+let todoState=JSON.parse(localStorage.getItem('prism-p2-todos'))||null;
+if(!todoState)todoState=TODOS.map(t=>({...t}));
+let commBoardLabels={};
+let recentSearches=JSON.parse(localStorage.getItem('prism-p2-recent-searches'))||[];
+
+// ---- UTILITY ----
+function $(s){return document.querySelector(s)}
+function $$(s){return document.querySelectorAll(s)}
+function autoSave(key,val){
+localStorage.setItem('prism-p2-'+key,typeof val==='string'?val:JSON.stringify(val));
+const ind=$('#autosave-indicator');
+if(ind){const now=new Date();ind.textContent='💾 Saved '+now.toLocaleTimeString();ind.classList.remove('autosave-pulse');void ind.offsetWidth;ind.classList.add('autosave-pulse');}
+}
+let saveDebounce={};
+function debounceSave(key,val,ms=800){clearTimeout(saveDebounce[key]);saveDebounce[key]=setTimeout(()=>autoSave(key,val),ms);}
+function showToast(msg){
+const t=document.createElement('div');
+t.style.cssText='position:fixed;bottom:50px;left:50%;transform:translateX(-50%);background:#1E293B;color:#fff;padding:10px 24px;border-radius:10px;font-size:13px;z-index:9999;animation:fadeIn .3s';
+t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2500);
+}
+function reinitIcons(){if(typeof lucide!=="undefined"&&typeof lucide.createIcons==="function")lucide.createIcons();}
+
+// ---- CLOCK ----
+function updateClock(){
+const now=new Date();
+const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const el=$('#live-clock-d1');
+if(el)el.textContent=days[now.getDay()]+', '+months[now.getMonth()]+' '+now.getDate()+', '+now.getFullYear()+' — '+now.toLocaleTimeString();
+}
+setInterval(updateClock,1000);updateClock();
+
+// ---- TAB SWITCHING ----
+function switchTab(tab){
+activeTab=tab;
+$$('.tab-section').forEach(s=>s.classList.remove('active'));
+$$('.tab-pill').forEach(p=>p.classList.remove('active'));
+const sec=$('#sec-'+tab);if(sec)sec.classList.add('active');
+$$('.tab-pill').forEach(p=>{if(p.dataset.tab===tab)p.classList.add('active');});
+autoSave('active-tab',tab);
+reinitIcons();
+}
+$$('.tab-pill').forEach(p=>p.addEventListener('click',()=>switchTab(p.dataset.tab)));
+
+// ---- WEEK CALENDAR ----
+function renderWeekCalendar(){
+const grid=$('#week-grid-d1');if(!grid)return;
+const dayNames=['Mon','Tue','Wed','Thu','Fri'];
+const events={Mon:['📋 IEP Meeting — Maya P.'],Tue:['🗣️ SLP Sessions (6)'],Wed:['📊 MTSS Review','📧 Parent calls'],Thu:['🗣️ SLP Sessions (5)','🧪 Eval — Lily S.'],Fri:['📝 Progress notes due','🎉 Team meeting']};
+grid.innerHTML=dayNames.map((d,i)=>{
+const date=new Date(2026,6,20+i);// July 20 is Monday
+return `<div style="border-radius:10px;background:${i===0?'var(--accent)':'var(--bg)'};padding:12px;min-height:100px;cursor:pointer;border:1px solid var(--border)">
+<div style="font-weight:700;font-size:13px;${i===0?'color:#fff':'color:var(--text)'}">${d} ${date.getDate()}</div>
+<div style="margin-top:6px;font-size:11px;display:flex;flex-direction:column;gap:3px;${i===0?'color:rgba(255,255,255,.9)':'color:var(--subtext)'}">
+${(events[d]||[]).map(e=>`<div style="background:${i===0?'rgba(255,255,255,.15)':'rgba(37,99,235,.08)'};padding:3px 6px;border-radius:4px">${e}</div>`).join('')}
+</div></div>`;
+}).join('');
+}
+
+function renderMonthCalendar(){
+const grid=$('#month-grid-d1');if(!grid)return;
+const headers=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const eventDays={1:1,5:1,8:2,12:1,15:2,18:1,20:3,22:1,24:2,28:1};
+let html=headers.map(h=>`<div style="font-weight:700;color:var(--subtext);padding:4px">${h}</div>`).join('');
+const firstDay=new Date(2026,6,1).getDay();
+for(let i=0;i<firstDay;i++)html+=`<div style="padding:4px"></div>`;
+for(let d=1;d<=31;d++){
+const dots=eventDays[d]||0;
+const isToday=d===20;
+html+=`<div style="padding:6px;border-radius:6px;${isToday?'background:var(--accent);color:#fff;font-weight:700':''}cursor:pointer;font-size:12px">
+${d}${dots?`<div style="display:flex;justify-content:center;gap:2px;margin-top:2px">${Array(Math.min(dots,3)).fill(0).map(()=>`<div style="width:4px;height:4px;border-radius:50%;background:${isToday?'#fff':'var(--accent)'}"></div>`).join('')}</div>`:''}
+</div>`;
+}
+grid.innerHTML=html;
+}
+
+// Cal toggle
+$$('.cal-toggle').forEach(btn=>btn.addEventListener('click',function(){
+$$('.cal-toggle').forEach(b=>{b.style.background='transparent';b.style.color='var(--subtext)';b.classList.remove('active');});
+this.style.background='var(--accent)';this.style.color='#fff';this.classList.add('active');
+$('#cal-week-view').style.display=this.dataset.view==='week'?'block':'none';
+$('#cal-month-view').style.display=this.dataset.view==='month'?'block':'none';
+}));
+
+// ---- TODOS ----
+function renderTodos(){
+const el=$('#todo-list-d1');if(!el)return;
+el.innerHTML=todoState.map((t,i)=>`<label style="display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;cursor:pointer;transition:all .15s;${t.done?'opacity:.4;text-decoration:line-through':''}" class="todo-item">
+<input type="checkbox" ${t.done?'checked':''} data-todoi="${i}" style="width:18px;height:18px;accent-color:var(--accent)">
+<span style="font-size:13px">${t.text}</span>
+</label>`).join('');
+el.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.addEventListener('change',function(){
+todoState[parseInt(this.dataset.todoi)].done=this.checked;
+autoSave('todos',todoState);renderTodos();
+}));
+}
+
+// ---- SESSION GROUPS ----
+function renderSessionGroups(){
+const el=$('#session-groups-d1');if(!el)return;
+el.innerHTML=TODAY_SESSIONS.map((s,i)=>`<div class="card" style="padding:12px;margin-bottom:8px;cursor:pointer" data-sgi="${i}">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div><span style="font-weight:700;font-size:14px">${s.time}</span> — <span style="font-weight:600">${s.name}</span> <span class="badge badge-blue">${s.students.length} students</span></div>
+<i data-lucide="chevron-down" class="w-4 h-4"></i>
+</div>
+<div class="expand-content" id="sg-expand-${i}">
+<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">
+${s.students.map(sid=>{const st=STUDENTS.find(x=>x.id===sid);return st?`<div style="background:${st.color};padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600">${st.name} <span style="font-size:10px;color:var(--subtext)">${st.grade}</span></div>`:''}).join('')}
+</div>
+<div style="margin-top:8px;font-size:12px;color:var(--subtext)"><strong>Goals:</strong> ${s.goals.join(' · ')}</div>
+</div></div>`).join('');
+el.querySelectorAll('[data-sgi]').forEach(card=>card.addEventListener('click',function(){
+const expand=$('#sg-expand-'+this.dataset.sgi);
+if(expand)expand.classList.toggle('expanded');
+}));
+reinitIcons();
+}
+
+// ---- TEAM CASELOAD TABLE ----
+function renderTeamCaseload(fGrade='',fDisc=''){
+const tbody=$('#tc-tbody');if(!tbody)return;
+let data=STUDENTS;
+if(fGrade)data=data.filter(s=>s.grade===fGrade);
+if(fDisc)data=data.filter(s=>s.discipline.includes(fDisc));
+tbody.innerHTML=data.map(s=>`<tr>
+<td style="font-weight:600">${s.name}</td>
+<td>${s.grade}</td><td>${s.provider}</td>
+<td>${s.discipline.map(d=>`<span class="badge badge-blue" style="margin-right:2px">${d}</span>`).join('')}</td>
+<td>${s.iepDue}</td>
+<td><span class="badge ${s.status==='On Track'?'badge-green':s.status==='Upcoming'?'badge-amber':'badge-red'}">${s.status}</span></td>
+</tr>`).join('');
+}
+
+$('#team-caseload-toggle').addEventListener('click',function(){
+$('#team-caseload-content').classList.toggle('expanded');
+});
+$('#tc-filter-grade').addEventListener('change',()=>renderTeamCaseload($('#tc-filter-grade').value,$('#tc-filter-disc').value));
+$('#tc-filter-disc').addEventListener('change',()=>renderTeamCaseload($('#tc-filter-grade').value,$('#tc-filter-disc').value));
+
+// ---- SUB PACKET ----
+$('#sub-packet-btn').addEventListener('click',()=>showToast('📄 Sub packet ready for download'));
+
+// ---- ADD FAVORITE ----
+$('#add-fav-tile').addEventListener('click',()=>{$('#fav-overlay').classList.add('show');});
+$('#fav-cancel-btn').addEventListener('click',()=>{$('#fav-overlay').classList.remove('show');});
+$('#fav-save-btn').addEventListener('click',()=>{
+const label=$('#fav-label').value;const url=$('#fav-url').value;
+if(label){
+const row=$('#quick-links-row');
+const tile=document.createElement('div');
+tile.className='quick-tile';tile.style.cssText='min-width:110px;padding:14px;border-radius:12px;background:linear-gradient(135deg,#E0E7FF,#EEF2FF);text-align:center;cursor:pointer';
+tile.innerHTML=`<div style="font-size:24px;margin-bottom:4px">🔗</div><div style="font-size:11px;font-weight:600">${label}</div>`;
+row.insertBefore(tile,document.getElementById('add-fav-tile'));
+autoSave('favorites',JSON.stringify({label,url}));
+$('#fav-overlay').classList.remove('show');showToast('⭐ Favorite added!');
+}
+});
+
+// ==================== TAB 2: STUDENT TILES ====================
+function renderStudentGrid(filter='all',search=''){
+const grid=$('#student-grid');if(!grid)return;
+let data=STUDENTS;
+if(filter!=='all')data=data.filter(s=>s.discipline.includes(filter));
+if(search)data=data.filter(s=>s.name.toLowerCase().includes(search.toLowerCase()));
+const discColor={SLP:'#AEE4FF',OT:'#D7C7FF',Behavior:'#FF9A8B',Academic:'#B8F2C8'};
+grid.innerHTML=data.map(s=>`<div class="card" style="padding:16px">
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+<div class="avatar-circle" style="background:${discColor[s.discipline[0]]||'#C5D0E6'}">${s.name.split(' ').map(w=>w[0]).join('')}</div>
+<div><div style="font-weight:700;font-size:15px">${s.name}</div>
+<div style="font-size:12px;color:var(--subtext)">${s.grade} · ${s.teacher}</div></div>
+</div>
+<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">${s.discipline.map(d=>`<span class="badge badge-blue">${d}: Samantha</span>`).join('')}</div>
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div><span style="font-size:12px;color:var(--subtext)">IEP: </span><span class="badge ${s.status==='On Track'?'badge-green':s.status==='Upcoming'?'badge-amber':'badge-red'}">${s.iepDue} · ${s.status}</span></div>
+<button class="btn btn-filled btn-sm open-tile-btn" data-sid="${s.id}"><i data-lucide="folder-open" class="w-4 h-4"></i> Open</button>
+</div></div>`).join('');
+grid.querySelectorAll('.open-tile-btn').forEach(b=>b.addEventListener('click',()=>openStudentPanel(b.dataset.sid)));
+reinitIcons();
+}
+
+$$('#stu-filters .filter-pill').forEach(p=>p.addEventListener('click',function(){
+$$('#stu-filters .filter-pill').forEach(x=>x.classList.remove('active'));this.classList.add('active');
+renderStudentGrid(this.dataset.sf,$('#stu-search').value);
+}));
+$('#stu-search').addEventListener('input',function(){
+const active=document.querySelector('#stu-filters .filter-pill.active');
+renderStudentGrid(active?active.dataset.sf:'all',this.value);
+});
+$('#add-student-btn').addEventListener('click',()=>showToast('➕ New student form would open here'));
+
+function openStudentPanel(sid){
+const s=STUDENTS.find(x=>x.id===sid);if(!s)return;
+$('#sp-name').textContent=s.name;
+$('#student-panel').classList.add('open');
+renderStudentSubTab(s,'profile');
+$$('#sp-sub-tabs .sub-tab').forEach(t=>{t.classList.remove('active');if(t.dataset.spt==='profile')t.classList.add('active');});
+$$('#sp-sub-tabs .sub-tab').forEach(t=>t.addEventListener('click',function(){
+$$('#sp-sub-tabs .sub-tab').forEach(x=>x.classList.remove('active'));this.classList.add('active');
+renderStudentSubTab(s,this.dataset.spt);
+}));
+}
+
+function renderStudentSubTab(s,tab){
+const c=$('#sp-content');if(!c)return;
+const saved=JSON.parse(localStorage.getItem('prism-p2-student-'+s.id))||{};
+if(tab==='profile'){
+c.innerHTML=`<div class="card" style="margin-bottom:10px"><h4 style="font-size:13px;margin-bottom:8px">💪 Strengths & Interests</h4>
+<textarea id="sp-interests" rows="2" style="font-size:12px">${saved.interests||s.interests}</textarea></div>
+<div class="card" style="margin-bottom:10px"><h4 style="font-size:13px;margin-bottom:8px">⚡ Triggers</h4>
+<textarea id="sp-triggers" rows="2" style="font-size:12px">${saved.triggers||s.triggers}</textarea></div>
+<div class="card" style="margin-bottom:10px"><h4 style="font-size:13px;margin-bottom:8px">🧘 Calming Strategies</h4>
+<textarea id="sp-calming" rows="2" style="font-size:12px">${saved.calming||s.calming}</textarea></div>
+<div class="card" style="margin-bottom:10px"><h4 style="font-size:13px;margin-bottom:8px">🎯 Goals</h4>
+${s.goals.map((g,i)=>`<div style="padding:6px 0;font-size:12px;border-bottom:1px solid var(--border)">${i+1}. ${g}</div>`).join('')}</div>
+<div class="card"><h4 style="font-size:13px;margin-bottom:8px">🛡️ Accommodations</h4>
+${s.accommodations.map(a=>`<span class="badge badge-lav" style="margin:2px">${a}</span>`).join('')}</div>`;
+['sp-interests','sp-triggers','sp-calming'].forEach(id=>{
+const el=document.getElementById(id);if(el)el.addEventListener('input',function(){
+const key=id.replace('sp-','');saved[key]=this.value;
+debounceSave('student-'+s.id,saved);
+});
+});
+}else if(tab==='history'){
+c.innerHTML=`<div class="card" style="margin-bottom:10px"><h4 style="font-size:13px;margin-bottom:8px">📞 Parent Contact Log</h4>
+<div class="overflow-x-auto"><table class="data-table"><thead><tr><th>Date</th><th>Type</th><th>Notes</th><th>By</th></tr></thead><tbody>
+<tr><td>07/15/2026</td><td>Phone</td><td>Discussed progress on /r/ goals</td><td>SK</td></tr>
+<tr><td>06/28/2026</td><td>Email</td><td>Sent home practice materials</td><td>SK</td></tr>
+</tbody></table></div></div>
+<div class="card" style="margin-bottom:10px"><h4 style="font-size:13px;margin-bottom:8px">📝 Service Log</h4>
+<div class="overflow-x-auto"><table class="data-table"><thead><tr><th>Date</th><th>Service</th><th>Minutes</th><th>Notes</th></tr></thead><tbody>
+<tr><td>07/18/2026</td><td>SLP</td><td>30</td><td>Worked on /r/ in sentences</td></tr>
+<tr><td>07/16/2026</td><td>SLP</td><td>30</td><td>Peer interaction activity</td></tr>
+</tbody></table></div></div>
+<div class="card"><h4 style="font-size:13px;margin-bottom:8px">✨ Prepare</h4>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="btn btn-filled btn-sm ai-draft-btn" data-dtype="Present Levels"><i data-lucide="sparkles" class="w-4 h-4"></i> Draft Present Levels</button>
+<button class="btn btn-filled btn-sm ai-draft-btn" data-dtype="Progress Report"><i data-lucide="sparkles" class="w-4 h-4"></i> Draft Progress Report</button>
+<button class="btn btn-filled btn-sm ai-draft-btn" data-dtype="Re-eval Prep"><i data-lucide="sparkles" class="w-4 h-4"></i> Draft Re-eval Prep</button>
+<button class="btn btn-filled btn-sm ai-draft-btn" data-dtype="Initial Eval"><i data-lucide="sparkles" class="w-4 h-4"></i> Draft Initial Eval</button>
+</div></div>`;
+c.querySelectorAll('.ai-draft-btn').forEach(b=>b.addEventListener('click',()=>showToast('✨ '+b.dataset.dtype+' draft generating…')));
+}else if(tab==='materials'){
+c.innerHTML=`<div class="card"><h4 style="font-size:13px;margin-bottom:8px">📁 Material History</h4>
+<div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap">
+<button class="filter-pill active" data-mf="all">All</button><button class="filter-pill" data-mf="worksheet">Worksheets</button><button class="filter-pill" data-mf="social">Social Stories</button><button class="filter-pill" data-mf="template">Templates</button>
+</div>
+<div style="font-size:12px">
+<div style="padding:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>📝 Articulation /r/ Worksheet</span><span class="badge badge-blue">07/12/2026</span></div>
+<div style="padding:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>📖 Social Story — Fire Drill</span><span class="badge badge-blue">06/28/2026</span></div>
+<div style="padding:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>🎨 Token Board — Stars</span><span class="badge badge-blue">06/15/2026</span></div>
+<div style="padding:8px;display:flex;justify-content:space-between"><span>📅 Visual Schedule — Daily</span><span class="badge badge-blue">06/01/2026</span></div>
+</div>
+<button class="btn btn-outlined btn-sm" style="margin-top:10px"><i data-lucide="download" class="w-4 h-4"></i> Export All</button></div>`;
+}else if(tab==='continuum'){
+const domains=[{name:'Expressive Language',level:2,zone:'Strategic'},{name:'Receptive Language',level:1,zone:'Benchmark'},{name:'Articulation',level:3,zone:'Intensive'},{name:'Social Communication',level:2,zone:'Strategic'},{name:'Behavior',level:s.discipline.includes('Behavior')?3:1,zone:s.discipline.includes('Behavior')?'Intensive':'Benchmark'}];
+const zoneColors={Enrichment:'#10B981',Benchmark:'#3B82F6',Strategic:'#F59E0B',Intensive:'#EF4444'};
+c.innerHTML=`<div class="card"><h4 style="font-size:13px;margin-bottom:12px">🌀 Continuum Profile — ${s.name}</h4>
+${domains.map(d=>`<div style="margin-bottom:10px">
+<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="font-weight:600">${d.name}</span><span class="badge" style="background:${zoneColors[d.zone]}20;color:${zoneColors[d.zone]}">${d.zone}</span></div>
+<div style="height:12px;background:var(--bg);border-radius:6px;overflow:hidden"><div style="height:100%;width:${d.level*25}%;background:${zoneColors[d.zone]};border-radius:6px;transition:width .5s"></div></div>
+</div>`).join('')}
+<button class="btn btn-outlined btn-sm" style="margin-top:8px"><i data-lucide="calendar" class="w-4 h-4"></i> View Last Year's Summary</button></div>`;
+}
+reinitIcons();
+}
+
+$('#sp-close').addEventListener('click',()=>$('#student-panel').classList.remove('open'));
+
+// ==================== TAB 3: MY CASELOAD ====================
+function renderCaseloadTable(fDisc='',fGrade=''){
+const tbody=$('#cl-tbody');if(!tbody)return;
+let data=STUDENTS;
+if(fDisc)data=data.filter(s=>s.discipline.includes(fDisc));
+if(fGrade)data=data.filter(s=>s.grade===fGrade);
+tbody.innerHTML=data.map(s=>`<tr>
+<td style="font-weight:600">${s.name}</td><td>${s.grade}</td>
+<td>${s.discipline.join(', ')}</td><td>${s.iepDue}</td>
+<td><span class="badge ${s.status==='On Track'?'badge-green':s.status==='Upcoming'?'badge-amber':'badge-red'}">${s.status}</span></td>
+<td><button class="btn btn-outlined btn-sm cl-session-btn" data-sid="${s.id}"><i data-lucide="clipboard" class="w-3 h-3"></i> Log</button></td>
+</tr>`).join('');
+tbody.querySelectorAll('.cl-session-btn').forEach(b=>b.addEventListener('click',()=>{
+$('#soap-date').value='2026-07-20';renderSOAPStudents();
+}));
+reinitIcons();
+}
+$('#cl-apply-btn').addEventListener('click',()=>renderCaseloadTable($('#cl-filter-disc').value,$('#cl-filter-grade').value));
+$('#cl-reset-btn').addEventListener('click',()=>{$('#cl-filter-disc').value='';$('#cl-filter-grade').value='';renderCaseloadTable();});
+
+// SOAP Notes
+function renderSOAPStudents(){
+const dateVal=$('#soap-date').value;
+const el=$('#soap-students-list');if(!el)return;
+// Show all students for the date (simplified — today shows all session students)
+const sessionStudentIds=[...new Set(TODAY_SESSIONS.flatMap(s=>s.students))];
+const students=STUDENTS.filter(s=>sessionStudentIds.includes(s.id));
+el.innerHTML=students.map(s=>{
+const soapKey='soap-'+s.id+'-'+dateVal;
+const saved=JSON.parse(localStorage.getItem('prism-p2-'+soapKey))||{seen:false,S:'',O:'',A:'',P:''};
+return `<div class="card" style="padding:14px;margin-bottom:8px">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="display:flex;align-items:center;gap:10px">
+<div class="avatar-circle" style="width:36px;height:36px;background:${s.color};font-size:12px">${s.name.split(' ').map(w=>w[0]).join('')}</div>
+<div><div style="font-weight:700;font-size:14px">${s.name}</div><div style="font-size:11px;color:var(--subtext)">${s.grade} · Goal: ${s.goals[0]||'—'}</div></div>
+</div>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:600">
+<input type="checkbox" class="soap-seen-cb" data-sid="${s.id}" data-date="${dateVal}" ${saved.seen?'checked':''} style="width:18px;height:18px;accent-color:var(--accent)"> ✅ Saw today
+</label>
+</div>
+<div class="soap-section expand-content ${saved.seen?'expanded':''}" id="soap-expand-${s.id}">
+<div style="margin-top:12px;display:grid;gap:8px">
+<div><label style="font-size:11px;font-weight:700;color:var(--accent)">S — Subjective</label><textarea class="soap-field" data-sid="${s.id}" data-date="${dateVal}" data-field="S" placeholder="Provider observations…">${saved.S}</textarea></div>
+<div><label style="font-size:11px;font-weight:700;color:var(--accent)">O — Objective</label><textarea class="soap-field" data-sid="${s.id}" data-date="${dateVal}" data-field="O" placeholder="Measurable data collected…">${saved.O}</textarea></div>
+<div><label style="font-size:11px;font-weight:700;color:var(--accent)">A — Assessment</label><textarea class="soap-field" data-sid="${s.id}" data-date="${dateVal}" data-field="A" placeholder="Clinical interpretation…">${saved.A}</textarea></div>
+<div><label style="font-size:11px;font-weight:700;color:var(--accent)">P — Plan</label><textarea class="soap-field" data-sid="${s.id}" data-date="${dateVal}" data-field="P" placeholder="Next session plan…">${saved.P}</textarea></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<button class="btn btn-outlined btn-sm soap-copy-btn" data-target="enrich">Copy to Enrich</button>
+<button class="btn btn-outlined btn-sm soap-copy-btn" data-target="medicaid">Copy for Medicaid</button>
+</div>
+</div>
+</div></div>`;
+}).join('');
+// Event listeners
+el.querySelectorAll('.soap-seen-cb').forEach(cb=>cb.addEventListener('change',function(){
+const key='soap-'+this.dataset.sid+'-'+this.dataset.date;
+const saved=JSON.parse(localStorage.getItem('prism-p2-'+key))||{seen:false,S:'',O:'',A:'',P:''};
+saved.seen=this.checked;autoSave(key,saved);
+const expand=$('#soap-expand-'+this.dataset.sid);
+if(expand){if(this.checked)expand.classList.add('expanded');else expand.classList.remove('expanded');}
+}));
+el.querySelectorAll('.soap-field').forEach(ta=>ta.addEventListener('input',function(){
+const key='soap-'+this.dataset.sid+'-'+this.dataset.date;
+const saved=JSON.parse(localStorage.getItem('prism-p2-'+key))||{seen:true,S:'',O:'',A:'',P:''};
+saved[this.dataset.field]=this.value;
+debounceSave(key,saved);
+}));
+el.querySelectorAll('.soap-copy-btn').forEach(b=>b.addEventListener('click',()=>showToast('📋 SOAP note copied for '+b.dataset.target)));
+reinitIcons();
+}
+$('#soap-date').addEventListener('change',renderSOAPStudents);
+
+// Populate soap history student dropdown
+function populateSoapHistoryDropdown(){
+const sel=$('#soap-history-student');if(!sel)return;
+sel.innerHTML='<option value="">All Students</option>'+STUDENTS.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+}
+
+// ==================== TAB 4: MTSS ====================
+// Sub-tab switching
+function switchMTSSTab(id){
+['overview','toolkit','calendar','district','eligibility'].forEach(t=>{
+$('#mt-'+t).style.display=t===id?'block':'none';
+});
+}
+$$('#mtss-sub-tabs .sub-tab').forEach(t=>t.addEventListener('click',function(){
+$$('#mtss-sub-tabs .sub-tab').forEach(x=>x.classList.remove('active'));this.classList.add('active');
+switchMTSSTab(this.dataset.mt);
+}));
+
+function renderMTSSTiers(){
+const el=$('#mtss-tier-cards');if(!el)return;
+const tierColors={3:'#FEE2E2',2:'#FEF3C7',1:'#D1FAE5'};
+const tierLabels={3:'Tier 3 — Intensive',2:'Tier 2 — Strategic',1:'Tier 1 — Core'};
+el.innerHTML=[3,2,1].map(tier=>`<div class="card" style="border-left:4px solid ${tier===3?'#EF4444':tier===2?'#F59E0B':'#10B981'}">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+<h4 style="font-size:14px">${tierLabels[tier]}</h4>
+<span class="badge" style="background:${tierColors[tier]}">${MTSS_TIERS[tier].length} students</span>
+</div>
+${MTSS_TIERS[tier].map(s=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;flex-wrap:wrap;gap:4px">
+<div><strong>${s.student}</strong> — ${s.intervention}</div>
+<div style="display:flex;align-items:center;gap:8px">
+<div style="width:80px;height:8px;background:var(--bg);border-radius:4px;overflow:hidden"><div style="width:${s.progress}%;height:100%;background:${tier===3?'#EF4444':tier===2?'#F59E0B':'#10B981'};border-radius:4px"></div></div>
+<span>${s.lastData}</span>
+</div></div>`).join('')}
+</div>`).join('');
+}
+
+function renderToolkit(){
+const grid=$('#toolkit-grid');if(!grid)return;
+grid.innerHTML=TOOLKIT_ITEMS.map(t=>`<div class="card">
+<div style="font-size:24px;margin-bottom:6px">${t.cat}</div>
+<h4 style="font-size:14px;margin-bottom:4px">${t.name}</h4>
+<p style="font-size:12px;color:var(--subtext);margin-bottom:10px">${t.desc}</p>
+<div style="display:flex;gap:6px"><button class="btn btn-filled btn-sm"><i data-lucide="download" class="w-3 h-3"></i> Download</button>
+<button class="btn btn-outlined btn-sm"><i data-lucide="sparkles" class="w-3 h-3"></i> Generate</button></div>
+</div>`).join('');
+reinitIcons();
+}
+
+function renderMTSSCalendar(){
+const grid=$('#mtss-cal-grid');if(!grid)return;
+const headers=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const events={6:'teal',13:'purple',14:'amber',20:'teal',24:'coral',27:'purple',28:'amber'};
+const eventLabels={6:'6-wk cycle start',13:'MTSS Meeting',14:'Progress check',20:'Cycle review',24:'Intervention end — Aiden',27:'MTSS Meeting',28:'Progress check'};
+let html=headers.map(h=>`<div style="font-weight:700;color:var(--subtext);padding:4px">${h}</div>`).join('');
+const firstDay=new Date(2026,6,1).getDay();
+for(let i=0;i<firstDay;i++)html+=`<div style="padding:4px"></div>`;
+for(let d=1;d<=31;d++){
+const ev=events[d];
+html+=`<div style="padding:6px;border-radius:6px;position:relative;font-size:12px;${ev?'font-weight:700':''}cursor:pointer" title="${eventLabels[d]||''}">${d}${ev?`<div style="width:6px;height:6px;border-radius:50%;background:${ev==='teal'?'#14B8A6':ev==='purple'?'#8B5CF6':ev==='amber'?'#F59E0B':'#F87171'};margin:2px auto 0"></div>`:''}</div>`;
+}
+grid.innerHTML=html;
+const alerts=$('#mtss-cal-alerts');
+if(alerts)alerts.innerHTML=`<div class="card" style="background:#FEF3C7;border-color:#FCD34D"><span style="font-size:13px">⚠️ Intervention ending soon: <strong>Aiden M.</strong> — Cycle ends July 24, 2026</span></div>`;
+}
+
+// District Assessment Team
+function renderDAT(){
+const tbody=$('#dat-tbody');if(!tbody)return;
+const datStudents=[
+{name:'Emma Thompson',type:'Cognitive + Academic',invited:true,meeting:false,report:'In Progress',timeline:'Day 23/60'},
+{name:'Lily Santos',type:'Social-Emotional',invited:true,meeting:true,report:'Draft Complete',timeline:'Day 51/60 ⚠️'},
+{name:'Marcus Lee',type:'Comprehensive Re-eval',invited:false,meeting:false,report:'Not Started',timeline:'Day 8/60'}
+];
+tbody.innerHTML=datStudents.map(s=>`<tr>
+<td style="font-weight:600">${s.name}</td><td>${s.type}</td>
+<td><input type="checkbox" ${s.invited?'checked':''} style="width:18px;height:18px;accent-color:var(--accent)"></td>
+<td><input type="checkbox" ${s.meeting?'checked':''} style="width:18px;height:18px;accent-color:var(--accent)"></td>
+<td><span class="badge ${s.report==='Draft Complete'?'badge-green':s.report==='In Progress'?'badge-amber':'badge-red'}">${s.report}</span></td>
+<td>${s.timeline}</td></tr>`).join('');
+}
+$('#add-dat-btn').addEventListener('click',()=>showToast('➕ New student assessment form would open'));
+
+// Eligibility
+function populateEligDropdown(){
+const sel=$('#elig-student');if(!sel)return;
+sel.innerHTML='<option value="">Select Student…</option>'+STUDENTS.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+}
+$('#gen-elig-btn').addEventListener('click',async function(){
+const sid=$('#elig-student').value;const s=STUDENTS.find(x=>x.id===sid);
+if(!s){showToast('Please select a student');return;}
+const out=$('#elig-output');
+out.innerHTML='<div style="text-align:center;padding:20px;color:var(--subtext)"><div class="animate-pulse">✨ Generating eligibility packet for '+s.name+'…</div></div>';
+try{
+const res=await AppSDK.ai.chat({messages:[
+{role:'system',content:'You are a special education compliance specialist. Generate a brief eligibility packet summary for an IEP team meeting. Include: MTSS data summary, service delivery notes, academic summary, behavior notes, and draft evaluation recommendations. Keep it concise (under 400 words). Format with clear section headers.'},
+{role:'user',content:`Generate an eligibility packet summary for student ${s.name}, ${s.grade}, disciplines: ${s.discipline.join(', ')}, tier: ${s.tier}, goals: ${s.goals.join('; ')}, accommodations: ${s.accommodations.join(', ')}`}
+]});
+out.innerHTML=`<div class="card"><div style="white-space:pre-wrap;font-size:13px;line-height:1.6">${res.content}</div>
+<div style="margin-top:12px;display:flex;gap:8px"><button class="btn btn-filled btn-sm" id="elig-print"><i data-lucide="printer" class="w-4 h-4"></i> Print</button></div></div>`;
+document.getElementById('elig-print').addEventListener('click',()=>showToast('🖨️ Sending to printer…'));
+reinitIcons();
+}catch(e){out.innerHTML='<div class="card" style="color:#EF4444">Error generating packet. Please try again.</div>';}
+});
+
+// ==================== TAB 5: EVAL TRACKER ====================
+let evalStageFilter=null;let evalTypeFilter='all';
+
+function renderEvalPipeline(){
+const el=$('#eval-pipeline');if(!el)return;
+const stageColors=['#DBEAFE','#BBF7D0','#FEF3C7','#FED7AA','#E9D5FF'];
+el.innerHTML=EVAL_STAGES.map((s,i)=>{
+const count=EVAL_STUDENTS.filter(e=>e.stage===i+1).length;
+return `<div class="pipeline-stage ${evalStageFilter===i+1?'active-stage':''}" style="background:${stageColors[i]}" data-stage="${i+1}">
+<div style="font-size:11px;font-weight:700">${s}</div><div style="font-size:18px;font-weight:800">${count}</div></div>`;
+}).join('');
+el.querySelectorAll('.pipeline-stage').forEach(ps=>ps.addEventListener('click',function(){
+const st=parseInt(this.dataset.stage);
+evalStageFilter=evalStageFilter===st?null:st;
+renderEvalPipeline();renderEvalTable();
+}));
+}
+
+function renderEvalTable(){
+const tbody=$('#eval-tbody');if(!tbody)return;
+let data=EVAL_STUDENTS;
+if(evalStageFilter)data=data.filter(e=>e.stage===evalStageFilter);
+if(evalTypeFilter!=='all')data=data.filter(e=>e.type===evalTypeFilter);
+tbody.innerHTML=data.map(e=>{
+const daysLeft=e.daysTotal-e.dayUsed;
+const cls=daysLeft>30?'badge-green':daysLeft>10?'badge-amber':'badge-red';
+const pulsing=daysLeft<10?'animation:blink-dot 1.5s infinite':'';
+return `<tr style="cursor:pointer" class="eval-row" data-ename="${e.name}">
+<td style="font-weight:600">${e.name}</td><td>${e.type} (${e.category})</td>
+<td>${EVAL_STAGES[e.stage-1]}</td><td>${e.evaluator}</td>
+<td style="font-size:12px">${e.referral}</td><td style="font-size:12px">${e.consent}</td>
+<td style="font-size:12px">${new Date(new Date(e.consent).getTime()+60*86400000).toISOString().split('T')[0]}</td>
+<td><span class="badge ${cls}" style="${pulsing}">${daysLeft}d</span></td>
+<td><span class="badge ${e.status.includes('Urgent')?'badge-red':'badge-blue'}">${e.status}</span></td></tr>`;
+}).join('');
+tbody.querySelectorAll('.eval-row').forEach(r=>r.addEventListener('click',()=>openEvalPanel(r.dataset.ename)));
+}
+
+$$('#eval-type-tabs .filter-pill').forEach(p=>p.addEventListener('click',function(){
+$$('#eval-type-tabs .filter-pill').forEach(x=>x.classList.remove('active'));this.classList.add('active');
+evalTypeFilter=this.dataset.et;renderEvalTable();
+}));
+
+function openEvalPanel(name){
+const e=EVAL_STUDENTS.find(x=>x.name===name);if(!e)return;
+$('#ep-name').textContent=e.name+' — Evaluation Checklist';
+$('#eval-panel').classList.add('open');
+const daysLeft=e.daysTotal-e.dayUsed;
+const pct=Math.round(e.dayUsed/e.daysTotal*100);
+const saved=JSON.parse(localStorage.getItem('prism-p2-eval-'+name.replace(/\s/g,'')))||{};
+$('#ep-content').innerHTML=`
+<div class="card" style="margin-bottom:10px">
+<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" ${saved.consent?'checked':''} class="eval-cb" data-key="consent" style="width:18px;height:18px;accent-color:var(--accent)"> ✅ Consent received</label>
+<div style="margin-top:8px"><div style="font-size:11px;color:var(--subtext);margin-bottom:4px">⏰ 60-Day Countdown — ${daysLeft} days remaining</div>
+<div style="height:12px;background:var(--bg);border-radius:6px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${daysLeft<10?'#EF4444':daysLeft<30?'#F59E0B':'#10B981'};border-radius:6px;transition:width .5s"></div></div></div>
+</div>
+<div class="card" style="margin-bottom:10px"><h4 style="font-size:13px;margin-bottom:8px">Who is Testing</h4>
+${['SLP','Psych','OT','PT'].map(d=>`<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;cursor:pointer"><input type="checkbox" ${saved['test_'+d]?'checked':''} class="eval-cb" data-key="test_${d}" style="accent-color:var(--accent)"> ${d} <button class="btn btn-sm btn-outlined" style="min-height:24px;padding:2px 8px;font-size:10px;margin-left:auto">${saved['test_'+d]?'✅ Complete':'Pending'}</button></label>`).join('')}
+</div>
+<div class="card" style="margin-bottom:10px"><h4 style="font-size:13px;margin-bottom:8px">Parent Forms</h4>
+<select class="eval-select" data-key="parentForms" style="font-size:12px"><option ${saved.parentForms==='Not Sent'?'selected':''}>Not Sent</option><option ${saved.parentForms==='Sent'?'selected':''}>Sent</option><option ${saved.parentForms==='Received'?'selected':''}>Received</option><option ${saved.parentForms==='Complete'?'selected':''}>Complete</option></select>
+</div>
+<div class="card" style="margin-bottom:10px"><h4 style="font-size:13px;margin-bottom:8px">Sections Checklist</h4>
+${['Observations','Rating Scales','Assessments','Meeting Scheduled','Report Written'].map(s=>`<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;cursor:pointer"><input type="checkbox" ${saved['sec_'+s]?'checked':''} class="eval-cb" data-key="sec_${s}" style="accent-color:var(--accent)"> ${s}</label>`).join('')}
+</div>
+<div class="card"><h4 style="font-size:13px;margin-bottom:8px">Notes</h4>
+<textarea id="eval-notes" rows="3" style="font-size:12px" placeholder="Additional notes…">${saved.notes||''}</textarea></div>`;
+// Save events
+$('#ep-content').querySelectorAll('.eval-cb').forEach(cb=>cb.addEventListener('change',function(){
+saved[this.dataset.key]=this.checked;autoSave('eval-'+name.replace(/\s/g,''),saved);
+}));
+$('#ep-content').querySelectorAll('.eval-select').forEach(sel=>sel.addEventListener('change',function(){
+saved[this.dataset.key]=this.value;autoSave('eval-'+name.replace(/\s/g,''),saved);
+}));
+const notesEl=document.getElementById('eval-notes');
+if(notesEl)notesEl.addEventListener('input',function(){saved.notes=this.value;debounceSave('eval-'+name.replace(/\s/g,''),saved);});
+reinitIcons();
+}
+$('#ep-close').addEventListener('click',()=>$('#eval-panel').classList.remove('open'));
+
+function renderEvalCalendar(){
+const grid=$('#eval-cal-grid');if(!grid)return;
+const headers=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const events={5:'blue',12:'blue',17:'blue',20:'purple',25:'red',27:'amber',30:'red'};
+let html=headers.map(h=>`<div style="font-weight:700;color:var(--subtext);padding:4px">${h}</div>`).join('');
+const firstDay=new Date(2026,6,1).getDay();
+for(let i=0;i<firstDay;i++)html+=`<div></div>`;
+for(let d=1;d<=31;d++){
+const ev=events[d];
+html+=`<div style="padding:6px;border-radius:6px;font-size:12px;cursor:pointer">${d}${ev?`<div style="width:6px;height:6px;border-radius:50%;background:${ev==='blue'?'#3B82F6':ev==='red'?'#EF4444':ev==='purple'?'#8B5CF6':'#F59E0B'};margin:2px auto 0"></div>`:''}</div>`;
+}
+grid.innerHTML=html;
+}
+
+// ==================== TAB 6: ACCESSIBILITY ====================
+function switchAccTab(id){
+['audio','multi','contrast','braille','visual'].forEach(t=>{$('#ac-'+t).style.display=t===id?'block':'none';});
+}
+$$('#acc-sub-tabs .sub-tab').forEach(t=>t.addEventListener('click',function(){
+$$('#acc-sub-tabs .sub-tab').forEach(x=>x.classList.remove('active'));this.classList.add('active');
+switchAccTab(this.dataset.ac);
+}));
+
+$('#gen-audio-btn').addEventListener('click',function(){
+const out=$('#audio-output');
+out.innerHTML=`<div class="card"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+<div style="width:40px;height:40px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;font-size:18px" id="audio-play-btn">▶</div>
+<div style="flex:1"><div style="height:6px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:0%;height:100%;background:var(--accent);border-radius:3px;transition:width 2s" id="audio-progress"></div></div>
+<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--subtext);margin-top:4px"><span>0:00</span><span>2:30</span></div></div></div>
+<div style="font-size:12px;color:var(--subtext)">📝 Transcript preview: "Question 1: What is the main idea of this passage?..."</div>
+<button class="btn btn-outlined btn-sm" style="margin-top:8px"><i data-lucide="download" class="w-3 h-3"></i> Download Audio</button></div>`;
+document.getElementById('audio-play-btn').addEventListener('click',function(){
+this.textContent='⏸';
+document.getElementById('audio-progress').style.width='100%';
+});
+showToast('🔊 Audio version generated!');reinitIcons();
+});
+
+$('#gen-multi-btn').addEventListener('click',function(){
+const lang=$('#multi-lang').value;
+$('#multi-output').innerHTML=`<div class="card"><h4 style="font-size:14px;margin-bottom:8px">🌐 ${lang} Translation Preview</h4>
+<div style="padding:12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.6">
+<p style="margin-bottom:8px"><strong>Formulario de Información para Padres</strong></p>
+<p>Por favor complete este formulario para ayudarnos a comprender mejor las necesidades de su hijo/a. Toda la información es confidencial.</p></div>
+<div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-filled btn-sm"><i data-lucide="printer" class="w-3 h-3"></i> Print</button>
+<button class="btn btn-outlined btn-sm"><i data-lucide="download" class="w-3 h-3"></i> Export</button></div></div>`;
+showToast('🌐 Translation complete!');reinitIcons();
+});
+
+$('#gen-contrast-btn').addEventListener('click',function(){
+$('#contrast-output').innerHTML=`<div class="card"><h4 style="font-size:12px;margin-bottom:6px">Original</h4>
+<div style="padding:12px;background:#fff;border-radius:8px;font-size:12px;border:1px solid #eee"><p style="color:#999">This is sample text with low contrast.</p><div style="display:flex;gap:4px;margin-top:6px"><div style="width:20px;height:20px;border-radius:4px;background:#f87171"></div><div style="width:20px;height:20px;border-radius:4px;background:#34d399"></div></div></div></div>
+<div class="card"><h4 style="font-size:12px;margin-bottom:6px">High Contrast</h4>
+<div style="padding:12px;background:#000;border-radius:8px;font-size:14px;font-weight:700;border:3px solid #FFD700"><p style="color:#fff">This is sample text with high contrast.</p><div style="display:flex;gap:4px;margin-top:6px"><div style="width:24px;height:24px;border-radius:4px;background:#FF6B35;border:2px solid #fff"></div><div style="width:24px;height:24px;border-radius:4px;background:#0066FF;border:2px solid #fff"></div></div></div></div>`;
+showToast('🎨 High-contrast version generated!');
+});
+
+$('#gen-braille-btn').addEventListener('click',function(){
+const stu=$('#braille-student').value;
+$('#braille-output').innerHTML=`<div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+<span style="font-size:20px">✅</span><div><div style="font-weight:700;font-size:14px">Braille-Ready File Generated</div>
+<div style="font-size:12px;color:var(--subtext)">${$('#braille-fmt').value}${stu?' · Stored in student folder ✓':''}</div></div></div>
+<button class="btn btn-filled btn-sm"><i data-lucide="download" class="w-3 h-3"></i> Download BRF File</button></div>`;
+showToast('⚡ Braille-ready file created!');reinitIcons();
+});
+
+$('#gen-visual-btn').addEventListener('click',function(){
+$('#visual-output').innerHTML=`<div class="card"><h4 style="font-size:14px;margin-bottom:10px">📸 Retooled Document Preview</h4>
+<div style="padding:16px;background:var(--bg);border-radius:10px;display:grid;grid-template-columns:60px 1fr;gap:12px;font-size:13px">
+<div style="width:50px;height:50px;background:var(--sky);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px">📖</div>
+<div><strong>Read the story carefully.</strong><br><span style="color:var(--subtext)">Look at the words. Think about what happens.</span></div>
+<div style="width:50px;height:50px;background:var(--mint);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px">✏️</div>
+<div><strong>Answer the questions.</strong><br><span style="color:var(--subtext)">Write your answer on the lines.</span></div>
+</div></div>`;
+showToast('📸 Document retooled with visuals!');
+});
+
+// ==================== TAB 7: TEMPLATES ====================
+function switchTplTab(id){
+['forms','creator','icons','tokens','schedules','comm','social'].forEach(t=>{$('#tp-'+t).style.display=t===id?'block':'none';});
+}
+$$('#tpl-sub-tabs .sub-tab').forEach(t=>t.addEventListener('click',function(){
+$$('#tpl-sub-tabs .sub-tab').forEach(x=>x.classList.remove('active'));this.classList.add('active');
+switchTplTab(this.dataset.tp);
+if(this.dataset.tp==='tokens')renderTokenPreview();
+if(this.dataset.tp==='schedules')renderVSPreview();
+if(this.dataset.tp==='comm')renderCommBoard();
+if(this.dataset.tp==='icons')renderIconGrid();
+}));
+
+// Forms Library
+function renderFormsGrid(filter='All'){
+const grid=$('#forms-grid');if(!grid)return;
+let data=FORMS;if(filter!=='All')data=data.filter(f=>f.cat===filter);
+const statusColors={'Not Opened':'badge-red','In Progress':'badge-amber','Finished':'badge-green'};
+grid.innerHTML=data.map((f,i)=>`<div class="card">
+<h4 style="font-size:14px;margin-bottom:4px">${f.name}</h4>
+<p style="font-size:12px;color:var(--subtext);margin-bottom:8px">${f.desc}</p>
+<span class="badge ${statusColors[f.status]}" style="margin-bottom:8px">${f.status}</span>
+<div style="display:flex;gap:6px"><button class="btn btn-filled btn-sm form-fill-btn" data-fi="${i}">Fill Out</button>
+<button class="btn btn-outlined btn-sm"><i data-lucide="download" class="w-3 h-3"></i> PDF</button></div>
+</div>`).join('');
+grid.querySelectorAll('.form-fill-btn').forEach(b=>b.addEventListener('click',function(){
+FORMS[parseInt(this.dataset.fi)].status='In Progress';
+autoSave('forms',FORMS);renderFormsGrid(filter);showToast('📋 Form opened — status updated');
+}));
+reinitIcons();
+}
+$$('#forms-filter .filter-pill').forEach(p=>p.addEventListener('click',function(){
+$$('#forms-filter .filter-pill').forEach(x=>x.classList.remove('active'));this.classList.add('active');
+renderFormsGrid(this.dataset.ff);
+}));
+
+// Template Creator style cards
+$$('.style-card').forEach(c=>c.addEventListener('click',function(){
+$$('.style-card').forEach(x=>{x.classList.remove('selected');x.style.borderColor='var(--border)';});
+this.classList.add('selected');this.style.borderColor='var(--accent)';
+}));
+$('#gen-tpl-btn').addEventListener('click',function(){
+const prompt=$('#tpl-prompt').value||'General template';
+const style=document.querySelector('.style-card.selected');
+const styleName=style?style.dataset.style:'kid';
+const preview=$('#tpl-preview');
+const colors={kid:'linear-gradient(135deg,#AEE4FF,#B8F2C8)',formal:'linear-gradient(135deg,#F1F5F9,#E2E8F0)',minimal:'#fff',ai:'linear-gradient(135deg,#E0E7FF,#EDE9FE)'};
+preview.innerHTML=`<div class="card" style="background:${colors[styleName]};text-align:center;padding:32px">
+<div style="font-size:28px;margin-bottom:8px">${styleName==='kid'?'🧒':styleName==='formal'?'📄':styleName==='minimal'?'📝':'🤖'}</div>
+<h3 style="font-size:16px;margin-bottom:8px">${prompt}</h3>
+<p style="font-size:12px;color:var(--subtext)">Generated with ${styleName} style</p>
+<div style="margin-top:12px;display:flex;gap:6px;justify-content:center">
+<button class="btn btn-filled btn-sm"><i data-lucide="printer" class="w-3 h-3"></i> Print</button>
+<button class="btn btn-outlined btn-sm"><i data-lucide="star" class="w-3 h-3"></i> Favorite</button></div></div>`;
+showToast('✨ Template generated!');reinitIcons();
+});
+
+// Icon Library
+function renderIconGrid(search='',cat=''){
+const wrap=$('#icon-grid-wrap');if(!wrap)return;
+const catFilters=$('#icon-category-filters');
+if(catFilters&&catFilters.children.length===0){
+catFilters.innerHTML='<button class="filter-pill active" data-ic="">All</button>'+ICON_CATEGORIES.map(c=>`<button class="filter-pill" data-ic="${c}">${c}</button>`).join('');
+catFilters.querySelectorAll('.filter-pill').forEach(p=>p.addEventListener('click',function(){
+catFilters.querySelectorAll('.filter-pill').forEach(x=>x.classList.remove('active'));this.classList.add('active');
+renderIconGrid($('#icon-search').value,this.dataset.ic);
+}));
+}
+let icons=[];
+const cats=cat?[cat]:ICON_CATEGORIES;
+cats.forEach(c=>{if(ICON_DATA[c])icons.push(...ICON_DATA[c].map(i=>({label:i,cat:c})));});
+if(search)icons=icons.filter(i=>i.label.toLowerCase().includes(search.toLowerCase()));
+wrap.innerHTML=icons.map(i=>{
+const parts=i.label.split(' ');const emoji=parts[0];const name=parts.slice(1).join(' ');
+return `<div class="icon-grid-item" title="${name}"><div style="font-size:24px">${emoji}</div><div style="font-size:10px;text-align:center;line-height:1.2">${name}</div></div>`;
+}).join('');
+wrap.querySelectorAll('.icon-grid-item').forEach(item=>item.addEventListener('click',()=>showToast('🎨 Icon "'+item.title+'" selected')));
+}
+$('#icon-search').addEventListener('input',function(){
+const active=document.querySelector('#icon-category-filters .filter-pill.active');
+renderIconGrid(this.value,active?active.dataset.ic:'');
+});
+
+// Token Board
+let tokenConfig={size:5,style:'⭐',color:'#AEE4FF',name:'',reward:''};
+function renderTokenPreview(){
+const p=$('#token-preview');if(!p)return;
+const name=$('#token-student-name').value||'Student Name';
+const reward=$('#token-reward').value||'My reward is…';
+p.innerHTML=`<div style="background:${tokenConfig.color};border-radius:12px;padding:16px;text-align:center">
+<div style="font-weight:800;font-size:16px;margin-bottom:12px;font-family:var(--font-heading)">${name}'s Token Board</div>
+<div style="display:flex;justify-content:center;gap:10px;margin-bottom:14px">${Array(tokenConfig.size).fill(0).map((_,i)=>`<div class="token-spot" data-ti="${i}">${i<2?tokenConfig.style:''}</div>`).join('')}</div>
+<div style="background:rgba(255,255,255,.7);padding:10px;border-radius:8px;font-weight:600;font-size:14px">🎁 ${reward}</div></div>`;
+p.querySelectorAll('.token-spot').forEach(spot=>spot.addEventListener('click',function(){
+this.classList.toggle('filled');
+this.textContent=this.classList.contains('filled')?tokenConfig.style:'';
+}));
+}
+$$('input[name="token-size"]').forEach(r=>r.addEventListener('change',function(){tokenConfig.size=parseInt(this.value);renderTokenPreview();}));
+$$('#token-style-picker .filter-pill').forEach(p=>p.addEventListener('click',function(){
+$$('#token-style-picker .filter-pill').forEach(x=>x.classList.remove('active'));this.classList.add('active');
+tokenConfig.style=this.dataset.ts;renderTokenPreview();
+}));
+$$('#token-bg-colors > div').forEach(c=>c.addEventListener('click',function(){
+$$('#token-bg-colors > div').forEach(x=>x.style.borderColor='transparent');this.style.borderColor='var(--accent)';
+tokenConfig.color=this.dataset.tc;renderTokenPreview();
+}));
+$('#token-student-name').addEventListener('input',renderTokenPreview);
+$('#token-reward').addEventListener('input',renderTokenPreview);
+$('#token-print-btn').addEventListener('click',()=>showToast('🖨️ Token board ready to print'));
+$('#token-save-btn').addEventListener('click',()=>showToast('💾 Token board saved to student tile'));
+
+// Visual Schedule
+function populateVSTimes(){
+const start=$('#vs-start');const end=$('#vs-end');
+start.innerHTML='';end.innerHTML='';
+for(let h=7;h<=16;h++)for(let m=0;m<60;m+=30){
+const t=`${h>12?h-12:h}:${m===0?'00':'30'} ${h>=12?'PM':'AM'}`;
+start.innerHTML+=`<option>${t}</option>`;end.innerHTML+=`<option>${t}</option>`;
+}
+start.selectedIndex=1;end.selectedIndex=11;
+}
+
+function renderVSPreview(){
+const p=$('#vs-preview');if(!p)return;
+const count=parseInt($('#vs-tasks-slider').value)||6;
+const taskLabels=['Morning Work','Reading Group','Math Centers','Snack/Break','Writing','Specials','Lunch','Science','Free Choice','Pack Up'];
+p.innerHTML=`<div style="font-weight:700;font-size:14px;text-align:center;margin-bottom:12px;font-family:var(--font-heading)">My Daily Schedule</div>
+${Array(count).fill(0).map((_,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px;background:${i%2===0?'var(--bg)':'var(--card-bg)'};border-radius:8px;margin-bottom:4px">
+<div style="width:28px;height:28px;background:var(--accent);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">${i+1}</div>
+<div style="width:32px;height:32px;background:var(--sky);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${['📖','📚','🔢','🍎','✏️','🎵','🍽️','🔬','🎮','🎒'][i]||'📋'}</div>
+<div style="font-weight:600;font-size:13px">${taskLabels[i]||'Task '+(i+1)}</div>
+</div>`).join('')}`;
+}
+$('#vs-tasks-slider').addEventListener('input',function(){$('#vs-task-count').textContent=this.value;renderVSPreview();});
+$('#gen-vs-btn').addEventListener('click',()=>{renderVSPreview();showToast('✨ Visual schedule generated!');});
+$('#vs-print-btn').addEventListener('click',()=>showToast('🖨️ Schedule ready to print'));
+$('#vs-save-btn').addEventListener('click',()=>showToast('💾 Schedule saved to student tile'));
+
+// Communication Board
+function renderCommBoard(){
+const p=$('#cb-preview');if(!p)return;
+const rows=parseInt($('#cb-rows').value)||3;
+const cols=parseInt($('#cb-cols').value)||4;
+$('#cb-rows-val').textContent=rows;$('#cb-cols-val').textContent=cols;
+const defaultLabels=['I want','more','help','stop','yes','no','please','thank you','go','wait','play','eat','drink','happy','sad','done','bathroom','all done','book','outside','music','home','school','friend'];
+const defaultEmojis=['🙋','➕','🤚','🛑','✅','❌','🙏','💛','🟢','⏳','🎮','🍽️','💧','😊','😢','✔️','🚻','👋','📖','🌳','🎵','🏠','🏫','👫'];
+const bgColors=['#AEE4FF','#B8F2C8','#FFD86B','#D7C7FF','#FF9A8B','#FFB085','#AEE4FF','#B8F2C8','#FFD86B','#D7C7FF','#FF9A8B','#FFB085','#AEE4FF','#B8F2C8','#FFD86B','#D7C7FF','#FF9A8B','#FFB085','#AEE4FF','#B8F2C8','#FFD86B','#D7C7FF','#FF9A8B','#FFB085'];
+let html=`<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:6px">`;
+for(let i=0;i<rows*cols;i++){
+const label=commBoardLabels[i]||defaultLabels[i]||'';
+const emoji=defaultEmojis[i]||'💬';
+html+=`<div class="comm-cell" data-ci="${i}" style="background:${bgColors[i%bgColors.length]};border-radius:8px;padding:8px;text-align:center;cursor:pointer;min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .1s" data-label="${label}">
+<div style="font-size:22px">${emoji}</div><div style="font-size:10px;font-weight:600;margin-top:2px">${label}</div></div>`;
+}
+html+=`</div>`;p.innerHTML=html;
+p.querySelectorAll('.comm-cell').forEach(cell=>cell.addEventListener('click',()=>{
+showToast('💬 '+cell.dataset.label);
+}));
+}
+$('#cb-rows').addEventListener('input',renderCommBoard);
+$('#cb-cols').addEventListener('input',renderCommBoard);
+$('#cb-voice-prompt-btn').addEventListener('click',()=>{$('#cb-voice-prompt-area').style.display=$('#cb-voice-prompt-area').style.display==='none'?'block':'none';});
+$('#cb-gen-vocab-btn').addEventListener('click',async function(){
+const prompt=$('#cb-voice-prompt').value;if(!prompt){showToast('Please describe the lesson');return;}
+this.textContent='Generating…';this.disabled=true;
+try{
+const res=await AppSDK.ai.chat({messages:[
+{role:'system',content:'Generate a list of 12 simple AAC/communication board vocabulary words for a special education lesson. Return only the words as a comma-separated list, no numbering.'},
+{role:'user',content:'Lesson: '+prompt}
+]});
+const words=res.content.split(',').map(w=>w.trim());
+words.forEach((w,i)=>{commBoardLabels[i]=w;});
+renderCommBoard();showToast('💬 Vocabulary auto-populated!');
+}catch(e){showToast('Error generating vocabulary');}
+this.textContent='✨ Auto-populate';this.disabled=false;
+});
+$('#cb-tablet-btn').addEventListener('click',function(){
+showToast('🖥️ Live Tablet Mode — click cells to hear labels');
+$('#cb-preview').querySelectorAll('.comm-cell').forEach(cell=>{
+// Remove old listener, add TTS listener
+cell.style.cursor='pointer';
+cell.addEventListener('click',async function(){
+const label=this.dataset.label;if(!label)return;
+this.style.transform='scale(1.1)';setTimeout(()=>this.style.transform='scale(1)',200);
+try{
+const result=await AppSDK.ai.speak({text:label,voice:'brook',audioFormat:'mp3'});
+const audio=new Audio('data:audio/'+result.format+';base64,'+result.audio);audio.play();
+}catch(e){showToast('Audio error');}
+});
+});
+});
+$('#cb-print-btn').addEventListener('click',()=>showToast('🖨️ Communication board ready to print'));
+$('#cb-save-btn').addEventListener('click',()=>showToast('💾 Board saved to student tile'));
+
+// Social Stories
+function populateSSDropdown(){
+const sel=$('#ss-student');if(!sel)return;
+sel.innerHTML='<option value="">Select Student…</option>'+STUDENTS.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+}
+$('#ss-student').addEventListener('change',function(){
+const s=STUDENTS.find(x=>x.id===this.value);
+const data=$('#ss-auto-data');
+if(s&&data){data.style.display='block';data.innerHTML=`📌 This story will use: <strong>${s.interests.split(',')[0]}</strong>, <strong>${s.calming.split(',')[0]}</strong>. Sensory note: ${s.triggers}.`;}
+else if(data){data.style.display='none';}
+});
+$$('.ss-style-card').forEach(c=>c.addEventListener('click',function(){
+$$('.ss-style-card').forEach(x=>{x.classList.remove('selected');x.style.borderColor='var(--border)';});
+this.classList.add('selected');this.style.borderColor='var(--accent)';
+}));
+$('#gen-ss-btn').addEventListener('click',async function(){
+const sid=$('#ss-student').value;const topic=$('#ss-topic').value;
+if(!topic){showToast('Please enter a story topic');return;}
+const s=STUDENTS.find(x=>x.id===sid);
+const preview=$('#ss-preview');
+preview.innerHTML='<div style="text-align:center;padding:32px;color:var(--subtext)"><div class="animate-pulse">✨ Generating social story…</div></div>';
+try{
+const prompt=s?`Write a short 4-page social story for a ${s.grade} student named ${s.name} about "${topic}". The student loves ${s.interests}. Include visual cues like [PICTURE: description]. Each page should be 1-2 sentences. Start with a title page.`
+:`Write a short 4-page social story about "${topic}" for an elementary student. Each page should be 1-2 sentences. Start with a title page.`;
+const res=await AppSDK.ai.chat({messages:[
+{role:'system',content:'You are a special education social story writer. Write clear, simple social stories using Carol Gray\'s Social Story format. Include [PICTURE: description] placeholders. Keep language simple and positive.'},
+{role:'user',content:prompt}
+]});
+const pages=res.content.split(/\n\n+/).filter(p=>p.trim());
+let currentPage=0;
+function renderPage(){
+const colors=['#AEE4FF','#B8F2C8','#FFD86B','#D7C7FF','#FF9A8B'];
+preview.innerHTML=`<div style="background:${colors[currentPage%colors.length]};border-radius:12px;padding:24px;min-height:250px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+<div style="font-size:14px;line-height:1.8;max-width:400px;font-weight:${currentPage===0?'700':'500'}">${pages[currentPage]||'The end!'}</div>
+<div style="margin-top:16px;display:flex;gap:12px;align-items:center">
+<button class="btn btn-outlined btn-sm ss-prev" ${currentPage===0?'disabled style="opacity:.3"':''}><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+<span style="font-size:12px;color:var(--subtext)">Page ${currentPage+1} of ${pages.length}</span>
+<button class="btn btn-outlined btn-sm ss-next" ${currentPage>=pages.length-1?'disabled style="opacity:.3"':''}><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+</div></div>`;
+preview.querySelector('.ss-prev')?.addEventListener('click',()=>{if(currentPage>0){currentPage--;renderPage();}});
+preview.querySelector('.ss-next')?.addEventListener('click',()=>{if(currentPage<pages.length-1){currentPage++;renderPage();}});
+reinitIcons();
+}
+renderPage();
+}catch(e){preview.innerHTML='<div style="color:#EF4444;text-align:center;padding:20px">Error generating story. Please try again.</div>';}
+});
+$('#ss-print-btn').addEventListener('click',()=>showToast('🖨️ Social story ready to print'));
+$('#ss-fullscreen-btn').addEventListener('click',()=>showToast('🖥️ Fullscreen mode activated'));
+$('#ss-save-btn').addEventListener('click',()=>showToast('💾 Saved to student tile'));
+
+// ==================== TAB 8: RESOURCES ====================
+$('#res-search-btn').addEventListener('click',async function(){
+const query=$('#res-search').value;
+if(!query){showToast('Please enter a search query');return;}
+const disc=document.querySelector('#res-discipline-filters .filter-pill.active')?.dataset.rd||'All';
+const dateRange=$('#res-date-range').value;
+// Save to recent
+if(!recentSearches.includes(query)){recentSearches.unshift(query);if(recentSearches.length>5)recentSearches.pop();autoSave('recent-searches',recentSearches);renderRecentSearches();}
+const out=$('#res-results');
+out.innerHTML='<div class="card" style="text-align:center;padding:24px"><div class="animate-pulse" style="color:var(--subtext)"><div style="font-size:24px;margin-bottom:8px">🔍</div>Searching peer-reviewed databases…</div></div>';
+try{
+const res=await AppSDK.ai.chat({messages:[
+{role:'system',content:`You are a special education research assistant. Generate 4 evidence-based research summaries related to the query. For each study, provide: 1) Study title (bold), 2) Authors, journal, year, 3) A 2-3 sentence plain-language summary, 4) A key finding. Format with clear separation between studies. Focus on ${disc!=='All'?disc+' discipline':'all disciplines'}. ${dateRange==='Last 5 years'?'Focus on studies from 2021-2026.':dateRange==='Last 10 years'?'Focus on studies from 2016-2026.':''}`},
+{role:'user',content:'Search for: '+query}
+]});
+const studies=res.content.split(/\n\n+/).filter(s=>s.trim());
+let html='';
+for(let i=0;i<studies.length;i++){
+html+=`<div class="card" style="margin-bottom:10px"><div style="font-size:13px;line-height:1.7;white-space:pre-wrap">${studies[i]}</div>
+<div style="display:flex;gap:6px;margin-top:10px">
+<button class="btn btn-outlined btn-sm"><i data-lucide="star" class="w-3 h-3"></i> Save to Drive</button>
+<button class="btn btn-outlined btn-sm"><i data-lucide="printer" class="w-3 h-3"></i> Print</button></div></div>`;
+}
+out.innerHTML=html;reinitIcons();
+}catch(e){out.innerHTML='<div class="card" style="color:#EF4444">Error searching. Please try again.</div>';}
+});
+
+function renderRecentSearches(){
+const el=$('#res-recent-chips');if(!el)return;
+el.innerHTML=recentSearches.map(s=>`<button class="filter-pill recent-search-chip">${s}</button>`).join('');
+el.querySelectorAll('.recent-search-chip').forEach(c=>c.addEventListener('click',function(){
+$('#res-search').value=this.textContent;$('#res-search-btn').click();
+}));
+}
+$$('#res-discipline-filters .filter-pill').forEach(p=>p.addEventListener('click',function(){
+$$('#res-discipline-filters .filter-pill').forEach(x=>x.classList.remove('active'));this.classList.add('active');
+}));
+
+// District info modals
+const districtContent={
+'Parental Rights':`<h4>Your Rights Under IDEA</h4><p>Under the Individuals with Disabilities Education Act (IDEA), parents and guardians have the right to:</p><ul style="margin:10px 0;padding-left:20px"><li>Participate in all decisions regarding their child's education</li><li>Give or deny consent for evaluations and services</li><li>Access all educational records</li><li>Request an Independent Educational Evaluation (IEE)</li><li>Request mediation or due process hearings</li><li>Receive Prior Written Notice before changes to placement or services</li></ul><p>For more information, contact the Cherry Creek SPED Department.</p>`,
+'FERPA Notice':`<h4>Family Educational Rights and Privacy Act</h4><p>FERPA protects the privacy of student education records. Under FERPA:</p><ul style="margin:10px 0;padding-left:20px"><li>Parents have the right to inspect and review their child's records</li><li>Schools must have written permission to release records</li><li>Parents can request corrections to records they believe are inaccurate</li><li>Schools may disclose records without consent to school officials with legitimate educational interest</li></ul><p>All PRISM data is FERPA-compliant and encrypted.</p>`,
+'District SPED Policies':`<h4>Cherry Creek School District — SPED Policies</h4><p>Key policies for the 2025-2026 school year:</p><ul style="margin:10px 0;padding-left:20px"><li>Notice of Meeting (NOM) must be sent 10 calendar days prior to IEP meetings</li><li>60-calendar-day evaluation timeline begins upon receipt of signed consent</li><li>Progress reports are issued quarterly, aligned with report card periods</li><li>All service providers must log minutes in Enrich within 48 hours</li><li>Annual IEP reviews must be completed before the anniversary date</li></ul>`
+};
+['district-parental','district-ferpa','district-policies'].forEach(id=>{
+const el=document.getElementById(id);if(!el)return;
+el.addEventListener('click',function(){
+const titles={'district-parental':'Parental Rights','district-ferpa':'FERPA Notice','district-policies':'District SPED Policies'};
+const title=titles[id];
+$('#district-modal-title').textContent=title;
+$('#district-modal-body').innerHTML=districtContent[title];
+$('#district-overlay').classList.add('show');
+});
+});
+$('#district-modal-close').addEventListener('click',()=>$('#district-overlay').classList.remove('show'));
+$('#district-overlay').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
+
+// ==================== MEETING TIMER ====================
+$('#open-meeting-timer-btn').addEventListener('click',function(){
+$('#meeting-timer-overlay').classList.add('show');
+if(!meetingTimerInterval){
+meetingStartTime=Date.now();
+meetingTimerInterval=setInterval(()=>{
+const elapsed=Date.now()-meetingStartTime;
+const h=Math.floor(elapsed/3600000);const m=Math.floor((elapsed%3600000)/60000);const s=Math.floor((elapsed%60000)/1000);
+$('#mt-elapsed').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+},1000);
+}
+renderMTDisciplines();
+});
+$('#mt-close').addEventListener('click',function(){
+$('#meeting-timer-overlay').classList.remove('show');
+});
+
+function renderMTDisciplines(){
+const el=$('#mt-disciplines');if(!el)return;
+const discs=['SLP','OT','Mental Health','Behavior','Admin'];
+el.innerHTML=discs.map(d=>{
+const key=d.replace(/\s/g,'');
+return `<div class="card" style="margin-bottom:8px">
+<div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" class="mt-disc-toggle" data-disc="${key}">
+<h4 style="font-size:14px">${d}</h4><i data-lucide="chevron-down" class="w-4 h-4"></i>
+</div>
+<div class="expand-content expanded" id="mt-disc-${key}">
+<div id="mt-items-${key}" style="margin-top:8px"></div>
+<div style="display:flex;gap:6px;margin-top:8px">
+<input type="text" id="mt-new-${key}" placeholder="Add agenda item…" style="flex:1;padding:8px 12px">
+<select id="mt-student-${key}" style="width:auto;padding:6px 10px;font-size:12px"><option value="">Link student</option>${STUDENTS.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select>
+<button class="btn btn-filled btn-sm mt-add-item" data-disc="${key}"><i data-lucide="plus" class="w-4 h-4"></i></button>
+</div></div></div>`;
+}).join('');
+el.querySelectorAll('.mt-disc-toggle').forEach(t=>t.addEventListener('click',function(){
+$('#mt-disc-'+this.dataset.disc).classList.toggle('expanded');
+}));
+el.querySelectorAll('.mt-add-item').forEach(b=>b.addEventListener('click',function(){
+const key=this.dataset.disc;
+const input=$('#mt-new-'+key);const studentSel=$('#mt-student-'+key);
+if(!input.value.trim())return;
+if(!meetingAgenda[key])meetingAgenda[key]=[];
+meetingAgenda[key].push({text:input.value,student:studentSel.value,done:false,review:false});
+input.value='';studentSel.selectedIndex=0;
+renderMTItems(key);
+}));
+reinitIcons();
+}
+
+function renderMTItems(key){
+const el=$('#mt-items-'+key);if(!el)return;
+el.innerHTML=(meetingAgenda[key]||[]).map((item,i)=>{
+const s=item.student?STUDENTS.find(x=>x.id===item.student):null;
+return `<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;flex-wrap:wrap">
+<span style="flex:1">${item.text}</span>
+${s?`<span class="badge badge-blue">${s.name}</span>`:''}
+<button class="btn btn-sm ${item.done?'btn-filled':'btn-outlined'} mt-done-btn" data-disc="${key}" data-idx="${i}" style="min-height:28px;padding:2px 8px;font-size:10px">✓ Done</button>
+<button class="btn btn-sm ${item.review?'btn-filled':'btn-outlined'} mt-review-btn" data-disc="${key}" data-idx="${i}" style="min-height:28px;padding:2px 8px;font-size:10px;${item.review?'background:#F59E0B;border-color:#F59E0B':''}">🚩 Review</button>
+<button class="btn btn-sm btn-outlined mt-del-btn" data-disc="${key}" data-idx="${i}" style="min-height:28px;padding:2px 8px;font-size:10px">✕</button>
+</div>`;
+}).join('');
+el.querySelectorAll('.mt-done-btn').forEach(b=>b.addEventListener('click',function(){
+meetingAgenda[this.dataset.disc][this.dataset.idx].done=!meetingAgenda[this.dataset.disc][this.dataset.idx].done;renderMTItems(this.dataset.disc);
+}));
+el.querySelectorAll('.mt-review-btn').forEach(b=>b.addEventListener('click',function(){
+meetingAgenda[this.dataset.disc][this.dataset.idx].review=!meetingAgenda[this.dataset.disc][this.dataset.idx].review;renderMTItems(this.dataset.disc);
+}));
+el.querySelectorAll('.mt-del-btn').forEach(b=>b.addEventListener('click',function(){
+meetingAgenda[this.dataset.disc].splice(parseInt(this.dataset.idx),1);renderMTItems(this.dataset.disc);
+}));
+}
+
+$('#mt-stop-btn').addEventListener('click',function(){
+clearInterval(meetingTimerInterval);meetingTimerInterval=null;
+const elapsed=$('#mt-elapsed').textContent;
+$('#mt-rec-dot').style.animation='none';$('#mt-rec-dot').style.background='#666';
+const summary=$('#mt-summary');summary.style.display='block';
+let agendaHTML='';
+Object.keys(meetingAgenda).forEach(key=>{
+const items=meetingAgenda[key];if(!items||items.length===0)return;
+agendaHTML+=`<h4 style="font-size:13px;margin-top:10px;margin-bottom:6px">${key}</h4>`;
+items.forEach(item=>{
+agendaHTML+=`<div style="font-size:12px;padding:4px 0">${item.done?'✅':'⬜'} ${item.text} ${item.review?'<span class="badge badge-amber">Needs Review</span>':''}</div>`;
+});
+});
+summary.innerHTML=`<div class="card" style="border-left:4px solid var(--accent)">
+<h3 style="font-size:16px;margin-bottom:8px">📋 Meeting Summary</h3>
+<div style="font-size:13px;margin-bottom:6px"><strong>Duration:</strong> ${elapsed}</div>
+<div style="font-size:13px;margin-bottom:6px"><strong>Date:</strong> ${$('#mt-date').value} at ${$('#mt-time').value}</div>
+${agendaHTML}
+<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+<button class="btn btn-filled btn-sm" id="mt-print-summary"><i data-lucide="printer" class="w-4 h-4"></i> Print Summary</button>
+<button class="btn btn-outlined btn-sm"><i data-lucide="save" class="w-4 h-4"></i> Save to SharePoint</button>
+<button class="btn btn-outlined btn-sm"><i data-lucide="mail" class="w-4 h-4"></i> Email to Team</button>
+</div></div>`;
+document.getElementById('mt-print-summary').addEventListener('click',()=>showToast('🖨️ Summary ready to print'));
+reinitIcons();
+});
+
+// ==================== THEME STUDIO ====================
+function renderThemeStudio(){
+const mainCards=$('#theme-main-cards');
+if(!mainCards)return;
+mainCards.innerHTML=THEMES.main.map((t,i)=>`<div class="theme-card ${i===currentMain?'selected':''}" data-mi="${i}" style="text-align:center;padding:16px">
+<div style="font-size:20px;margin-bottom:4px">${i===0?'🏥':i===1?'🌸':'🌑'}</div>
+<div style="font-size:13px;font-weight:700">${t}</div></div>`).join('');
+mainCards.querySelectorAll('.theme-card').forEach(c=>c.addEventListener('click',function(){
+currentMain=parseInt(this.dataset.mi);renderThemeStudio();
+}));
+const subCards=$('#theme-sub-cards');
+const subs=THEMES.subs[currentMain];
+$('#theme-sub-label').textContent=THEMES.main[currentMain]+' — Sub-palettes';
+subCards.innerHTML=subs.map((s,i)=>{
+return `<div class="theme-card ${i===currentSub?'selected':''}" data-si="${i}" style="padding:10px">
+<div class="mini-preview" style="background:${s.bg};border:1px solid ${s.border}"><div style="background:${s.primary};height:60%"></div><div style="background:${s.accent};height:40%"></div><div style="background:${s.card};height:50%"></div></div>
+<div style="font-size:11px;font-weight:600;text-align:center;margin-top:6px">${s.name}</div></div>`;
+}).join('');
+subCards.querySelectorAll('.theme-card').forEach(c=>c.addEventListener('click',function(){
+currentSub=parseInt(this.dataset.si);renderThemeStudio();
+}));
+// Mini preview
+const theme=subs[currentSub];
+$('#theme-mini-preview').style.background=theme.bg;
+$('#theme-mini-preview').innerHTML=`<div style="background:${theme.header};height:100%;border-radius:4px"></div><div style="background:${theme.primary};height:80%;border-radius:4px"></div><div style="background:${theme.accent};height:60%;border-radius:4px"></div><div style="background:${theme.card};height:70%;border-radius:4px;border:1px solid ${theme.border}"></div>`;
+}
+
+$('#theme-btn-x1').addEventListener('click',()=>{$('#theme-overlay').classList.add('show');renderThemeStudio();});
+$('#theme-close-btn').addEventListener('click',()=>$('#theme-overlay').classList.remove('show'));
+$('#theme-overlay').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
+
+$('#theme-apply-btn').addEventListener('click',function(){
+const theme=THEMES.subs[currentMain][currentSub];
+document.documentElement.style.setProperty('--bg',theme.bg);
+document.documentElement.style.setProperty('--card-bg',theme.card);
+document.documentElement.style.setProperty('--header-bg',theme.header);
+document.documentElement.style.setProperty('--header-txt',theme.headerTxt);
+document.documentElement.style.setProperty('--accent',theme.primary);
+document.documentElement.style.setProperty('--text',theme.text);
+document.documentElement.style.setProperty('--subtext',theme.subtext);
+document.documentElement.style.setProperty('--nav-active',theme.navActive);
+document.documentElement.style.setProperty('--nav-active-txt',theme.navActiveTxt);
+document.documentElement.style.setProperty('--nav-inactive',theme.navInactive);
+document.documentElement.style.setProperty('--nav-inactive-txt',theme.navInactiveTxt);
+document.documentElement.style.setProperty('--border',theme.border);
+document.body.style.background=theme.bg;document.body.style.color=theme.text;
+$('.topbar').style.background=theme.header;$('.topbar').style.color=theme.headerTxt;
+$('.tab-strip').style.background=theme.card;
+$('.footer-bar').style.background=theme.header;
+$$('.tab-pill').forEach(p=>{if(p.classList.contains('active')){p.style.background=theme.navActive;p.style.color=theme.navActiveTxt;}else{p.style.background=theme.navInactive;p.style.color=theme.navInactiveTxt;}});
+localStorage.setItem('prism-main',currentMain);
+localStorage.setItem('prism-sub',currentSub);
+$('#theme-overlay').classList.remove('show');
+showToast('🎨 Theme applied: '+theme.name);
+});
+
+// ---- Restore theme on load ----
+function restoreTheme(){
+const m=parseInt(localStorage.getItem('prism-main'));const s=parseInt(localStorage.getItem('prism-sub'));
+if(!isNaN(m)&&!isNaN(s)&&THEMES.subs[m]&&THEMES.subs[m][s]){
+currentMain=m;currentSub=s;
+const theme=THEMES.subs[m][s];
+document.documentElement.style.setProperty('--bg',theme.bg);
+document.documentElement.style.setProperty('--card-bg',theme.card);
+document.documentElement.style.setProperty('--header-bg',theme.header);
+document.documentElement.style.setProperty('--accent',theme.primary);
+document.documentElement.style.setProperty('--text',theme.text);
+document.documentElement.style.setProperty('--subtext',theme.subtext);
+document.documentElement.style.setProperty('--nav-active',theme.navActive);
+document.documentElement.style.setProperty('--nav-active-txt',theme.navActiveTxt);
+document.documentElement.style.setProperty('--nav-inactive',theme.navInactive);
+document.documentElement.style.setProperty('--nav-inactive-txt',theme.navInactiveTxt);
+document.documentElement.style.setProperty('--border',theme.border);
+document.body.style.background=theme.bg;document.body.style.color=theme.text;
+$('.topbar').style.background=theme.header;$('.footer-bar').style.background=theme.header;
+}
+}
+
+// ---- POPULATE DROPDOWNS ----
+function populateAllDropdowns(){
+const selectors=['#braille-student','#tpl-student'];
+selectors.forEach(sel=>{
+const el=$(sel);if(!el)return;
+el.innerHTML='<option value="">Select Student…</option>'+STUDENTS.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+});
+populateEligDropdown();
+populateSoapHistoryDropdown();
+populateSSDropdown();
+}
+
+// ---- INIT ----
+function init(){
+restoreTheme();
+switchTab(activeTab);
+renderWeekCalendar();
+renderMonthCalendar();
+renderTodos();
+renderSessionGroups();
+renderTeamCaseload();
+renderStudentGrid();
+renderCaseloadTable();
+renderSOAPStudents();
+renderMTSSTiers();
+renderToolkit();
+renderMTSSCalendar();
+renderDAT();
+renderEvalPipeline();
+renderEvalTable();
+renderEvalCalendar();
+renderFormsGrid();
+renderTokenPreview();
+renderVSPreview();
+renderCommBoard();
+renderIconGrid();
+populateVSTimes();
+populateAllDropdowns();
+renderRecentSearches();
+reinitIcons();
+}
+
+init();
+</script>
+</body>
+</html>
