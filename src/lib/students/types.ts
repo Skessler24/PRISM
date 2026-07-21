@@ -34,6 +34,8 @@ export type Student = {
   section504Impairment?: string
   hasBip?: boolean
   hasAlp?: boolean
+  /** ISO date YYYY-MM-DD — optional for age calculator */
+  dob?: string
 }
 
 export type StudentFilter = 'All' | 'IEP' | '504' | 'MLL' | string

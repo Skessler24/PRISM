@@ -1,10 +1,28 @@
-import { NavLink } from 'react-router-dom'
+import { useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useHelpAssist } from '../lib/help-assist/help-assist-context'
 import { useTheme } from '../app/theme-context'
+import { useAdminRole } from '../lib/admin/admin-role-context'
 
 export function TopBar() {
   const { enabled, toggle } = useHelpAssist()
   const { setThemeStudioOpen } = useTheme()
+  const { isAdmin, unlockAdmin, setStaff, role } = useAdminRole()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const navigate = useNavigate()
+
+  function requestAdmin() {
+    const code = window.prompt(
+      'Admin access is for district configuration only.\nEnter admin code:',
+    )
+    if (code == null) return
+    if (unlockAdmin(code)) {
+      setMenuOpen(false)
+      navigate('/district')
+    } else {
+      window.alert('Incorrect admin code.')
+    }
+  }
 
   return (
     <header
@@ -39,13 +57,68 @@ export function TopBar() {
         >
           Theme
         </button>
-        <NavLink
-          to="/district"
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-blue-600 text-sm font-bold text-white"
-          title="District Profile"
-        >
-          SK
-        </NavLink>
+
+        <div className="relative">
+          <button
+            type="button"
+            className="flex h-9 items-center gap-1 rounded-full bg-gradient-to-br from-violet-600 to-blue-600 px-2 text-sm font-bold text-white"
+            title="Account / Admin"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            SK
+            <span className="hidden text-[10px] font-semibold uppercase sm:inline">
+              {role === 'admin' ? 'Admin' : 'Staff'}
+            </span>
+          </button>
+          {menuOpen && (
+            <>
+              <button
+                type="button"
+                className="fixed inset-0 z-[1001]"
+                aria-label="Close menu"
+                onClick={() => setMenuOpen(false)}
+              />
+              <div className="absolute right-0 z-[1002] mt-2 w-56 rounded-xl border border-[var(--border)] bg-[var(--card-bg)] p-2 text-[var(--text)] shadow-xl">
+                <p className="px-2 py-1 text-[10px] font-semibold uppercase text-[var(--subtext)]">
+                  Role: {isAdmin ? 'Admin' : 'Staff'}
+                </p>
+                {isAdmin ? (
+                  <>
+                    <button
+                      type="button"
+                      className="block w-full rounded-lg px-2 py-2 text-left text-xs font-semibold hover:bg-[var(--slate)]"
+                      onClick={() => {
+                        setMenuOpen(false)
+                        navigate('/district')
+                      }}
+                    >
+                      ⚙️ District Admin
+                    </button>
+                    <button
+                      type="button"
+                      className="block w-full rounded-lg px-2 py-2 text-left text-xs font-semibold hover:bg-[var(--slate)]"
+                      onClick={() => {
+                        setStaff()
+                        setMenuOpen(false)
+                      }}
+                    >
+                      Switch to Staff view
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="block w-full rounded-lg px-2 py-2 text-left text-xs font-semibold hover:bg-[var(--slate)]"
+                    onClick={requestAdmin}
+                  >
+                    Admin access…
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </header>
   )

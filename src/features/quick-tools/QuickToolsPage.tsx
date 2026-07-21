@@ -405,14 +405,17 @@ export function QuickToolsPage() {
                 className="mt-1 w-full rounded-lg border border-[var(--border)] px-2 py-2"
                 value={ageStudentId}
                 onChange={(e) => {
-                  setAgeStudentId(e.target.value)
-                  // Demo students may not have DOB — leave manual
+                  const id = e.target.value
+                  setAgeStudentId(id)
+                  const s = students.find((x) => x.id === id)
+                  if (s?.dob) setDob(s.dob)
                 }}
               >
                 <option value="">Manual DOB…</option>
                 {students.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.name}
+                    {s.dob ? ` · DOB ${s.dob}` : ''}
                   </option>
                 ))}
               </select>

@@ -4,6 +4,7 @@ import { useDistrictProfile } from '../../lib/district-profiles/useDistrictProfi
 import { FEATURE_LABELS, type FeatureName } from '../../lib/district-profiles/types'
 import type { TimelineEventType } from '../../lib/district-profiles/loadProfile'
 import { FieldTip } from '../../lib/help-assist/FieldTip'
+import { readSuiteMode, writeSuiteMode, type SuiteMode } from '../../lib/templates/catalog'
 
 const EVENT_OPTIONS: TimelineEventType[] = [
   'Consent Received',
@@ -42,6 +43,7 @@ export function DistrictProfilePage() {
 
   const [event, setEvent] = useState<TimelineEventType>('Consent Received')
   const [trigger, setTrigger] = useState(() => new Date().toISOString().slice(0, 10))
+  const [suiteMode, setSuiteMode] = useState<SuiteMode>(() => readSuiteMode())
 
   const lines = useMemo(() => {
     const d = new Date(`${trigger}T12:00:00`)
@@ -51,25 +53,75 @@ export function DistrictProfilePage() {
 
   const featureNames = Object.keys(profile.features) as FeatureName[]
 
+  function setMode(mode: SuiteMode) {
+    setSuiteMode(mode)
+    writeSuiteMode(mode)
+  }
+
   return (
     <PageShell
-      title="🏛️ District Profile"
-      description={`${profile.name} (${profile.state}) · IEP system: ${profile.iepSystem}. Rules are data-driven from Enrich + DAT — not hardcoded. Profile #2 can plug in later.`}
+      title="⚙️ District Administration"
+      description={`Admin-only · ${profile.name} (${profile.state}) · IEP system: ${profile.iepSystem}. Suite mode, module toggles, rules, and timeline tools.`}
     >
       <div className="mb-3 rounded-xl border border-[var(--border)] bg-[var(--card-bg)] p-3 text-xs text-[var(--subtext)]">
         Active profile: <strong className="text-[var(--text)]">{profile.name}</strong> · id{' '}
         <code>{profileId}</code>
+        <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-900">
+          {suiteMode === 'standalone' ? 'Standalone suite' : 'Companion mode'}
+        </span>
         {availableProfiles.length < 2 && (
           <span className="ml-2 italic">
-            {/* TODO(Profile #2): add another district JSON + picker UI */}
             (Profile #2 interface ready — add another file under district-profiles/)
           </span>
         )}
         <p className="mt-1">
-          PRISM never syncs live to Enrich (HIPAA). This profile powers reminders, checklists,
-          timeline math, and Help Assist.
+          PRISM never syncs live to Enrich (HIPAA). Same localStorage keys as deploy Admin (
+          <code>prism_district_settings_v1</code>, feature overrides).
         </p>
       </div>
+
+      <section className="mb-3 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card">
+        <h2 className="font-heading text-sm font-bold">Suite mode</h2>
+        <p className="mt-1 text-xs text-[var(--subtext)]">
+          Companion: Enrich / external SoR remains system of record — PRISM prepares and Copies.
+          Standalone: PRISM can own drafts and district template instances.
+        </p>
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          {(
+            [
+              {
+                id: 'companion' as const,
+                title: 'Companion',
+                body: `Finalize official IEPs in ${profile.iepSystem}. PRISM drafts, reminds, and copies.`,
+              },
+              {
+                id: 'standalone' as const,
+                title: 'Standalone suite',
+                body: 'PRISM can be the full platform. Save district drafts; turn off modules you do not need below.',
+              },
+            ] as const
+          ).map((opt) => (
+            <label
+              key={opt.id}
+              className={`cursor-pointer rounded-xl border p-3 text-xs ${
+                suiteMode === opt.id
+                  ? 'border-[var(--accent)] bg-[var(--sky)]'
+                  : 'border-[var(--border)]'
+              }`}
+            >
+              <input
+                type="radio"
+                className="mr-2"
+                name="suiteMode"
+                checked={suiteMode === opt.id}
+                onChange={() => setMode(opt.id)}
+              />
+              <strong>{opt.title}</strong>
+              <p className="mt-1 text-[var(--subtext)]">{opt.body}</p>
+            </label>
+          ))}
+        </div>
+      </section>
 
       <div className="grid gap-3 lg:grid-cols-2">
         <section className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card">
@@ -120,13 +172,13 @@ export function DistrictProfilePage() {
             <label className="text-xs font-semibold">
               Event
               <select
-                className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-2 py-2"
+                className="mt-1 w-full rounded-lg border border-[var(--border)] px-2 py-2"
                 value={event}
                 onChange={(e) => setEvent(e.target.value as TimelineEventType)}
               >
-                {EVENT_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
+                {EVENT_OPTIONS.map((o) => (
+                  <option key={o} value={o}>
+                    {o}
                   </option>
                 ))}
               </select>
@@ -135,7 +187,7 @@ export function DistrictProfilePage() {
               Trigger date
               <input
                 type="date"
-                className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-2 py-2"
+                className="mt-1 w-full rounded-lg border border-[var(--border)] px-2 py-2"
                 value={trigger}
                 onChange={(e) => setTrigger(e.target.value)}
               />
@@ -145,7 +197,7 @@ export function DistrictProfilePage() {
             {lines.map((line) => (
               <div
                 key={line.label}
-                className={`rounded-lg border-l-4 p-2 text-xs ${toneClass[line.tone]}`}
+                className={`rounded-lg border-l-4 p-2 text-xs ${toneClass[line.tone] || toneClass.info}`}
               >
                 <p className="font-semibold">{line.label}</p>
                 <p className="text-[var(--subtext)]">{formatDate(line.date)}</p>
@@ -156,10 +208,10 @@ export function DistrictProfilePage() {
       </div>
 
       <section className="mt-3 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card">
-        <h2 className="font-heading text-sm font-bold">Feature toggles</h2>
+        <h2 className="font-heading text-sm font-bold">Module toggles</h2>
         <p className="mt-1 text-xs text-[var(--subtext)]">
-          Flip features for this district. Overrides persist in localStorage. Components should call{' '}
-          <code>isFeatureEnabled(...)</code>.
+          Hide tabs districts cover in another system (e.g. CCSD Companion keeps 504/MLL off). Overrides
+          persist in localStorage.
         </p>
         <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {featureNames.map((name) => {
@@ -227,7 +279,7 @@ export function DistrictProfilePage() {
                     {r.source}
                   </span>
                 </td>
-                <td className="p-2">{r.active ? '✅ Active' : 'Off'}</td>
+                <td className="p-2">{r.active ? 'Active' : 'Off'}</td>
               </tr>
             ))}
           </tbody>

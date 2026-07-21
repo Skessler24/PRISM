@@ -12,7 +12,6 @@ import {
   saveTemplateInstances,
   suiteModeNote,
   type FormTemplate,
-  type SuiteMode,
   type TemplateInstance,
 } from '../../lib/templates/catalog'
 import { FieldTip } from '../../lib/help-assist/FieldTip'
@@ -25,7 +24,7 @@ const CATS = ['All', 'IEP', '504', 'MLL', 'Compliance', 'Behavior', 'Communicati
 export function TemplatesPage() {
   const { students } = useStudents()
   const { profile } = useDistrictProfile()
-  const [mode] = useState<SuiteMode>(() => readSuiteMode())
+  const mode = readSuiteMode()
   const [custom, setCustom] = useState<FormTemplate[]>(() => loadCustomTemplates())
   const [instances, setInstances] = useState<TemplateInstance[]>(() => loadTemplateInstances())
   const [cat, setCat] = useState<string>('All')

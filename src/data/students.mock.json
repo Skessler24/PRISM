@@ -4,7 +4,10 @@
     "name": "Aiden M.",
     "grade": "Gr3",
     "teacher": "Ms. Thompson",
-    "discipline": ["SLP", "Behavior"],
+    "discipline": [
+      "SLP",
+      "Behavior"
+    ],
     "provider": "Samantha",
     "caseManager": "Samantha",
     "tier": 3,
@@ -15,22 +18,32 @@
     "interests": "Dinosaurs, Minecraft, the color blue",
     "triggers": "Loud noises, unexpected transitions",
     "calming": "Deep breathing, fidget cube, quiet corner",
-    "goals": ["Produce /r/ in sentences 80%", "Follow 2-step directions 75%"],
-    "accommodations": ["Preferential seating", "Visual schedule", "Noise-canceling headphones"],
+    "goals": [
+      "Produce /r/ in sentences 80%",
+      "Follow 2-step directions 75%"
+    ],
+    "accommodations": [
+      "Preferential seating",
+      "Visual schedule",
+      "Noise-canceling headphones"
+    ],
     "disability": "EBD/SLD",
     "lastContact": "2026-07-15",
     "fallEval": false,
     "source": "demo",
     "hasIEP": true,
     "has504": false,
-    "hasMLL": false
+    "hasMLL": false,
+    "dob": "2017-05-21"
   },
   {
     "id": "bella",
     "name": "Bella R.",
     "grade": "Gr4",
     "teacher": "Mr. Davis",
-    "discipline": ["Academic"],
+    "discipline": [
+      "Academic"
+    ],
     "provider": "Samantha",
     "caseManager": "Samantha",
     "tier": 2,
@@ -41,22 +54,33 @@
     "interests": "Harry Potter, drawing, cats",
     "triggers": "Written tasks, timed tests",
     "calming": "Drawing break, reading corner",
-    "goals": ["Read grade-level text 90 wpm", "Written expression 3+ sentences"],
-    "accommodations": ["Extended time", "Graphic organizers", "Text-to-speech"],
+    "goals": [
+      "Read grade-level text 90 wpm",
+      "Written expression 3+ sentences"
+    ],
+    "accommodations": [
+      "Extended time",
+      "Graphic organizers",
+      "Text-to-speech"
+    ],
     "disability": "SLD",
     "lastContact": "2026-07-10",
     "fallEval": false,
     "source": "demo",
     "hasIEP": true,
     "has504": false,
-    "hasMLL": false
+    "hasMLL": false,
+    "dob": "2016-11-08"
   },
   {
     "id": "carlos",
     "name": "Carlos T.",
     "grade": "Gr2",
     "teacher": "Ms. Rivera",
-    "discipline": ["SLP", "ELA"],
+    "discipline": [
+      "SLP",
+      "ELA"
+    ],
     "provider": "Samantha",
     "caseManager": "Samantha",
     "tier": 2,
@@ -67,8 +91,14 @@
     "interests": "Soccer, superheroes, the color red",
     "triggers": "Peer conflict",
     "calming": "Movement break, counting",
-    "goals": ["Produce /s/ blends 80%", "Use complete sentences in conversation"],
-    "accommodations": ["Visual cues", "Sentence starters"],
+    "goals": [
+      "Produce /s/ blends 80%",
+      "Use complete sentences in conversation"
+    ],
+    "accommodations": [
+      "Visual cues",
+      "Sentence starters"
+    ],
     "disability": "DLD",
     "lastContact": "2026-07-05",
     "fallEval": false,
@@ -78,14 +108,17 @@
     "hasMLL": true,
     "homeLanguage": "Spanish",
     "eldLevel": "Emerging",
-    "interpreterNeeded": true
+    "interpreterNeeded": true,
+    "dob": "2018-09-04"
   },
   {
     "id": "diana",
     "name": "Diana S.",
     "grade": "Gr5",
     "teacher": "Ms. Chen",
-    "discipline": ["OT"],
+    "discipline": [
+      "OT"
+    ],
     "provider": "Samantha",
     "caseManager": "Samantha",
     "tier": 1,
@@ -97,8 +130,13 @@
     "triggers": "Fine motor tasks, handwriting",
     "calming": "Hand stretches, art activities",
     "goals": [],
-    "accommodations": ["Slant board", "Pencil grip", "Modified worksheets", "Extended time on writing tasks"],
-    "disability": "504 — ADHD / fine motor",
+    "accommodations": [
+      "Slant board",
+      "Pencil grip",
+      "Modified worksheets",
+      "Extended time on writing tasks"
+    ],
+    "disability": "504 \u2014 ADHD / fine motor",
     "lastContact": "2026-07-08",
     "fallEval": false,
     "source": "demo",
@@ -106,14 +144,18 @@
     "has504": true,
     "hasMLL": false,
     "section504Due": "2026-10-01",
-    "section504Impairment": "ADHD / fine motor"
+    "section504Impairment": "ADHD / fine motor",
+    "dob": "2015-02-17"
   },
   {
     "id": "maya",
     "name": "Maya P.",
     "grade": "Gr1",
     "teacher": "Ms. Johnson",
-    "discipline": ["Behavior", "SLP"],
+    "discipline": [
+      "Behavior",
+      "SLP"
+    ],
     "provider": "Samantha",
     "caseManager": "Samantha",
     "tier": 3,
@@ -124,22 +166,32 @@
     "interests": "Princesses, glitter, the color pink",
     "triggers": "Transitions, denied requests",
     "calming": "Token board, first-then board, calm corner",
-    "goals": ["Stay in assigned area 80% of session", "Use 3-word requests independently"],
-    "accommodations": ["Visual schedule", "Token economy", "1:1 para support"],
+    "goals": [
+      "Stay in assigned area 80% of session",
+      "Use 3-word requests independently"
+    ],
+    "accommodations": [
+      "Visual schedule",
+      "Token economy",
+      "1:1 para support"
+    ],
     "disability": "AUT",
     "lastContact": "2026-07-18",
     "fallEval": false,
     "source": "demo",
     "hasIEP": true,
     "has504": false,
-    "hasMLL": false
+    "hasMLL": false,
+    "dob": "2019-03-12"
   },
   {
     "id": "jordan",
     "name": "Jordan K.",
     "grade": "Gr3",
     "teacher": "Mr. Park",
-    "discipline": ["Academic"],
+    "discipline": [
+      "Academic"
+    ],
     "provider": "Samantha",
     "caseManager": "Samantha",
     "tier": 2,
@@ -150,8 +202,16 @@
     "interests": "Legos, video games, science",
     "triggers": "Reading aloud, new social situations",
     "calming": "Lego break, quiet workspace",
-    "goals": ["Decode CVC words 90%", "Math facts to 20 fluently"],
-    "accommodations": ["Audio books", "Manipulatives", "Small group testing", "Preferential seating"],
+    "goals": [
+      "Decode CVC words 90%",
+      "Math facts to 20 fluently"
+    ],
+    "accommodations": [
+      "Audio books",
+      "Manipulatives",
+      "Small group testing",
+      "Preferential seating"
+    ],
     "disability": "SLD",
     "lastContact": "2026-07-12",
     "fallEval": false,
@@ -160,14 +220,18 @@
     "has504": true,
     "hasMLL": false,
     "section504Due": "2026-09-15",
-    "section504Impairment": "ADHD (co-occurring with IEP)"
+    "section504Impairment": "ADHD (co-occurring with IEP)",
+    "dob": "2017-05-21"
   },
   {
     "id": "sofia",
     "name": "Sofia G.",
     "grade": "Gr4",
     "teacher": "Ms. Anderson",
-    "discipline": ["SLP", "ELA"],
+    "discipline": [
+      "SLP",
+      "ELA"
+    ],
     "provider": "Samantha",
     "caseManager": "Samantha",
     "tier": 1,
@@ -178,8 +242,14 @@
     "interests": "Dancing, unicorns, the color purple",
     "triggers": "Large group activities",
     "calming": "Drawing, listening to music",
-    "goals": ["Produce /l/ in conversation 85%", "Narrative retell with 5 elements"],
-    "accommodations": ["Small group instruction", "Visual supports"],
+    "goals": [
+      "Produce /l/ in conversation 85%",
+      "Narrative retell with 5 elements"
+    ],
+    "accommodations": [
+      "Small group instruction",
+      "Visual supports"
+    ],
     "disability": "DLD",
     "lastContact": "2026-07-14",
     "fallEval": false,
@@ -189,6 +259,7 @@
     "hasMLL": true,
     "homeLanguage": "Spanish",
     "eldLevel": "Developing",
-    "interpreterNeeded": false
+    "interpreterNeeded": false,
+    "dob": "2016-11-08"
   }
 ]

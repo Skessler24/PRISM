@@ -41,6 +41,7 @@ export function normalizeStudent(raw: Partial<Student> & { id: string; name: str
     section504Impairment: raw.section504Impairment || '',
     hasBip: Boolean(raw.hasBip),
     hasAlp: Boolean(raw.hasAlp),
+    dob: raw.dob || '',
   }
 }
 
