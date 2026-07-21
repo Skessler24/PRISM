@@ -16,14 +16,13 @@ Real student files stay in the browser (`localStorage`). Never commit exports or
 
 | Source | Fields kept |
 |--------|-------------|
-| Contacts export | Student number, HH1/HH2 parent names, emails, phones |
-| Address export | Guardian, street, city, state, zip |
-| ALP PDF | Short profile, strengths, goals excerpts |
-| BIP PDF | Strengths profile + FBA summary excerpts (not full 10+ page plan) |
+| Contacts export (CSV / `.text`) | Student number, HH1/HH2 parent names, emails, phones |
+| Address export (CSV / `.text`) | Guardian, street, city, state, zip |
+| ALP / BIP PDF | **Paused for now** (browser PDF import unreliable) — use later |
 
 ## Coverage UI
 
-After **Import Docs**, Student Tiles shows a **Coverage gaps** panel: contact misses, ALP/BIP matches, and packets that did not land on the Special Pops caseload.
+After **Import Docs**, Student Tiles shows a **Coverage gaps** panel: contact misses and any skipped files.
 
 ## Not in the current upload set
 
