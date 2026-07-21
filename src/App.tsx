@@ -19,6 +19,9 @@ import { ResourcesPage } from './features/resources/ResourcesPage'
 import { AdminDistrictGate } from './features/district-profile/AdminDistrictGate'
 import { Section504Page } from './features/section504/Section504Page'
 import { MllPage } from './features/mll/MllPage'
+import { ProgressMonitoringPage } from './features/progress-monitoring/ProgressMonitoringPage'
+import { CaseloadBinderPage } from './features/caseload-binder/CaseloadBinderPage'
+import { MotivationGamePage } from './features/motivation-game/MotivationGamePage'
 
 export default function App() {
   return (
@@ -33,6 +36,9 @@ export default function App() {
                     <Route index element={<DashboardPage />} />
                     <Route path="students" element={<StudentTilesPage />} />
                     <Route path="caseload" element={<CaseloadPage />} />
+                    <Route path="progress" element={<ProgressMonitoringPage />} />
+                    <Route path="binder" element={<CaseloadBinderPage />} />
+                    <Route path="game" element={<MotivationGamePage />} />
                     <Route path="mtss" element={<MtssPage />} />
                     <Route path="evaluations" element={<EvaluationsPage />} />
                     <Route path="fba" element={<FbaBipPage />} />

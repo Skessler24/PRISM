@@ -103,3 +103,10 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 - **Suite Mode** Companion vs Standalone persisted to `prism_district_settings_v1` (shared with deploy/).
 - Module toggles remain on District Admin only (already admin-gated with the page).
 - Still later: Graph MSAL OAuth, TTS vendor, Azure API attach (`docs/ops/AZURE_RECOVERY_CHECKLIST.md`), React `dist/` cutover.
+
+## Decisions locked (Progress + Binder + Motivation Game)
+
+- **Progress Monitoring** tab (`/progress`, feature `progress`): ESGI-style item probes, exit tickets, cadence due/overdue alerts; syncs last score into caseload probe bars (`prism_pm_sessions_v1` / `prism_exit_tickets_v1` / legacy `prism_progress_probes_v1`).
+- **Caseload Binder** (`/binder`, feature `print`): browser-side jsPDF download — roster, parent log, progress/gradebook snapshot, weekly planner, motivation/attendance pages. FERPA: generated locally, never uploaded.
+- **Motivation Game** (`/game`): ClassDojo-style points + Candyland/Chutes board — attendance check-in, dice, chance cards, year-long prize board; links to Progress + Binder.
+- Offline-first — does **not** require Azure Functions.
