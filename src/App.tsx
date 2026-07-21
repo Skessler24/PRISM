@@ -13,6 +13,7 @@ import { FbaBipPage } from './features/fba-bip/FbaBipPage'
 import { AccessibilityPage } from './features/accessibility/AccessibilityPage'
 import { TemplatesPage } from './features/templates-forms/TemplatesPage'
 import { GenerationPage } from './features/generation/GenerationPage'
+import { QuickToolsPage } from './features/quick-tools/QuickToolsPage'
 import { ResourcesPage } from './features/resources/ResourcesPage'
 import { DistrictProfilePage } from './features/district-profile/DistrictProfilePage'
 import { Section504Page } from './features/section504/Section504Page'
@@ -38,6 +39,7 @@ export default function App() {
                   <Route path="accessibility" element={<AccessibilityPage />} />
                   <Route path="templates" element={<TemplatesPage />} />
                   <Route path="generation" element={<GenerationPage />} />
+                  <Route path="tools" element={<QuickToolsPage />} />
                   <Route path="resources" element={<ResourcesPage />} />
                   <Route path="district" element={<DistrictProfilePage />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
