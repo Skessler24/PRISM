@@ -8,6 +8,8 @@ export type AppTab = {
   icon: string
   /** When set, tab is hidden unless district feature is on */
   featureId?: FeatureName
+  /** When true, tab only shows for Admin role */
+  adminOnly?: boolean
 }
 
 /** First 5 tabs are primary nav; remaining tabs live in the hamburger drawer. */
@@ -87,7 +89,7 @@ export const APP_TABS: AppTab[] = [
     icon: '📚',
     featureId: 'resources',
   },
-  { id: 'district', path: '/district', label: 'District Profile', shortLabel: 'District', icon: '🏛️' },
+  { id: 'district', path: '/district', label: 'District Admin', shortLabel: 'Admin', icon: '⚙️', adminOnly: true },
 ]
 
 export const PRIMARY_TAB_IDS = ['dashboard', 'students', 'caseload', 'mtss', 'evaluations'] as const

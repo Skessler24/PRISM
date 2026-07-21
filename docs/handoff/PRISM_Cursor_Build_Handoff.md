@@ -94,3 +94,12 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 - LRE: weekly minutes **outside** GE only (no push-in); school minutes default override **1,965**/week matching the sheet; bands 80–100 / 40–79 / 0–39.
 - Linked from Eval Tracker, Generation Studio (LRE / Placement Summary doc type), and Dashboard.
 - Source sheet archived: `docs/tools/LRE_Calculation_Tool_for_IEPs.csv`.
+- Demo students include optional `dob` for age prefill.
+
+## Decisions locked (Prompt 9 — React Admin Suite Controls)
+
+- **Admin unlock:** same pilot code as deploy (`prism-admin`) via TopBar SK menu; role in `prism_user_role_v1`.
+- **District Admin** (`/district`) is admin-gated — hidden from staff nav; Staff redirected if they hit the URL.
+- **Suite Mode** Companion vs Standalone persisted to `prism_district_settings_v1` (shared with deploy/).
+- Module toggles remain on District Admin only (already admin-gated with the page).
+- Still later: Graph MSAL OAuth, TTS vendor, Azure API attach (`docs/ops/AZURE_RECOVERY_CHECKLIST.md`), React `dist/` cutover.

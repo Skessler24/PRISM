@@ -2,20 +2,23 @@ import { useMemo, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { APP_TABS, PRIMARY_TAB_IDS, getTabByPath } from '../app/tabs'
 import { useDistrictProfile } from '../lib/district-profiles/useDistrictProfile'
+import { useAdminRole } from '../lib/admin/admin-role-context'
 
 export function TabNavigation() {
   const location = useLocation()
   const active = getTabByPath(location.pathname)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { isFeatureEnabled } = useDistrictProfile()
+  const { isAdmin } = useAdminRole()
 
   const visibleTabs = useMemo(
     () =>
       APP_TABS.filter((t) => {
+        if (t.adminOnly && !isAdmin) return false
         if (!t.featureId) return true
         return isFeatureEnabled(t.featureId)
       }),
-    [isFeatureEnabled],
+    [isFeatureEnabled, isAdmin],
   )
 
   const primaryTabs = visibleTabs.filter((t) =>

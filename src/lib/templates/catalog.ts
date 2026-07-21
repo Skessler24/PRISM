@@ -324,6 +324,23 @@ export function readSuiteMode(): SuiteMode {
   return 'companion'
 }
 
+export function writeSuiteMode(mode: SuiteMode) {
+  let prev: Record<string, unknown> = {}
+  try {
+    const raw = localStorage.getItem(DISTRICT_SETTINGS_KEY)
+    if (raw) prev = JSON.parse(raw) as Record<string, unknown>
+  } catch {
+    /* ignore */
+  }
+  localStorage.setItem(
+    DISTRICT_SETTINGS_KEY,
+    JSON.stringify({
+      ...prev,
+      suiteMode: mode,
+    }),
+  )
+}
+
 export function loadCustomTemplates(): FormTemplate[] {
   try {
     const raw = localStorage.getItem(DISTRICT_TEMPLATES_KEY)
