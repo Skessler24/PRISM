@@ -6,36 +6,36 @@
 <title>PRISM Phase 3 — SPED Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Figtree:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800&family=Poppins:wght@400;600;700;800&family=Figtree:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="enrichment-import.js"></script>
 <script>
-tailwind.config={theme:{extend:{fontFamily:{heading:['Poppins','sans-serif'],body:['Figtree','sans-serif'],mono:['Space Grotesk','monospace']},colors:{navy:'#1E3A5F',accent:'#2563EB','accent-h':'#1D4ED8',sky:'#F0F9FF','card-bg':'#FFFFFF',border:'#E2E8F0',subtext:'#64748B',mint:'#D1FAE5',coral:'#FEE2E2',sun:'#FEF3C7',lav:'#EDE9FE',softorange:'#FFEDD5',pink:'#FCE7F3',slate:'#F1F5F9'}}}}
+tailwind.config={theme:{extend:{fontFamily:{heading:['var(--font-heading)','Inter','sans-serif'],body:['var(--font-body)','Inter','sans-serif'],mono:['Space Grotesk','monospace']},colors:{navy:'#1E3A5F',accent:'#2563EB','accent-h':'#1D4ED8',sky:'#F0F9FF','card-bg':'#FFFFFF',border:'#E2E8F0',subtext:'#64748B',mint:'#D1FAE5',coral:'#FEE2E2',sun:'#FEF3C7',lav:'#EDE9FE',softorange:'#FFEDD5',pink:'#FCE7F3',slate:'#F1F5F9'}}}}
 </script>
 <style>
-:root{--bg:#F0F9FF;--card-bg:#FFFFFF;--text:#1E293B;--subtext:#64748B;--border:#E2E8F0;--shadow:0 1px 3px rgba(0,0,0,.08);--accent:#2563EB;--nav-active:#2563EB;--nav-active-txt:#fff;--nav-inactive:#E2E8F0;--nav-inactive-txt:#475569;--sky:#DBEAFE;--mint:#D1FAE5;--coral:#FEE2E2;--sun:#FEF3C7;--lav:#EDE9FE;--softorange:#FFEDD5;--pink:#FCE7F3;--slate:#F1F5F9;--header-bg:#1E3A5F;--header-txt:#fff}
+:root{--bg:#F0F9FF;--card-bg:#FFFFFF;--text:#1E293B;--subtext:#64748B;--border:#E2E8F0;--shadow:0 1px 3px rgba(0,0,0,.08);--accent:#2563EB;--accent-h:#0EA5E9;--nav-active:#2563EB;--nav-active-txt:#fff;--nav-inactive:#E2E8F0;--nav-inactive-txt:#64748B;--sky:#DBEAFE;--mint:#D1FAE5;--coral:#FEE2E2;--sun:#FEF3C7;--lav:#EDE9FE;--softorange:#FFEDD5;--pink:#FCE7F3;--slate:#F1F5F9;--header-bg:#1E3A5F;--header-txt:#fff;--font-heading:'Inter',sans-serif;--font-body:'Inter',sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--text);padding-top:116px;padding-bottom:36px;min-height:100vh;font-size:14px}
-h1,h2,h3,h4,h5{font-family:'Poppins',sans-serif}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);padding-top:116px;padding-bottom:36px;min-height:100vh;font-size:14px}
+h1,h2,h3,h4,h5,.font-heading{font-family:var(--font-heading)}
 .font-mono-d{font-family:'Space Grotesk',monospace}
 .topbar{position:fixed;top:0;left:0;right:0;height:64px;background:var(--header-bg);color:var(--header-txt);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:1000}
-.prism-logo{display:flex;align-items:center;gap:2px;font-family:'Poppins',sans-serif;font-weight:800;font-size:22px}
+.prism-logo{display:flex;align-items:center;gap:2px;font-family:var(--font-heading);font-weight:800;font-size:22px}
 .prism-pr{background:linear-gradient(135deg,#F472B6,#FB923C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .prism-sm{background:linear-gradient(135deg,#60A5FA,#A78BFA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .prism-icon{width:28px;height:28px;margin:0 1px}
-.tagline{font-size:11px;opacity:.7;margin-left:8px;font-style:italic;font-family:'Figtree',sans-serif}
-.tab-strip{position:fixed;top:64px;left:0;right:0;height:52px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:4px;padding:0 12px;overflow-x:auto;z-index:999;scrollbar-width:none}
+.tagline{font-size:11px;opacity:.7;margin-left:8px;font-style:italic;font-family:var(--font-body)}
+.tab-strip{position:fixed;top:64px;left:0;right:0;height:52px;background:var(--card-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:4px;padding:0 12px;overflow-x:auto;z-index:999;scrollbar-width:none}
 .tab-strip::-webkit-scrollbar{display:none}
-.tab-pill{white-space:nowrap;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;border:none;background:var(--nav-inactive);color:var(--nav-inactive-txt);font-family:'Figtree',sans-serif;min-height:36px}
+.tab-pill{white-space:nowrap;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;border:none;background:var(--nav-inactive);color:var(--nav-inactive-txt);font-family:var(--font-body);min-height:36px}
 .tab-pill.active{background:var(--nav-active);color:var(--nav-active-txt)}
-.tab-pill:hover:not(.active){background:#CBD5E1}
+.tab-pill:hover:not(.active){filter:brightness(.95)}
 .footer-bar{position:fixed;bottom:0;left:0;right:0;height:36px;background:var(--header-bg);color:var(--header-txt);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:11px;z-index:1000}
 .card{background:var(--card-bg);border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--border);padding:16px;margin-bottom:12px}
-.btn-filled{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px;min-height:44px;font-family:'Figtree',sans-serif;transition:background .2s}
+.btn-filled{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px;min-height:44px;font-family:var(--font-body);transition:background .2s}
 .btn-filled:hover{background:var(--accent-h,#1D4ED8)}
-.btn-outlined{background:transparent;color:var(--accent);border:2px solid var(--accent);padding:8px 16px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px;min-height:44px;font-family:'Figtree',sans-serif}
+.btn-outlined{background:transparent;color:var(--accent);border:2px solid var(--accent);padding:8px 16px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px;min-height:44px;font-family:var(--font-body)}
 .btn-sm{padding:4px 12px;min-height:34px;font-size:12px;border-radius:8px}
 .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:600}
 .badge-green{background:#D1FAE5;color:#065F46}
@@ -1157,7 +1157,7 @@ textarea{min-height:80px;resize:vertical}
 
 <!-- THEME STUDIO MODAL -->
 <div data-id="1381" class="overlay-bg" id="themeOverlay"></div>
-<div data-id="1382" class="modal" id="themeModal" style="display:none;min-width:360px;max-width:560px">
+<div data-id="1382" class="modal" id="themeModal" style="display:none;min-width:360px;max-width:640px">
 <div data-id="1383" class="flex items-center justify-between mb-4">
 <h3 data-id="1384" class="text-lg font-bold font-heading"><i data-id="1385" data-lucide="palette" class="w-5 h-5 inline"></i> Theme Studio</h3>
 <button data-id="1386" id="closeThemeBtn"><i data-id="1387" data-lucide="x" class="w-5 h-5"></i></button>
@@ -1470,29 +1470,97 @@ persistRole();
 applyRoleUI();
 showToast(role==='admin'?'Admin access enabled':'Staff view');
 }
+/* Canonical Vision Board v2.1 — keep in sync with src/lib/themes.ts */
 const THEMES=[
-{name:'Calm & Clinical',palettes:[
-{name:'Default Blue',bg:'#F0F9FF',header:'#1E3A5F',accent:'#2563EB',card:'#FFFFFF'},
-{name:'Soft Slate',bg:'#F8FAFC',header:'#334155',accent:'#3B82F6',card:'#FFFFFF'},
-{name:'Arctic',bg:'#F0F4F8',header:'#1E293B',accent:'#0EA5E9',card:'#FFFFFF'},
-{name:'Ocean',bg:'#ECFDF5',header:'#064E3B',accent:'#059669',card:'#FFFFFF'},
-{name:'Minimal',bg:'#FAFAFA',header:'#18181B',accent:'#6366F1',card:'#FFFFFF'}
+{id:'calm-clinical',name:'Calm & Clinical',dot:'#2563EB',fontPrimary:"'Inter', sans-serif",fontSecondary:"'Inter', sans-serif",fontPrimaryName:'Inter',fontSecondaryName:'Inter',palettes:[
+{name:'Classic Blue',bg:'#F0F9FF',card:'#FFFFFF',header:'#1E3A5F',headerTxt:'#FFFFFF',primary:'#2563EB',accent:'#0EA5E9',text:'#1E293B',muted:'#64748B',navActive:'#2563EB',navActiveTxt:'#FFFFFF',navInactive:'#E2E8F0',navInactiveTxt:'#64748B',border:'#E2E8F0'},
+{name:'Slate & Silver',bg:'#F8FAFC',card:'#FFFFFF',header:'#1E293B',headerTxt:'#FFFFFF',primary:'#475569',accent:'#94A3B8',text:'#0F172A',muted:'#64748B',navActive:'#475569',navActiveTxt:'#FFFFFF',navInactive:'#F1F5F9',navInactiveTxt:'#475569',border:'#CBD5E1'},
+{name:'Teal Clinic',bg:'#ECFEFF',card:'#FFFFFF',header:'#164E63',headerTxt:'#FFFFFF',primary:'#0891B2',accent:'#22D3EE',text:'#0C4A6E',muted:'#0891B2',navActive:'#0891B2',navActiveTxt:'#FFFFFF',navInactive:'#CFFAFE',navInactiveTxt:'#0E7490',border:'#A5F3FC'},
+{name:'Sage & Stone',bg:'#ECFDF5',card:'#FFFFFF',header:'#064E3B',headerTxt:'#FFFFFF',primary:'#059669',accent:'#34D399',text:'#022C22',muted:'#059669',navActive:'#059669',navActiveTxt:'#FFFFFF',navInactive:'#D1FAE5',navInactiveTxt:'#065F46',border:'#A7F3D0'},
+{name:'Dusty Rose',bg:'#FFF1F2',card:'#FFFFFF',header:'#881337',headerTxt:'#FFFFFF',primary:'#BE185D',accent:'#F9A8D4',text:'#1E1B1B',muted:'#9D174D',navActive:'#BE185D',navActiveTxt:'#FFFFFF',navInactive:'#FCE7F3',navInactiveTxt:'#9D174D',border:'#FBCFE8'}
 ]},
-{name:'Soft Pastel Pro',palettes:[
-{name:'Lavender Dream',bg:'#FAF5FF',header:'#581C87',accent:'#9333EA',card:'#FFFFFF'},
-{name:'Rose Quartz',bg:'#FFF1F2',header:'#881337',accent:'#E11D48',card:'#FFFFFF'},
-{name:'Mint Fresh',bg:'#F0FDF4',header:'#14532D',accent:'#16A34A',card:'#FFFFFF'},
-{name:'Peach Glow',bg:'#FFF7ED',header:'#7C2D12',accent:'#EA580C',card:'#FFFFFF'},
-{name:'Sky Breeze',bg:'#F0F9FF',header:'#0C4A6E',accent:'#0284C7',card:'#FFFFFF'}
+{id:'soft-pastel',name:'Soft Pastel Pro',dot:'#A78BFA',fontPrimary:"'Nunito', sans-serif",fontSecondary:"'Nunito', sans-serif",fontPrimaryName:'Nunito',fontSecondaryName:'Nunito',palettes:[
+{name:'Lavender Dream',bg:'#F9FAFB',card:'#FFFFFF',header:'linear-gradient(135deg,#C4B5FD,#93C5FD)',headerTxt:'#1E1B4B',primary:'#A78BFA',accent:'#34D399',text:'#374151',muted:'#9CA3AF',navActive:'#A78BFA',navActiveTxt:'#FFFFFF',navInactive:'#EDE9FE',navInactiveTxt:'#7C3AED',border:'#EDE9FE'},
+{name:'Peach Blossom',bg:'#FFF7ED',card:'#FFFFFF',header:'linear-gradient(135deg,#FED7AA,#FCA5A5)',headerTxt:'#7C2D12',primary:'#FB923C',accent:'#F472B6',text:'#431407',muted:'#9A3412',navActive:'#FB923C',navActiveTxt:'#FFFFFF',navInactive:'#FFEDD5',navInactiveTxt:'#C2410C',border:'#FED7AA'},
+{name:'Mint Breeze',bg:'#ECFDF5',card:'#FFFFFF',header:'linear-gradient(135deg,#A7F3D0,#6EE7B7)',headerTxt:'#064E3B',primary:'#10B981',accent:'#818CF8',text:'#022C22',muted:'#059669',navActive:'#10B981',navActiveTxt:'#FFFFFF',navInactive:'#D1FAE5',navInactiveTxt:'#047857',border:'#A7F3D0'},
+{name:'Rose Garden',bg:'#FFF1F2',card:'#FFFFFF',header:'linear-gradient(135deg,#FECDD3,#FDA4AF)',headerTxt:'#881337',primary:'#F43F5E',accent:'#C084FC',text:'#1E1B1B',muted:'#BE123C',navActive:'#F43F5E',navActiveTxt:'#FFFFFF',navInactive:'#FFE4E6',navInactiveTxt:'#E11D48',border:'#FECDD3'},
+{name:'Sky & Cloud',bg:'#EFF6FF',card:'#FFFFFF',header:'linear-gradient(135deg,#BAE6FD,#93C5FD)',headerTxt:'#1E3A5F',primary:'#60A5FA',accent:'#F9A8D4',text:'#1E3A5F',muted:'#3B82F6',navActive:'#60A5FA',navActiveTxt:'#FFFFFF',navInactive:'#DBEAFE',navInactiveTxt:'#2563EB',border:'#BFDBFE'}
 ]},
-{name:'Dark Mode Elite',palettes:[
-{name:'Midnight',bg:'#0F172A',header:'#020617',accent:'#3B82F6',card:'#1E293B'},
-{name:'Charcoal',bg:'#171717',header:'#0A0A0A',accent:'#A855F7',card:'#262626'},
-{name:'Forest Night',bg:'#052E16',header:'#022C22',accent:'#22C55E',card:'#14532D'},
-{name:'Deep Ocean',bg:'#0C1832',header:'#020617',accent:'#06B6D4',card:'#1E293B'},
-{name:'Ember',bg:'#1C1917',header:'#0C0A09',accent:'#F97316',card:'#292524'}
+{id:'dark-mode',name:'Dark Mode Elite',dot:'#818CF8',fontPrimary:"'Space Grotesk', sans-serif",fontSecondary:"'Inter', sans-serif",fontPrimaryName:'Space Grotesk',fontSecondaryName:'Inter',palettes:[
+{name:'Indigo Glow',bg:'#0F172A',card:'#1E293B',header:'#020617',headerTxt:'#E2E8F0',primary:'#818CF8',accent:'#38BDF8',text:'#F1F5F9',muted:'#94A3B8',navActive:'#818CF8',navActiveTxt:'#FFFFFF',navInactive:'#1E293B',navInactiveTxt:'#94A3B8',border:'#334155'},
+{name:'Emerald Night',bg:'#0F172A',card:'#1E293B',header:'#022C22',headerTxt:'#D1FAE5',primary:'#10B981',accent:'#6EE7B7',text:'#F0FDF4',muted:'#6EE7B7',navActive:'#10B981',navActiveTxt:'#022C22',navInactive:'#1E293B',navInactiveTxt:'#6EE7B7',border:'#134E4A'},
+{name:'Amber Dark',bg:'#0F172A',card:'#1E293B',header:'#1C1002',headerTxt:'#FDE68A',primary:'#F59E0B',accent:'#FDE68A',text:'#FFFBEB',muted:'#FCD34D',navActive:'#F59E0B',navActiveTxt:'#1C1002',navInactive:'#1E293B',navInactiveTxt:'#FCD34D',border:'#292524'},
+{name:'Rose Noir',bg:'#0F172A',card:'#1E293B',header:'#1A0010',headerTxt:'#FFE4E6',primary:'#F43F5E',accent:'#FDA4AF',text:'#FFF1F2',muted:'#FDA4AF',navActive:'#F43F5E',navActiveTxt:'#FFFFFF',navInactive:'#1E293B',navInactiveTxt:'#FDA4AF',border:'#4C0519'},
+{name:'Cyan Storm',bg:'#0F172A',card:'#1E293B',header:'#012025',headerTxt:'#A5F3FC',primary:'#06B6D4',accent:'#67E8F9',text:'#ECFEFF',muted:'#67E8F9',navActive:'#06B6D4',navActiveTxt:'#012025',navInactive:'#1E293B',navInactiveTxt:'#67E8F9',border:'#164E63'}
 ]}
 ];
+const THEME_STORAGE_KEY='prism_theme_v21';
+const DEFAULT_THEME={familyId:'calm-clinical',paletteName:'Classic Blue'};
+function getThemeFamily(id){return THEMES.find(f=>f.id===id)}
+function getThemePalette(familyId,paletteName){
+const f=getThemeFamily(familyId);
+return f?f.palettes.find(p=>p.name===paletteName):null;
+}
+function paletteToCssVars(palette,family){
+const isDark=family.id==='dark-mode'||palette.bg.startsWith('#0')||palette.bg.startsWith('#1C');
+return {
+'--bg':palette.bg,
+'--card-bg':palette.card,
+'--text':palette.text,
+'--subtext':palette.muted,
+'--border':palette.border,
+'--accent':palette.primary,
+'--accent-h':palette.accent,
+'--nav-active':palette.navActive,
+'--nav-active-txt':palette.navActiveTxt,
+'--nav-inactive':palette.navInactive,
+'--nav-inactive-txt':palette.navInactiveTxt,
+'--header-bg':palette.header,
+'--header-txt':palette.headerTxt,
+'--sky':isDark?palette.border:'#DBEAFE',
+'--mint':isDark?palette.border:'#D1FAE5',
+'--coral':isDark?palette.border:'#FEE2E2',
+'--sun':isDark?palette.border:'#FEF3C7',
+'--lav':isDark?palette.border:'#EDE9FE',
+'--softorange':isDark?palette.border:'#FFEDD5',
+'--pink':isDark?palette.border:'#FCE7F3',
+'--slate':isDark?palette.navInactive:'#F1F5F9',
+'--font-heading':family.fontPrimary,
+'--font-body':family.fontSecondary,
+'--shadow':isDark?'0 1px 3px rgba(0,0,0,.35)':'0 1px 3px rgba(0,0,0,.08)'
+};
+}
+function applyTheme(familyId,paletteName,persist){
+const family=getThemeFamily(familyId)||THEMES[0];
+const palette=getThemePalette(family.id,paletteName)||family.palettes[0];
+const vars=paletteToCssVars(palette,family);
+const root=document.documentElement;
+Object.keys(vars).forEach(k=>root.style.setProperty(k,vars[k]));
+document.body.style.background=palette.bg;
+document.body.style.color=palette.text;
+document.body.style.fontFamily=family.fontSecondary;
+document.querySelectorAll('.topbar,.footer-bar').forEach(el=>{
+el.style.background=palette.header;
+el.style.color=palette.headerTxt;
+});
+document.querySelectorAll('.card').forEach(el=>{
+el.style.background=palette.card;
+el.style.borderColor=palette.border;
+});
+if(persist!==false){
+try{localStorage.setItem(THEME_STORAGE_KEY,JSON.stringify({familyId:family.id,paletteName:palette.name}));}catch(e){}
+}
+}
+function readSavedTheme(){
+try{
+const raw=localStorage.getItem(THEME_STORAGE_KEY);
+if(raw){
+const parsed=JSON.parse(raw);
+if(parsed.familyId&&parsed.paletteName&&getThemePalette(parsed.familyId,parsed.paletteName))return parsed;
+}
+}catch(e){}
+return DEFAULT_THEME;
+}
 
 const TRAINING=[
 {title:'Enrich IEP System Basics',desc:'How to navigate, enter data, and finalize IEPs in Enrich',content:'Enrich is CCSD\'s official IEP management system. Key steps: 1) Log in via MyCherry Creek portal. 2) Select student from caseload. 3) Navigate sections: Student Info, Present Levels, Goals, Services, LRE, ESY, Accommodations, Assessments. 4) Enter all required data. 5) Convert (draft → active). 6) Validate (system checks for missing fields). 7) Finalize (locks the IEP). Remember: Always Convert → Validate → Finalize in that order. Never skip validation.'},
@@ -2399,23 +2467,23 @@ document.getElementById('themeModal').style.display='none';
 });
 function renderThemes(){
 const g=document.getElementById('themeGrid');
-g.innerHTML=THEMES.map(cat=>`<div><h4 class="font-bold text-sm mb-2">${cat.name}</h4>
-<div class="grid grid-cols-5 gap-2">${cat.palettes.map(p=>`<div class="cursor-pointer p-2 rounded-lg border text-center theme-apply-btn" data-bg="${p.bg}" data-header="${p.header}" data-accent="${p.accent}" data-card="${p.card}">
-<div class="flex gap-1 justify-center mb-1"><div class="w-4 h-4 rounded-full" style="background:${p.header}"></div><div class="w-4 h-4 rounded-full" style="background:${p.accent}"></div><div class="w-4 h-4 rounded-full" style="background:${p.bg}"></div></div>
-<p class="text-xs">${p.name}</p></div>`).join('')}</div></div>`).join('');
+const saved=readSavedTheme();
+g.innerHTML=THEMES.map((cat,fi)=>`<div class="mb-4"><h4 class="font-bold text-sm mb-1 flex items-center gap-2"><span class="inline-block w-2.5 h-2.5 rounded-full" style="background:${cat.dot}"></span>${cat.name}</h4>
+<p class="text-xs mb-2" style="color:var(--subtext)">${cat.fontPrimaryName}${cat.fontSecondaryName&&cat.fontSecondaryName!==cat.fontPrimaryName?' + '+cat.fontSecondaryName:''}</p>
+<div class="grid grid-cols-2 sm:grid-cols-5 gap-2">${cat.palettes.map((p,pi)=>{
+const active=saved.familyId===cat.id&&saved.paletteName===p.name;
+const swatch=p.header.startsWith('linear')?p.header:p.header;
+return `<div class="cursor-pointer p-2 rounded-lg border text-center theme-apply-btn" style="border-color:${active?p.primary:p.border};${active?'box-shadow:0 0 0 2px '+p.primary:''}" data-fi="${fi}" data-pi="${pi}">
+<div class="flex gap-1 justify-center mb-1"><div class="w-4 h-4 rounded-full" style="background:${swatch}"></div><div class="w-4 h-4 rounded-full" style="background:${p.primary}"></div><div class="w-4 h-4 rounded-full border" style="background:${p.bg};border-color:${p.border}"></div></div>
+<p class="text-xs" style="color:var(--text)">${p.name}</p></div>`;
+}).join('')}</div></div>`).join('');
 g.querySelectorAll('.theme-apply-btn').forEach(b=>{
 b.addEventListener('click',()=>{
-document.documentElement.style.setProperty('--bg',b.dataset.bg);
-document.documentElement.style.setProperty('--header-bg',b.dataset.header);
-document.documentElement.style.setProperty('--accent',b.dataset.accent);
-document.documentElement.style.setProperty('--card-bg',b.dataset.card);
-document.body.style.background=b.dataset.bg;
-document.querySelectorAll('.topbar,.footer-bar').forEach(el=>el.style.background=b.dataset.header);
-document.querySelectorAll('.card').forEach(el=>el.style.background=b.dataset.card);
-const isDark=b.dataset.bg.startsWith('#0')||b.dataset.bg.startsWith('#1');
-document.body.style.color=isDark?'#E2E8F0':'#1E293B';
-localStorage.setItem('prism_theme',JSON.stringify({bg:b.dataset.bg,header:b.dataset.header,accent:b.dataset.accent,card:b.dataset.card}));
-showToast('Theme applied!');
+const fam=THEMES[+b.dataset.fi];
+const pal=fam.palettes[+b.dataset.pi];
+applyTheme(fam.id,pal.name,true);
+renderThemes();
+showToast('Theme applied: '+pal.name);
 });
 });
 }
@@ -2780,15 +2848,8 @@ const dash=document.querySelector('.tab-pill[data-tab="dashboard"]');
 if(dash)dash.click();
 }
 }
-const savedTheme=JSON.parse(localStorage.getItem('prism_theme')||'null');
-if(savedTheme){
-document.documentElement.style.setProperty('--bg',savedTheme.bg);
-document.documentElement.style.setProperty('--header-bg',savedTheme.header);
-document.documentElement.style.setProperty('--accent',savedTheme.accent);
-document.documentElement.style.setProperty('--card-bg',savedTheme.card);
-document.body.style.background=savedTheme.bg;
-document.querySelectorAll('.topbar,.footer-bar').forEach(el=>el.style.background=savedTheme.header);
-}
+const savedThemeSel=readSavedTheme();
+applyTheme(savedThemeSel.familyId,savedThemeSel.paletteName,false);
 
 // Final icon refresh
 updateCaseloadBanner();
