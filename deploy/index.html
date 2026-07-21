@@ -2361,7 +2361,21 @@ const d=new Date(trigger);d.setFullYear(d.getFullYear()+3);
 const prep=new Date(d);prep.setDate(prep.getDate()-90);
 lines=[{label:'Last Evaluation',date:fmt(trigger),color:'#22C55E'},{label:'Begin Reeval Prep',date:fmt(prep),color:'#F59E0B'},{label:'Reevaluation Deadline',date:fmt(d),color:'#EF4444'}];
 }
-out.innerHTML=lines.map(l=>`<div class="flex items-center gap-3 p-2 rounded-lg bg-slate"><div class="w-3 h-3 rounded-full" style="background:${l.color}"></div><span class="font-semibold text-sm">${l.label}</span><span class="font-mono-d text-sm ml-auto">${l.date}</span></div>`).join('');
+out.innerHTML=lines.map(l=>{
+const iso=/^\d{4}-\d{2}-\d{2}$/.test(l.date)?l.date:'';
+const hit=iso&&typeof isNoSchoolDay==='function'?isNoSchoolDay(iso):null;
+const warn=hit?`<span class="badge badge-amber ml-2" title="${hit.title}">District calendar conflict</span>`:'';
+return`<div class="flex items-center gap-3 p-2 rounded-lg bg-slate"><div class="w-3 h-3 rounded-full" style="background:${l.color}"></div><span class="font-semibold text-sm">${l.label}</span>${warn}<span class="font-mono-d text-sm ml-auto">${l.date}</span></div>`;
+}).join('');
+if(typeof isNoSchoolDay==='function'){
+const conflicts=lines.filter(l=>/^\d{4}-\d{2}-\d{2}$/.test(l.date)&&isNoSchoolDay(l.date));
+if(conflicts.length){
+const note=document.createElement('p');
+note.className='text-xs text-amber-700 mt-2';
+note.textContent='One or more deadlines fall on a CCSD no-school / non-contact day — adjust meeting dates using District → School Calendar.';
+out.appendChild(note);
+}
+}
 const addBtn=document.createElement('button');addBtn.className='btn-sm btn-outlined mt-2';addBtn.textContent='Add to Calendar';
 addBtn.addEventListener('click',()=>showToast('Added to calendar'));
 out.appendChild(addBtn);
