@@ -22,6 +22,8 @@ import { MllPage } from './features/mll/MllPage'
 import { ProgressMonitoringPage } from './features/progress-monitoring/ProgressMonitoringPage'
 import { CaseloadBinderPage } from './features/caseload-binder/CaseloadBinderPage'
 import { MotivationGamePage } from './features/motivation-game/MotivationGamePage'
+import { EnrichRemindersPage } from './features/enrich-reminders/EnrichRemindersPage'
+import { ParentContactsPage } from './features/parent-contacts/ParentContactsPage'
 
 export default function App() {
   return (
@@ -39,6 +41,8 @@ export default function App() {
                     <Route path="progress" element={<ProgressMonitoringPage />} />
                     <Route path="binder" element={<CaseloadBinderPage />} />
                     <Route path="game" element={<MotivationGamePage />} />
+                    <Route path="reminders" element={<EnrichRemindersPage />} />
+                    <Route path="contacts" element={<ParentContactsPage />} />
                     <Route path="mtss" element={<MtssPage />} />
                     <Route path="evaluations" element={<EvaluationsPage />} />
                     <Route path="fba" element={<FbaBipPage />} />
