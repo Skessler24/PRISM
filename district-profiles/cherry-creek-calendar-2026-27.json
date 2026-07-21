@@ -1,0 +1,189 @@
+{
+  "id": "cherry-creek-sy2026-27",
+  "districtId": "cherry-creek",
+  "title": "Cherry Creek School District 2026–2027 School Year Calendar",
+  "scope": "ALL SCHOOLS",
+  "adopted": "2024-01-08",
+  "sourcePdf": "docs/ccsd/calendars/ccsd-sy2026-27-calendar.pdf",
+  "deployPdf": "assets/ccsd-sy2026-27-calendar.pdf",
+  "officialUrl": "https://resources.finalsite.net/images/v1731599722/cherrycreekschoolsorg/cvfzzayrounv1otba48x/finalsy2026-27ccsdcalendar_0124.pdf",
+  "notes": [
+    "If the district closes schools for more than two days, the Board of Education may amend this calendar to add school days.",
+    "K-8 Non-contact/conferences days: no school for K-8 students; high school schedules may differ per building."
+  ],
+  "legend": [
+    { "type": "no_school", "label": "No School for Students and Staff" },
+    { "type": "school_starts", "label": "School Starts" },
+    { "type": "last_day", "label": "Last day of School" },
+    { "type": "teacher_work", "label": "Teacher Work Days Prior to Start of School" },
+    { "type": "k12_noncontact", "label": "K-12 Non-contact" },
+    { "type": "k8_conferences", "label": "K-8 Non-contact/conferences" }
+  ],
+  "events": [
+    {
+      "id": "teacher-work-aug",
+      "title": "Teacher Work Days Prior to Start of School",
+      "type": "teacher_work",
+      "start": "2026-08-10",
+      "end": "2026-08-14",
+      "studentSchool": false,
+      "staffWork": true
+    },
+    {
+      "id": "first-day",
+      "title": "First Day of School",
+      "type": "school_starts",
+      "start": "2026-08-17",
+      "end": "2026-08-17",
+      "studentSchool": true,
+      "staffWork": true
+    },
+    {
+      "id": "labor-day",
+      "title": "Labor Day — No School",
+      "type": "no_school",
+      "start": "2026-09-07",
+      "end": "2026-09-07",
+      "studentSchool": false,
+      "staffWork": false
+    },
+    {
+      "id": "k12-nc-sep",
+      "title": "K-12 Non-contact",
+      "type": "k12_noncontact",
+      "start": "2026-09-18",
+      "end": "2026-09-18",
+      "studentSchool": false,
+      "staffWork": true
+    },
+    {
+      "id": "fall-break",
+      "title": "Fall Break — No School",
+      "type": "no_school",
+      "start": "2026-10-12",
+      "end": "2026-10-16",
+      "studentSchool": false,
+      "staffWork": false
+    },
+    {
+      "id": "k8-conf-nov",
+      "title": "K-8 Non-contact / Conferences",
+      "type": "k8_conferences",
+      "start": "2026-11-06",
+      "end": "2026-11-06",
+      "studentSchool": false,
+      "staffWork": true,
+      "grades": "K-8"
+    },
+    {
+      "id": "k12-nc-nov",
+      "title": "K-12 Non-contact",
+      "type": "k12_noncontact",
+      "start": "2026-11-25",
+      "end": "2026-11-25",
+      "studentSchool": false,
+      "staffWork": true
+    },
+    {
+      "id": "thanksgiving",
+      "title": "Thanksgiving Break — No School",
+      "type": "no_school",
+      "start": "2026-11-26",
+      "end": "2026-11-27",
+      "studentSchool": false,
+      "staffWork": false
+    },
+    {
+      "id": "winter-break",
+      "title": "Winter Break — No School",
+      "type": "no_school",
+      "start": "2026-12-21",
+      "end": "2027-01-01",
+      "studentSchool": false,
+      "staffWork": false
+    },
+    {
+      "id": "k12-nc-jan",
+      "title": "K-12 Non-contact",
+      "type": "k12_noncontact",
+      "start": "2027-01-04",
+      "end": "2027-01-04",
+      "studentSchool": false,
+      "staffWork": true
+    },
+    {
+      "id": "mlk",
+      "title": "Martin Luther King, Jr. Day — No School",
+      "type": "no_school",
+      "start": "2027-01-18",
+      "end": "2027-01-18",
+      "studentSchool": false,
+      "staffWork": false
+    },
+    {
+      "id": "presidents-day",
+      "title": "Presidents' Day — No School",
+      "type": "no_school",
+      "start": "2027-02-15",
+      "end": "2027-02-15",
+      "studentSchool": false,
+      "staffWork": false
+    },
+    {
+      "id": "k12-nc-feb",
+      "title": "K-12 Non-contact",
+      "type": "k12_noncontact",
+      "start": "2027-02-16",
+      "end": "2027-02-16",
+      "studentSchool": false,
+      "staffWork": true
+    },
+    {
+      "id": "k8-conf-mar",
+      "title": "K-8 Non-contact / Conferences",
+      "type": "k8_conferences",
+      "start": "2027-03-04",
+      "end": "2027-03-05",
+      "studentSchool": false,
+      "staffWork": true,
+      "grades": "K-8"
+    },
+    {
+      "id": "spring-break",
+      "title": "Spring Break — No School",
+      "type": "no_school",
+      "start": "2027-03-15",
+      "end": "2027-03-19",
+      "studentSchool": false,
+      "staffWork": false
+    },
+    {
+      "id": "k8-conf-may",
+      "title": "K-8 Non-contact / Conferences",
+      "type": "k8_conferences",
+      "start": "2027-05-07",
+      "end": "2027-05-07",
+      "studentSchool": false,
+      "staffWork": true,
+      "grades": "K-8"
+    },
+    {
+      "id": "last-day",
+      "title": "Last Day of School",
+      "type": "last_day",
+      "start": "2027-05-28",
+      "end": "2027-05-28",
+      "studentSchool": true,
+      "staffWork": true
+    },
+    {
+      "id": "memorial-day",
+      "title": "Memorial Day — No School",
+      "type": "no_school",
+      "start": "2027-05-31",
+      "end": "2027-05-31",
+      "studentSchool": false,
+      "staffWork": false
+    }
+  ]
+}

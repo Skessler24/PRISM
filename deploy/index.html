@@ -295,7 +295,7 @@ textarea{min-height:80px;resize:vertical}
 <button data-id="241" class="sub-tab-btn" data-filter="AUT">AUT</button>
 <button data-id="242" class="sub-tab-btn" data-filter="SLD">SLD</button>
 </div>
-<div data-id="243" class="help-assist-panel"><strong data-id="244">💡 Help Assist:</strong> Click "Open" on any student tile to view their full profile. Use <strong>Import CSV</strong> with your ARR Special Pops export (By Grade sheet). Real student data stays on your device only.</div>
+<div data-id="243" class="help-assist-panel"><strong data-id="244">💡 Help Assist:</strong> <strong>Import CSV</strong> loads the Special Pops caseload. <strong>Import Docs</strong> merges parent/contact exports plus ALP/BIP PDFs (whole-school rosters are filtered to your caseload). Everything stays in this browser only.</div>
 <div data-id="245" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3" id="studentGrid"></div>
 </div>
 </div>
@@ -907,6 +907,7 @@ textarea{min-height:80px;resize:vertical}
 <div data-id="1177" class="flex flex-wrap gap-2 mb-4">
 <button data-id="1178" class="sub-tab-btn active" data-dist="dist-profile">Profile Settings</button>
 <button data-id="1179" class="sub-tab-btn" data-dist="dist-rules">CCSD Rules</button>
+<button class="sub-tab-btn" data-dist="dist-calendar">School Calendar</button>
 <button data-id="1180" class="sub-tab-btn" data-dist="dist-timeline">Timeline Engine</button>
 <button data-id="1181" class="sub-tab-btn" data-dist="dist-toggles">Feature Toggles</button>
 <button data-id="1182" class="sub-tab-btn" data-dist="dist-add">Add District</button>
@@ -936,6 +937,33 @@ textarea{min-height:80px;resize:vertical}
 <thead data-id="1224"><tr data-id="1225" class="border-b"><th data-id="1226" class="p-2 text-left">Rule</th><th data-id="1227" class="p-2 text-left">Requirement</th><th data-id="1228" class="p-2">Source</th><th data-id="1229" class="p-2">Status</th></tr></thead>
 <tbody data-id="1230" id="rulesBody"></tbody>
 </table>
+</div>
+</div>
+
+<div class="sub-content" id="dist-calendar">
+<div class="card">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
+<div>
+<h3 class="text-sm font-bold font-heading">CCSD 2026–2027 School Year Calendar</h3>
+<p class="text-xs text-subtext">All schools · Adopted by Board of Education Jan 8, 2024</p>
+</div>
+<div class="flex flex-wrap gap-2">
+<a class="btn-outlined btn-sm" href="assets/ccsd-sy2026-27-calendar.pdf" target="_blank" rel="noopener">Open PDF</a>
+<a class="btn-outlined btn-sm" href="assets/ccsd-sy2026-27-calendar.json" target="_blank" rel="noopener">Key dates JSON</a>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+<div class="p-3 rounded-lg bg-slate"><p class="text-xs text-subtext">First day</p><p class="font-bold text-sm">Mon, Aug 17, 2026</p></div>
+<div class="p-3 rounded-lg bg-slate"><p class="text-xs text-subtext">Last day</p><p class="font-bold text-sm">Fri, May 28, 2027</p></div>
+<div class="p-3 rounded-lg bg-slate"><p class="text-xs text-subtext">Teacher work week</p><p class="font-bold text-sm">Aug 10–14, 2026</p></div>
+</div>
+<p class="text-xs text-subtext mb-2">Use these when scheduling IEPs, NOMs, and eval meetings — avoid no-school and non-contact days for family meetings when possible.</p>
+<div class="overflow-x-auto">
+<table class="w-full text-xs" id="districtCalendarTable">
+<thead><tr class="border-b"><th class="p-2 text-left">Date(s)</th><th class="p-2 text-left">Event</th><th class="p-2 text-left">Type</th><th class="p-2 text-center">Students</th></tr></thead>
+<tbody id="districtCalendarBody"></tbody>
+</table>
+</div>
 </div>
 </div>
 
@@ -1921,6 +1949,48 @@ formsGrid.innerHTML=FORMS.map(f=>`<div class="card"><h4 class="font-bold text-sm
 const rulesBody=document.getElementById('rulesBody');
 rulesBody.innerHTML=RULES.map(r=>`<tr class="border-b"><td class="p-2 font-semibold">${r.rule}</td><td class="p-2">${r.req}</td><td class="p-2 text-center"><span class="badge badge-sky">${r.source}</span></td><td class="p-2 text-center"><span class="badge badge-green">✅ Active</span></td></tr>`).join('');
 
+// === DISTRICT SCHOOL CALENDAR (SY26-27) ===
+const CCSD_CAL_TYPE_BADGE={
+no_school:'badge-red',
+school_starts:'badge-green',
+last_day:'badge-amber',
+teacher_work:'badge-blue',
+k12_noncontact:'badge-sky',
+k8_conferences:'badge-lav'
+};
+function formatCalRange(start,end){
+const opts={weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'UTC'};
+const a=new Date(start+'T12:00:00Z');
+const b=new Date((end||start)+'T12:00:00Z');
+const fa=a.toLocaleDateString('en-US',opts);
+if(start===end||!end)return fa;
+return fa+' – '+b.toLocaleDateString('en-US',opts);
+}
+function renderDistrictCalendar(cal){
+const body=document.getElementById('districtCalendarBody');
+if(!body||!cal||!cal.events)return;
+body.innerHTML=cal.events.map(e=>{
+const badge=CCSD_CAL_TYPE_BADGE[e.type]||'badge-sky';
+const students=e.studentSchool?'In session':'No school';
+return`<tr class="border-b"><td class="p-2 font-mono-d whitespace-nowrap">${formatCalRange(e.start,e.end)}</td><td class="p-2 font-semibold">${e.title}</td><td class="p-2"><span class="badge ${badge}">${e.type.replace(/_/g,' ')}</span></td><td class="p-2 text-center">${students}</td></tr>`;
+}).join('');
+window.CCSD_CALENDAR=cal;
+}
+fetch('assets/ccsd-sy2026-27-calendar.json').then(r=>r.json()).then(renderDistrictCalendar).catch(()=>{
+const body=document.getElementById('districtCalendarBody');
+if(body)body.innerHTML='<tr><td colspan="4" class="p-3 text-subtext">Calendar data unavailable — open the PDF link above.</td></tr>';
+});
+
+function isNoSchoolDay(isoDate){
+const cal=window.CCSD_CALENDAR;
+if(!cal||!cal.events||!isoDate)return null;
+const d=isoDate.slice(0,10);
+for(const e of cal.events){
+if(e.studentSchool)continue;
+if(d>=e.start&&d<=(e.end||e.start))return e;
+}
+return null;
+}
 // === FEATURE TOGGLES ===
 const ftGrid=document.getElementById('featureToggles');
 ftGrid.innerHTML=FEATURES.map((f,i)=>`<div class="p-3 rounded-lg bg-slate flex items-center justify-between">
