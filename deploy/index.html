@@ -90,6 +90,14 @@ textarea{min-height:80px;resize:vertical}
 .required-highlight{border-left:3px solid #F59E0B;padding-left:8px}
 .loading-dots::after{content:'...';animation:dots 1.5s infinite}
 @keyframes dots{0%{content:'.'}33%{content:'..'}66%{content:'...'}}
+.admin-menu-wrap{position:relative}
+.admin-dropdown{display:none;position:absolute;right:0;top:calc(100% + 8px);min-width:240px;background:#fff;color:#1E293B;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.25);border:1px solid #E2E8F0;padding:8px;z-index:1100}
+.admin-dropdown.open{display:block}
+.admin-dropdown button{display:block;width:100%;text-align:left;padding:10px 12px;border:none;background:transparent;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Figtree',sans-serif;color:#1E293B}
+.admin-dropdown button:hover{background:#F1F5F9}
+.account-menu-wrap{position:relative}
+.suite-mode-card{border:1px solid var(--border);border-radius:12px;padding:12px;background:#F8FAFC}
+.tab-pill[hidden],.tab-pill.is-hidden{display:none!important}
 </style>
 </head>
 <body data-id="0">
@@ -102,10 +110,25 @@ textarea{min-height:80px;resize:vertical}
 <img src="/prism-wordmark.png" alt="PRISM — Reflect the Whole Human" style="height:56px;width:auto;max-width:min(72vw,380px);object-fit:contain;object-position:left" />
 </a>
 </div>
-<div data-id="14" class="flex items-center gap-3">
+<div data-id="14" class="flex items-center gap-2 md:gap-3">
 <button data-id="15" class="help-toggle" id="helpToggleBtn">💡 Help Assist: OFF</button>
 <button data-id="16" class="theme-btn" id="themeStudioBtn"><i data-id="17" data-lucide="palette" class="w-4 h-4 inline"></i> Theme</button>
-<div data-id="18" class="avatar-circle" style="background:linear-gradient(135deg,#7C3AED,#2563EB)">SK</div>
+<div class="admin-menu-wrap" id="adminMenuWrap" hidden>
+<button class="theme-btn" id="adminMenuBtn" type="button" title="District administration"><i data-lucide="shield" class="w-4 h-4 inline"></i> Admin</button>
+<div class="admin-dropdown" id="adminMenuDropdown">
+<button type="button" id="adminOpenDistrictBtn">🏛️ District Profile &amp; Settings</button>
+<button type="button" id="adminOpenTogglesBtn">🎚️ Module toggles</button>
+<button type="button" id="adminExitBtn">Exit admin view</button>
+</div>
+</div>
+<div class="account-menu-wrap">
+<button type="button" class="avatar-circle" id="accountMenuBtn" style="background:linear-gradient(135deg,#7C3AED,#2563EB);border:none;cursor:pointer" title="Account / role">SK</button>
+<div class="admin-dropdown" id="accountMenuDropdown">
+<p class="text-xs text-subtext px-3 py-1" id="accountRoleLabel">Role: Staff</p>
+<button type="button" id="switchToStaffBtn">Staff view</button>
+<button type="button" id="switchToAdminBtn">Admin access…</button>
+</div>
+</div>
 </div>
 </header>
 
@@ -114,12 +137,13 @@ textarea{min-height:80px;resize:vertical}
 <button data-id="20" class="tab-pill active" data-tab="dashboard">🏠 Dashboard</button>
 <button data-id="21" class="tab-pill" data-tab="students">🧩 Students</button>
 <button data-id="22" class="tab-pill" data-tab="caseload">👤 My Caseload</button>
-<button data-id="23" class="tab-pill" data-tab="mtss">📋 MTSS Hub</button>
-<button data-id="24" class="tab-pill" data-tab="eval">📊 Eval Tracker</button>
-<button data-id="25" class="tab-pill" data-tab="accessibility">♿ Accessibility</button>
-<button data-id="26" class="tab-pill" data-tab="templates">🎨 Templates</button>
-<button data-id="27" class="tab-pill" data-tab="resources">📚 Resources</button>
-<button data-id="28" class="tab-pill" data-tab="district">🏛️ District</button>
+<button data-id="23" class="tab-pill" data-tab="mtss" data-feature="mtss">📋 MTSS Hub</button>
+<button class="tab-pill" data-tab="section504" data-feature="section504" hidden>📑 504 Plans</button>
+<button class="tab-pill" data-tab="mll" data-feature="mll" hidden>🌍 Multilingual Learners</button>
+<button data-id="24" class="tab-pill" data-tab="eval" data-feature="eval">📊 Eval Tracker</button>
+<button data-id="25" class="tab-pill" data-tab="accessibility" data-feature="accessibility">♿ Accessibility</button>
+<button data-id="26" class="tab-pill" data-tab="templates" data-feature="templates">🎨 Templates</button>
+<button data-id="27" class="tab-pill" data-tab="resources" data-feature="resources">📚 Resources</button>
 </nav>
 
 <!-- COMPLIANCE TICKER -->
@@ -344,6 +368,33 @@ textarea{min-height:80px;resize:vertical}
 <div data-id="313" class="space-y-3" id="progressMonitorList"></div>
 </div>
 </div>
+</div>
+</div>
+</div>
+
+<!-- ===== TAB: 504 PLANS ===== -->
+<div class="tab-content" id="tab-section504">
+<div class="max-w-7xl mx-auto">
+<h2 class="text-lg font-bold font-heading mb-3">📑 504 Plans</h2>
+<div class="card">
+<p class="text-sm mb-2">Section 504 accommodation plans — first-class PRISM module (toggleable per district).</p>
+<div class="help-assist-panel show"><strong>Coming next build:</strong> 504 caseload list, accommodation checklist, annual review dates, and parent notice drafts. Enable/disable this tab in <strong>Admin → Module toggles</strong>.</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+<div class="p-3 rounded-lg bg-slate"><p class="text-xs text-subtext">Students with 504</p><p class="font-bold text-lg" id="count504">—</p></div>
+<div class="p-3 rounded-lg bg-slate"><p class="text-xs text-subtext">Reviews due (45 days)</p><p class="font-bold text-lg">—</p></div>
+<div class="p-3 rounded-lg bg-slate"><p class="text-xs text-subtext">Missing accommodations doc</p><p class="font-bold text-lg">—</p></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== TAB: MULTILINGUAL LEARNERS ===== -->
+<div class="tab-content" id="tab-mll">
+<div class="max-w-7xl mx-auto">
+<h2 class="text-lg font-bold font-heading mb-3">🌍 Multilingual Learners</h2>
+<div class="card">
+<p class="text-sm mb-2">MLL / EL program workspace — language, ELD level, interpreter needs, CLD-safe assessment guidance.</p>
+<div class="help-assist-panel show"><strong>Coming next build:</strong> MLL student roster, home language, ELD tier, interpreter flags, and parent communication drafts. Accessibility already has translated NOM/consent helpers; this tab will own the full MLL ecosystem. Toggle in <strong>Admin → Module toggles</strong>.</div>
 </div>
 </div>
 </div>
@@ -867,25 +918,23 @@ textarea{min-height:80px;resize:vertical}
 </div>
 </div>
 
-<!-- Enrich Quick Reference -->
+<!-- System of record quick reference -->
 <div data-id="1118" class="card">
-<h3 data-id="1119" class="text-sm font-bold font-heading mb-3">PRISM vs. Enrich — Quick Reference</h3>
+<h3 data-id="1119" class="text-sm font-bold font-heading mb-3" id="sorCompareTitle">PRISM vs. Official IEP System — Quick Reference</h3>
+<p class="text-xs text-subtext mb-2" id="sorCompareHint">Mode is set in Admin → District Profile (Companion vs Standalone).</p>
 <div data-id="1120" class="overflow-x-auto">
 <table data-id="1121" class="w-full text-xs">
-<thead data-id="1122"><tr data-id="1123" class="border-b"><th data-id="1124" class="p-2 text-left">Feature</th><th data-id="1125" class="p-2 text-left" style="background:#EDE9FE">PRISM Does</th><th data-id="1126" class="p-2 text-left" style="background:#DBEAFE">Enrich Does</th></tr></thead>
+<thead data-id="1122"><tr data-id="1123" class="border-b"><th data-id="1124" class="p-2 text-left">Feature</th><th data-id="1125" class="p-2 text-left" style="background:#EDE9FE">PRISM</th><th data-id="1126" class="p-2 text-left" style="background:#DBEAFE" id="sorOtherCol">Enrich / external SoR</th></tr></thead>
 <tbody data-id="1127">
-<tr data-id="1128" class="border-b"><td data-id="1129" class="p-2 font-semibold">Timeline Tracking</td><td data-id="1130" class="p-2">✅ Tracks all deadlines, sends alerts</td><td data-id="1131" class="p-2">Official dates of record</td></tr>
-<tr data-id="1132" class="border-b"><td data-id="1133" class="p-2 font-semibold">Draft Generation</td><td data-id="1134" class="p-2">✅ AI-generated drafts for all docs</td><td data-id="1135" class="p-2">—</td></tr>
-<tr data-id="1136" class="border-b"><td data-id="1137" class="p-2 font-semibold">Materials Storage</td><td data-id="1138" class="p-2">✅ Stores all working materials</td><td data-id="1139" class="p-2">—</td></tr>
-<tr data-id="1140" class="border-b"><td data-id="1141" class="p-2 font-semibold">Compliance Alerts</td><td data-id="1142" class="p-2">✅ Proactive deadline warnings</td><td data-id="1143" class="p-2">—</td></tr>
-<tr data-id="1144" class="border-b"><td data-id="1145" class="p-2 font-semibold">IEP of Record</td><td data-id="1146" class="p-2">—</td><td data-id="1147" class="p-2">✅ Official IEP system</td></tr>
-<tr data-id="1148" class="border-b"><td data-id="1149" class="p-2 font-semibold">Finalize/Validate</td><td data-id="1150" class="p-2">—</td><td data-id="1151" class="p-2">✅ Convert, validate, finalize</td></tr>
-<tr data-id="1152" class="border-b"><td data-id="1153" class="p-2 font-semibold">Service Logs</td><td data-id="1154" class="p-2">SOAP notes (working copy)</td><td data-id="1155" class="p-2">✅ Official service logs</td></tr>
-<tr data-id="1156"><td data-id="1157" class="p-2 font-semibold">District Reporting</td><td data-id="1158" class="p-2">—</td><td data-id="1159" class="p-2">✅ CDE/state reporting</td></tr>
+<tr data-id="1128" class="border-b"><td data-id="1129" class="p-2 font-semibold">Draft IEP / 504 / MLL docs</td><td data-id="1130" class="p-2">✅ Always</td><td data-id="1131" class="p-2" id="sorDraftCell">Optional</td></tr>
+<tr data-id="1132" class="border-b"><td data-id="1133" class="p-2 font-semibold">Finalize official plan</td><td data-id="1134" class="p-2" id="sorFinalizePrism">Companion: draft only · Standalone: ✅</td><td data-id="1135" class="p-2" id="sorFinalizeOther">Companion: ✅ Enrich</td></tr>
+<tr data-id="1136" class="border-b"><td data-id="1137" class="p-2 font-semibold">Module tabs (504 / MLL / MTSS)</td><td data-id="1138" class="p-2">✅ Toggle per district</td><td data-id="1139" class="p-2">Use external system or turn module off</td></tr>
+<tr data-id="1140" class="border-b"><td data-id="1141" class="p-2 font-semibold">Live sync / automation into Enrich</td><td data-id="1142" class="p-2">❌ Never (HIPAA / security)</td><td data-id="1143" class="p-2">N/A</td></tr>
+<tr data-id="1152" class="border-b"><td data-id="1153" class="p-2 font-semibold">Help Assist &amp; timelines</td><td data-id="1154" class="p-2">✅ District-profile driven</td><td data-id="1155" class="p-2">—</td></tr>
 </tbody>
 </table>
 </div>
-<div data-id="1160" class="mt-2 p-2 rounded-lg" style="background:#FEF3C7"><p data-id="1161" class="text-xs font-semibold">💡 PRISM is your brain. Enrich is your official record. Always enter finalized data into Enrich.</p></div>
+<div data-id="1160" class="mt-2 p-2 rounded-lg" style="background:#FEF3C7"><p data-id="1161" class="text-xs font-semibold" id="sorFooterNote">💡 Companion (CCSD default): PRISM is your brain; Enrich is the official record. Standalone: PRISM can be the full suite.</p></div>
 </div>
 
 <!-- Community Resources -->
@@ -900,33 +949,56 @@ textarea{min-height:80px;resize:vertical}
 </div>
 </div>
 
-<!-- ===== TAB 9: DISTRICT PROFILE ===== -->
+<!-- ===== TAB 9: DISTRICT PROFILE (Admin only) ===== -->
 <div data-id="1174" class="tab-content" id="tab-district">
 <div data-id="1175" class="max-w-7xl mx-auto">
-<h2 data-id="1176" class="text-lg font-bold font-heading mb-3">🏛️ District Profile</h2>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
+<div>
+<h2 data-id="1176" class="text-lg font-bold font-heading">⚙️ District Administration</h2>
+<p class="text-xs text-subtext">Admin-only · Suite mode, module toggles, rules, and district profile</p>
+</div>
+<span class="badge badge-amber" id="suiteModeBadge">Companion mode</span>
+</div>
 <div data-id="1177" class="flex flex-wrap gap-2 mb-4">
-<button data-id="1178" class="sub-tab-btn active" data-dist="dist-profile">Profile Settings</button>
+<button data-id="1178" class="sub-tab-btn active" data-dist="dist-profile">Profile &amp; Suite Mode</button>
 <button data-id="1179" class="sub-tab-btn" data-dist="dist-rules">CCSD Rules</button>
 <button class="sub-tab-btn" data-dist="dist-calendar">School Calendar</button>
 <button data-id="1180" class="sub-tab-btn" data-dist="dist-timeline">Timeline Engine</button>
-<button data-id="1181" class="sub-tab-btn" data-dist="dist-toggles">Feature Toggles</button>
+<button data-id="1181" class="sub-tab-btn" data-dist="dist-toggles">Module Toggles</button>
 <button data-id="1182" class="sub-tab-btn" data-dist="dist-add">Add District</button>
 </div>
 
 <div data-id="1183" class="sub-content active" id="dist-profile">
 <div data-id="1184" class="card">
 <div data-id="1185" class="flex items-center gap-2 mb-4"><span data-id="1186" class="badge badge-green">✅ Active Profile</span><h3 data-id="1187" class="text-sm font-bold">Cherry Creek School District — Profile #1 (Pilot)</h3></div>
-<div data-id="1188" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-<div data-id="1189"><label data-id="1190" class="text-xs font-semibold">District Name</label><input data-id="1191" type="text" value="Cherry Creek School District" /></div>
-<div data-id="1192"><label data-id="1193" class="text-xs font-semibold">State</label><input data-id="1194" type="text" value="Colorado" /></div>
-<div data-id="1195"><label data-id="1196" class="text-xs font-semibold">IEP System</label><input data-id="1197" type="text" value="Enrich" /></div>
-<div data-id="1198"><label data-id="1199" class="text-xs font-semibold">AI Approved</label><div data-id="1200" class="toggle-switch on" id="aiApprovedToggle"><div data-id="1201" class="knob"></div></div></div>
-<div data-id="1202"><label data-id="1203" class="text-xs font-semibold">AI Tool</label><select data-id="1204"><option data-id="1205">Copilot</option><option data-id="1206">Gemini</option><option data-id="1207">None</option></select></div>
-<div data-id="1208"><label data-id="1209" class="text-xs font-semibold">Primary Storage</label><input data-id="1210" type="text" value="OneDrive" /></div>
-<div data-id="1211"><label data-id="1212" class="text-xs font-semibold">Secondary Storage</label><input data-id="1213" type="text" value="Google Drive" /></div>
-<div data-id="1214"><label data-id="1215" class="text-xs font-semibold">District Admin</label><input data-id="1216" type="text" placeholder="admin@cherrycreekschools.org" /></div>
+
+<div class="suite-mode-card mb-4">
+<label class="text-xs font-semibold text-subtext">Suite mode</label>
+<p class="text-xs text-subtext mb-2">Choose how PRISM relates to Enrich / IEP Writer / other systems of record.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+<label class="p-3 rounded-lg border cursor-pointer flex gap-2 items-start" style="border-color:var(--border)">
+<input type="radio" name="suiteMode" value="companion" id="suiteModeCompanion" checked />
+<span><strong class="text-sm">Companion</strong><br><span class="text-xs text-subtext">Enrich (or another IEP system) stays official. PRISM drafts, reminds, and Copy-to-export.</span></span>
+</label>
+<label class="p-3 rounded-lg border cursor-pointer flex gap-2 items-start" style="border-color:var(--border)">
+<input type="radio" name="suiteMode" value="standalone" id="suiteModeStandalone" />
+<span><strong class="text-sm">Standalone suite</strong><br><span class="text-xs text-subtext">PRISM runs the full IEP/504/MLL lifecycle and district templates — usable instead of Enrich / IEP Writer.</span></span>
+</label>
 </div>
-<div data-id="1217" class="flex gap-2 mt-3"><button data-id="1218" class="btn-filled btn-sm">Export Profile</button><button data-id="1219" class="btn-outlined btn-sm">Import Profile</button></div>
+</div>
+
+<div data-id="1188" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div data-id="1189"><label data-id="1190" class="text-xs font-semibold">District Name</label><input data-id="1191" type="text" id="distNameInput" value="Cherry Creek School District" /></div>
+<div data-id="1192"><label data-id="1193" class="text-xs font-semibold">State</label><input data-id="1194" type="text" id="distStateInput" value="Colorado" /></div>
+<div data-id="1195"><label data-id="1196" class="text-xs font-semibold">IEP / Plan System</label><input data-id="1197" type="text" id="distIepSystemInput" value="Enrich" placeholder="Enrich, IEP Writer, or PRISM" /></div>
+<div data-id="1198"><label data-id="1199" class="text-xs font-semibold">AI Approved</label><div data-id="1200" class="toggle-switch on" id="aiApprovedToggle"><div data-id="1201" class="knob"></div></div></div>
+<div data-id="1202"><label data-id="1203" class="text-xs font-semibold">AI Tool</label><select data-id="1204" id="distAiTool"><option data-id="1205">Copilot</option><option data-id="1206">Gemini</option><option data-id="1207">None</option></select></div>
+<div data-id="1208"><label data-id="1209" class="text-xs font-semibold">Primary Storage</label><input data-id="1210" type="text" id="distStoragePrimary" value="OneDrive" /></div>
+<div data-id="1211"><label data-id="1212" class="text-xs font-semibold">Secondary Storage</label><input data-id="1213" type="text" id="distStorageSecondary" value="Google Drive" /></div>
+<div data-id="1214"><label data-id="1215" class="text-xs font-semibold">District Admin</label><input data-id="1216" type="text" id="distAdminEmail" placeholder="admin@cherrycreekschools.org" /></div>
+</div>
+<div data-id="1217" class="flex gap-2 mt-3"><button data-id="1218" class="btn-filled btn-sm" id="saveDistrictProfileBtn">Save Profile</button><button data-id="1219" class="btn-outlined btn-sm">Export Profile</button><button class="btn-outlined btn-sm">Import Profile</button></div>
+<p class="text-xs text-subtext mt-2" id="suiteModeHint">Companion mode: finalize official IEPs in Enrich. PRISM prepares and copies.</p>
 </div>
 </div>
 
@@ -982,9 +1054,9 @@ textarea{min-height:80px;resize:vertical}
 
 <div data-id="1252" class="sub-content" id="dist-toggles">
 <div data-id="1253" class="card">
-<h3 data-id="1254" class="text-sm font-bold font-heading mb-3">Feature Toggles</h3>
+<h3 data-id="1254" class="text-sm font-bold font-heading mb-3">Module Toggles</h3>
+<p class="text-xs text-subtext mb-3">Turn modules off when your district already stores that work in Enrich or another system. Off modules are hidden from the main tab bar for all staff.</p>
 <div data-id="1255" class="grid grid-cols-1 md:grid-cols-2 gap-3" id="featureToggles"></div>
-<p data-id="1256" class="text-xs text-subtext mt-3">Features marked OFF are hidden from all users. Toggle ON to activate for this district profile.</p>
 </div>
 </div>
 
@@ -1254,10 +1326,150 @@ const RULES=[
 {rule:'Transfer Timeline',req:'Records requested within 10 days; services within 30 days',source:'CCSD/IDEA',active:true}
 ];
 
+const PRISM_ROLE_KEY='prism_user_role_v1';
+const PRISM_DISTRICT_KEY='prism_district_settings_v1';
+const ADMIN_PILOT_CODE='prism-admin';
+
 const FEATURES=[
-{name:'MTSS/RTI Module',on:true},{name:'FBA/BIP Engine',on:true},{name:'Transfer Wizard',on:true},{name:'Action Builder',on:true},{name:'Manifestation Determination',on:true},{name:'CLD Guidance',on:true},{name:'Private School Service Plans',on:false},{name:'Transportation Documentation',on:true},{name:'ESY Tracking',on:true},{name:'Progress Monitoring Probes',on:true},{name:'AI Draft Engine',on:true},{name:'Help Assist Mode',on:true},{name:'Dual Cloud Storage',on:true},{name:'Print Center Export',on:true},{name:'Enrich Reminder Workflow',on:true}
+{id:'mtss',name:'MTSS/RTI Module',tab:'mtss',on:true},
+{id:'section504',name:'504 Plans',tab:'section504',on:false},
+{id:'mll',name:'Multilingual Learners',tab:'mll',on:false},
+{id:'eval',name:'Eval Tracker',tab:'eval',on:true},
+{id:'accessibility',name:'Accessibility',tab:'accessibility',on:true},
+{id:'templates',name:'Templates & Forms',tab:'templates',on:true},
+{id:'resources',name:'Resources',tab:'resources',on:true},
+{id:'fba',name:'FBA/BIP Engine',tab:null,on:true},
+{id:'transfer',name:'Transfer Wizard',tab:null,on:true},
+{id:'actionBuilder',name:'Action Builder',tab:null,on:true},
+{id:'manif',name:'Manifestation Determination',tab:null,on:true},
+{id:'cld',name:'CLD Guidance',tab:null,on:true},
+{id:'privateSchool',name:'Private School Service Plans',tab:null,on:false},
+{id:'transport',name:'Transportation Documentation',tab:null,on:true},
+{id:'esy',name:'ESY Tracking',tab:null,on:true},
+{id:'progress',name:'Progress Monitoring Probes',tab:null,on:true},
+{id:'ai',name:'AI Draft Engine',tab:null,on:true},
+{id:'help',name:'Help Assist Mode',tab:null,on:true},
+{id:'dualCloud',name:'Dual Cloud Storage',tab:null,on:true},
+{id:'print',name:'Print Center Export',tab:null,on:true},
+{id:'enrichReminders',name:'Enrich Reminder Workflow',tab:null,on:true}
 ];
 
+let USER_ROLE=localStorage.getItem(PRISM_ROLE_KEY)||'staff';
+let DISTRICT_SETTINGS=JSON.parse(localStorage.getItem(PRISM_DISTRICT_KEY)||'null')||{
+suiteMode:'companion',
+iepSystem:'Enrich',
+districtName:'Cherry Creek School District',
+state:'Colorado',
+storagePrimary:'OneDrive',
+storageSecondary:'Google Drive',
+adminEmail:'',
+features:null
+};
+if(DISTRICT_SETTINGS.features){
+FEATURES.forEach(f=>{
+if(typeof DISTRICT_SETTINGS.features[f.id]==='boolean')f.on=DISTRICT_SETTINGS.features[f.id];
+});
+}
+
+function persistDistrictSettings(){
+DISTRICT_SETTINGS.features={};
+FEATURES.forEach(f=>{DISTRICT_SETTINGS.features[f.id]=!!f.on});
+localStorage.setItem(PRISM_DISTRICT_KEY,JSON.stringify(DISTRICT_SETTINGS));
+}
+function persistRole(){localStorage.setItem(PRISM_ROLE_KEY,USER_ROLE)}
+
+function applyFeatureVisibility(){
+FEATURES.forEach(f=>{
+if(!f.tab)return;
+document.querySelectorAll('.tab-pill[data-tab="'+f.tab+'"]').forEach(btn=>{
+btn.hidden=!f.on;
+btn.classList.toggle('is-hidden',!f.on);
+});
+});
+const active=document.querySelector('.tab-pill.active');
+if(active&&active.hidden){
+const dash=document.querySelector('.tab-pill[data-tab="dashboard"]');
+if(dash)dash.click();
+}
+}
+
+function applySuiteModeUI(){
+const mode=DISTRICT_SETTINGS.suiteMode||'companion';
+const badge=document.getElementById('suiteModeBadge');
+const hint=document.getElementById('suiteModeHint');
+const companion=document.getElementById('suiteModeCompanion');
+const standalone=document.getElementById('suiteModeStandalone');
+if(companion)companion.checked=mode==='companion';
+if(standalone)standalone.checked=mode==='standalone';
+if(badge){
+badge.textContent=mode==='standalone'?'Standalone suite':'Companion mode';
+badge.className='badge '+(mode==='standalone'?'badge-lav':'badge-amber');
+}
+if(hint){
+hint.textContent=mode==='standalone'
+?'Standalone: PRISM can finalize plans and run district templates without Enrich.'
+:'Companion: finalize official IEPs in '+(DISTRICT_SETTINGS.iepSystem||'Enrich')+'. PRISM prepares and copies.';
+}
+const iep=document.getElementById('distIepSystemInput');
+if(iep&&document.activeElement!==iep)iep.value=DISTRICT_SETTINGS.iepSystem||iep.value;
+const other=document.getElementById('sorOtherCol');
+const footer=document.getElementById('sorFooterNote');
+if(other)other.textContent=mode==='standalone'?'External systems (optional)':((DISTRICT_SETTINGS.iepSystem||'Enrich')+' / external SoR');
+if(footer){
+footer.textContent=mode==='standalone'
+?'💡 Standalone suite: PRISM can be the full platform. Turn off modules you do not need under Admin → Module toggles.'
+:'💡 Companion (CCSD default): PRISM is your brain; '+(DISTRICT_SETTINGS.iepSystem||'Enrich')+' is the official record.';
+}
+const enrichFeat=FEATURES.find(f=>f.id==='enrichReminders');
+if(enrichFeat&&mode==='standalone'&&enrichFeat.on===true){
+/* leave user choice; just hint via Help Assist later */
+}
+}
+
+function applyRoleUI(){
+const wrap=document.getElementById('adminMenuWrap');
+const label=document.getElementById('accountRoleLabel');
+if(label)label.textContent='Role: '+(USER_ROLE==='admin'?'Admin':'Staff');
+if(wrap)wrap.hidden=USER_ROLE!=='admin';
+if(USER_ROLE!=='admin'){
+const distTab=document.getElementById('tab-district');
+const distPill=document.querySelector('.tab-pill[data-tab="district"]');
+if(distPill)distPill.hidden=true;
+if(distTab&&distTab.classList.contains('active')){
+const dash=document.querySelector('.tab-pill[data-tab="dashboard"]');
+if(dash)dash.click();
+}
+document.getElementById('adminMenuDropdown')?.classList.remove('open');
+}
+}
+
+function openDistrictAdmin(sub){
+if(USER_ROLE!=='admin'){showToast('Admin access required');return}
+const pill=document.querySelector('.tab-pill[data-tab="district"]');
+// district has no pill — activate tab content directly
+document.querySelectorAll('.tab-pill').forEach(b=>b.classList.remove('active'));
+document.querySelectorAll('.tab-content').forEach(tc=>tc.classList.remove('active'));
+const target=document.getElementById('tab-district');
+if(target)target.classList.add('active');
+localStorage.setItem('prism_active_tab','district');
+if(sub){
+document.querySelectorAll('[data-dist]').forEach(b=>b.classList.remove('active'));
+document.querySelectorAll('#tab-district .sub-content').forEach(sc=>sc.classList.remove('active'));
+const btn=document.querySelector('[data-dist="'+sub+'"]');
+const pane=document.getElementById(sub);
+if(btn)btn.classList.add('active');
+if(pane)pane.classList.add('active');
+}
+document.getElementById('adminMenuDropdown')?.classList.remove('open');
+refreshIcons();
+}
+
+function setUserRole(role){
+USER_ROLE=role;
+persistRole();
+applyRoleUI();
+showToast(role==='admin'?'Admin access enabled':'Staff view');
+}
 const THEMES=[
 {name:'Calm & Clinical',palettes:[
 {name:'Default Blue',bg:'#F0F9FF',header:'#1E3A5F',accent:'#2563EB',card:'#FFFFFF'},
@@ -1593,6 +1805,7 @@ refreshIcons();
 // === TAB SWITCHING ===
 document.querySelectorAll('.tab-pill').forEach(btn=>{
 btn.addEventListener('click',()=>{
+if(btn.hidden)return;
 document.querySelectorAll('.tab-pill').forEach(b=>b.classList.remove('active'));
 btn.classList.add('active');
 document.querySelectorAll('.tab-content').forEach(tc=>tc.classList.remove('active'));
@@ -1990,19 +2203,98 @@ if(d>=e.start&&d<=(e.end||e.start))return e;
 }
 return null;
 }
-// === FEATURE TOGGLES ===
+// === FEATURE / MODULE TOGGLES ===
 const ftGrid=document.getElementById('featureToggles');
-ftGrid.innerHTML=FEATURES.map((f,i)=>`<div class="p-3 rounded-lg bg-slate flex items-center justify-between">
-<span class="text-sm font-semibold">${f.name}</span>
+function renderFeatureToggles(){
+ftGrid.innerHTML=FEATURES.map((f,i)=>`<div class="p-3 rounded-lg bg-slate flex items-center justify-between gap-2">
+<div><span class="text-sm font-semibold">${f.name}</span>${f.tab?`<p class="text-xs text-subtext">Tab: ${f.tab}</p>`:'<p class="text-xs text-subtext">In-module feature</p>'}</div>
 <div class="toggle-switch ${f.on?'on':''}" data-fidx="${i}"><div class="knob"></div></div>
 </div>`).join('');
 ftGrid.querySelectorAll('.toggle-switch').forEach(t=>{
 t.addEventListener('click',()=>{
-const idx=t.dataset.fidx;FEATURES[idx].on=!FEATURES[idx].on;
+const idx=+t.dataset.fidx;FEATURES[idx].on=!FEATURES[idx].on;
 t.classList.toggle('on',FEATURES[idx].on);
+persistDistrictSettings();
+applyFeatureVisibility();
 showToast(FEATURES[idx].name+' '+(FEATURES[idx].on?'enabled':'disabled'));
 });
 });
+}
+renderFeatureToggles();
+applyFeatureVisibility();
+applySuiteModeUI();
+applyRoleUI();
+
+// === ADMIN / ACCOUNT MENUS ===
+document.getElementById('accountMenuBtn').addEventListener('click',(e)=>{
+e.stopPropagation();
+document.getElementById('adminMenuDropdown')?.classList.remove('open');
+document.getElementById('accountMenuDropdown').classList.toggle('open');
+});
+document.getElementById('adminMenuBtn')?.addEventListener('click',(e)=>{
+e.stopPropagation();
+document.getElementById('accountMenuDropdown')?.classList.remove('open');
+document.getElementById('adminMenuDropdown').classList.toggle('open');
+});
+document.getElementById('switchToStaffBtn').addEventListener('click',()=>{
+setUserRole('staff');
+document.getElementById('accountMenuDropdown').classList.remove('open');
+});
+document.getElementById('switchToAdminBtn').addEventListener('click',()=>{
+const code=prompt('Admin access is for district configuration only.\nEnter admin code:');
+if(code===ADMIN_PILOT_CODE){
+setUserRole('admin');
+document.getElementById('accountMenuDropdown').classList.remove('open');
+}else if(code!==null){
+showToast('Incorrect admin code');
+}
+});
+document.getElementById('adminOpenDistrictBtn')?.addEventListener('click',()=>openDistrictAdmin('dist-profile'));
+document.getElementById('adminOpenTogglesBtn')?.addEventListener('click',()=>openDistrictAdmin('dist-toggles'));
+document.getElementById('adminExitBtn')?.addEventListener('click',()=>{
+setUserRole('staff');
+document.getElementById('adminMenuDropdown')?.classList.remove('open');
+});
+document.addEventListener('click',()=>{
+document.getElementById('adminMenuDropdown')?.classList.remove('open');
+document.getElementById('accountMenuDropdown')?.classList.remove('open');
+});
+
+['suiteModeCompanion','suiteModeStandalone'].forEach(id=>{
+document.getElementById(id)?.addEventListener('change',()=>{
+const mode=document.getElementById('suiteModeStandalone').checked?'standalone':'companion';
+DISTRICT_SETTINGS.suiteMode=mode;
+if(mode==='standalone'&&(!DISTRICT_SETTINGS.iepSystem||DISTRICT_SETTINGS.iepSystem==='Enrich')){
+DISTRICT_SETTINGS.iepSystem='PRISM';
+const iep=document.getElementById('distIepSystemInput');
+if(iep)iep.value='PRISM';
+}
+if(mode==='companion'&&DISTRICT_SETTINGS.iepSystem==='PRISM'){
+DISTRICT_SETTINGS.iepSystem='Enrich';
+const iep=document.getElementById('distIepSystemInput');
+if(iep)iep.value='Enrich';
+}
+persistDistrictSettings();
+applySuiteModeUI();
+showToast('Suite mode: '+mode);
+});
+});
+document.getElementById('saveDistrictProfileBtn')?.addEventListener('click',()=>{
+DISTRICT_SETTINGS.districtName=document.getElementById('distNameInput')?.value||DISTRICT_SETTINGS.districtName;
+DISTRICT_SETTINGS.state=document.getElementById('distStateInput')?.value||DISTRICT_SETTINGS.state;
+DISTRICT_SETTINGS.iepSystem=document.getElementById('distIepSystemInput')?.value||DISTRICT_SETTINGS.iepSystem;
+DISTRICT_SETTINGS.storagePrimary=document.getElementById('distStoragePrimary')?.value||'';
+DISTRICT_SETTINGS.storageSecondary=document.getElementById('distStorageSecondary')?.value||'';
+DISTRICT_SETTINGS.adminEmail=document.getElementById('distAdminEmail')?.value||'';
+persistDistrictSettings();
+applySuiteModeUI();
+showToast('District profile saved (this browser)');
+});
+// hydrate profile fields
+(function hydrateProfile(){
+const map=[['distNameInput','districtName'],['distStateInput','state'],['distIepSystemInput','iepSystem'],['distStoragePrimary','storagePrimary'],['distStorageSecondary','storageSecondary'],['distAdminEmail','adminEmail']];
+map.forEach(([id,key])=>{const el=document.getElementById(id);if(el&&DISTRICT_SETTINGS[key]!=null)el.value=DISTRICT_SETTINGS[key]});
+})();
 
 // === TRAINING LIBRARY ===
 const trainGrid=document.getElementById('trainingGrid');
@@ -2474,9 +2766,19 @@ setInterval(updateClock,1000);
 
 // === RESTORE SAVED STATE ===
 const savedTab=localStorage.getItem('prism_active_tab');
-if(savedTab){
+if(savedTab==='district'){
+if(USER_ROLE==='admin')openDistrictAdmin('dist-profile');
+else{
+const dash=document.querySelector('.tab-pill[data-tab="dashboard"]');
+if(dash)dash.click();
+}
+}else if(savedTab){
 const btn=document.querySelector(`.tab-pill[data-tab="${savedTab}"]`);
-if(btn)btn.click();
+if(btn&&!btn.hidden)btn.click();
+else{
+const dash=document.querySelector('.tab-pill[data-tab="dashboard"]');
+if(dash)dash.click();
+}
 }
 const savedTheme=JSON.parse(localStorage.getItem('prism_theme')||'null');
 if(savedTheme){

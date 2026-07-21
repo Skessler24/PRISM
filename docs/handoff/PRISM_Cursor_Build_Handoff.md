@@ -54,3 +54,10 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 - First focus after scaffold: District Profile (CCSD) + Help Assist + Eval timeline
 - Demo data: fake/sample only (no real PHI)
 - Hosting default: Azure Static Web Apps + Azure Functions
+
+## Decisions locked (Samantha · July 21, 2026 — Suite Mode)
+
+- PRISM supports **Companion** (Enrich/IEP Writer as SoR) and **Standalone suite** (PRISM is the full platform).
+- District Profile lives in a **permission-gated Admin menu**, not the main tab bar.
+- Module toggles (504, MLL, MTSS, etc.) hide main tabs when a district uses another system for that work.
+- No live Enrich sync in either mode.

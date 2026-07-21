@@ -187,21 +187,27 @@
     }
   ],
   "features": {
-    "MTSS/RTI Module": true,
-    "FBA/BIP Engine": true,
-    "Transfer Wizard": true,
-    "Action Builder": true,
-    "Manifestation Determination": true,
-    "CLD Guidance": true,
-    "Private School Service Plans": false,
-    "Transportation Documentation": true,
-    "ESY Tracking": true,
-    "Progress Monitoring Probes": true,
-    "AI Draft Engine": true,
-    "Help Assist Mode": true,
-    "Dual Cloud Storage": true,
-    "Print Center Export": true,
-    "Enrich Reminder Workflow": true
+    "mtss": true,
+    "section504": false,
+    "mll": false,
+    "eval": true,
+    "accessibility": true,
+    "templates": true,
+    "resources": true,
+    "fba": true,
+    "transfer": true,
+    "actionBuilder": true,
+    "manif": true,
+    "cld": true,
+    "privateSchool": false,
+    "transport": true,
+    "esy": true,
+    "progress": true,
+    "ai": true,
+    "help": true,
+    "dualCloud": true,
+    "print": true,
+    "enrichReminders": true
   },
   "dat": {
     "dualReferralRequired": true,
@@ -264,5 +270,17 @@
     "pdf": "docs/ccsd/calendars/ccsd-sy2026-27-calendar.pdf",
     "firstDay": "2026-08-17",
     "lastDay": "2027-05-28"
+  },
+  "suiteMode": "companion",
+  "operatingModes": {
+    "companion": "External IEP system (e.g. Enrich) is system of record; PRISM drafts/reminds/exports",
+    "standalone": "PRISM runs full suite including finalize and district templates"
+  },
+  "adminAccess": {
+    "note": "District administration is permission-gated (Admin menu). Pilot unlock code is client-side only.",
+    "roles": [
+      "staff",
+      "admin"
+    ]
   }
 }
