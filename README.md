@@ -54,8 +54,12 @@ docs/                    Master plan, Enrich guide, Cursor handoff
 6. OneDrive/SharePoint via Microsoft Graph
 7+. Phase depth per Master Platform Plan
 
-## Compliance
+## Deploy (Azure Static Web Apps)
 
-- Demo/sample student data only — no real PHI
-- No direct Enrich automation or API sync
-- AI is assistive; human review required before use
+This repo deploys from GitHub Actions on push to `main`.
+
+- Build: `npm ci && npm run build`
+- Publish folder: `dist/`
+- Live site: https://gentle-coast-08903c010.7.azurestaticapps.net
+
+If the site looks blank, the workflow is likely publishing source `index.html` instead of `dist/`. Check `.github/workflows/azure-static-web-apps-gentle-coast-08903c010.yml` has `output_location: "dist"`.
