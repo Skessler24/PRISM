@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PageShell } from '../../components/PageShell'
 import { useStudents } from '../../lib/students/useStudents'
@@ -15,19 +15,16 @@ export function CaseloadBinderPage() {
   const [busy, setBusy] = useState(false)
   const [toast, setToast] = useState('')
 
-  const preview = useMemo(() => {
-    const sessions = loadProbeSessions()
-    const tickets = loadExitTickets()
-    const soap = loadSoapNotes()
-    const game = loadGameState()
-    return {
-      sessions: sessions.length,
-      tickets: tickets.length,
-      soap: soap.length,
-      gameStudents: game.students.length,
-    }
-    // Recompute when caseload size changes (localStorage counts otherwise stale after navigation)
-  }, [students.length])
+  const sessions = loadProbeSessions()
+  const tickets = loadExitTickets()
+  const soap = loadSoapNotes()
+  const game = loadGameState()
+  const preview = {
+    sessions: sessions.length,
+    tickets: tickets.length,
+    soap: soap.length,
+    gameStudents: game.students.length,
+  }
 
   function flash(msg: string) {
     setToast(msg)
