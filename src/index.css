@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Exact :root tokens from uploaded index.html (Classic Blue default) */
+:root {
+  --bg: #f0f9ff;
+  --card-bg: #ffffff;
+  --text: #1e293b;
+  --subtext: #64748b;
+  --border: #e2e8f0;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --accent: #2563eb;
+  --accent-h: #1d4ed8;
+  --nav-active: #2563eb;
+  --nav-active-txt: #fff;
+  --nav-inactive: #e2e8f0;
+  --nav-inactive-txt: #475569;
+  --sky: #dbeafe;
+  --mint: #d1fae5;
+  --coral: #fee2e2;
+  --sun: #fef3c7;
+  --lav: #ede9fe;
+  --softorange: #ffedd5;
+  --pink: #fce7f3;
+  --slate: #f1f5f9;
+  --header-bg: #1e3a5f;
+  --header-txt: #fff;
+  --font-heading: 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+@layer components {
+  .help-assist-panel {
+    display: none;
+    background: #eff6ff;
+    border: 1px solid #93c5fd;
+    border-radius: 10px;
+    padding: 12px;
+    margin: 8px 0;
+    font-size: 12px;
+    color: #1e40af;
+    line-height: 1.6;
+  }
+
+  .help-assist-panel.block {
+    display: block;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: inline-block;
+  min-width: 200%;
+  animation: marquee 45s linear infinite;
+}

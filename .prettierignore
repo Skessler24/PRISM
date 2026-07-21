@@ -1,0 +1,5 @@
+dist
+node_modules
+archive
+*.pdf
+package-lock.json
