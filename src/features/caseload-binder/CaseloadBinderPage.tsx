@@ -6,6 +6,7 @@ import { useDistrictProfile } from '../../lib/district-profiles/useDistrictProfi
 import { loadSoapNotes } from '../../lib/session-notes/store'
 import { loadExitTickets, loadProbeSessions } from '../../lib/progress-monitoring/store'
 import { loadGameState } from '../../lib/motivation-game/store'
+import { loadParentContacts } from '../../lib/parent-contacts/store'
 import { downloadCaseloadBinderPdf } from '../../lib/caseload-binder/generatePdf'
 import { readSuiteMode } from '../../lib/templates/catalog'
 
@@ -19,10 +20,12 @@ export function CaseloadBinderPage() {
   const tickets = loadExitTickets()
   const soap = loadSoapNotes()
   const game = loadGameState()
+  const contacts = loadParentContacts()
   const preview = {
     sessions: sessions.length,
     tickets: tickets.length,
     soap: soap.length,
+    contacts: contacts.length,
     gameStudents: game.students.length,
   }
 
@@ -43,6 +46,7 @@ export function CaseloadBinderPage() {
         sessions: loadProbeSessions(),
         tickets: loadExitTickets(),
         game: loadGameState(),
+        parentContacts: loadParentContacts(),
       })
       flash('PDF downloaded — paper version of your caseload toolkit')
     } catch (e) {
@@ -67,16 +71,17 @@ export function CaseloadBinderPage() {
         <h2 className="font-heading text-sm font-bold">What&apos;s included</h2>
         <ul className="mt-2 list-disc space-y-1 pl-4 text-xs">
           <li>Caseload roster (programs, services, due dates)</li>
-          <li>Parent / contact log (blank lines + recent SOAP dates)</li>
+          <li>Parent / contact log (digital contacts + blank lines + recent SOAP dates)</li>
           <li>Progress / gradebook snapshot from Progress Monitoring probes & exit tickets</li>
           <li>Weekly planner pages (Mon–Fri)</li>
           <li>Motivation game points, attendance, and prize board</li>
         </ul>
-        <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-5">
           {[
             { label: 'Students', value: students.length },
             { label: 'Probe sessions', value: preview.sessions },
             { label: 'Exit tickets', value: preview.tickets },
+            { label: 'Parent contacts', value: preview.contacts },
             { label: 'SOAP notes', value: preview.soap },
           ].map((c) => (
             <div key={c.label} className="rounded-xl border border-[var(--border)] p-3 text-center">
@@ -98,11 +103,14 @@ export function CaseloadBinderPage() {
           enter official records in {profile.iepSystem}.
         </p>
         <div className="mt-3 flex flex-wrap gap-3 text-xs">
+          <Link to="/contacts" className="font-semibold text-[var(--accent)]">
+            Parent Contact Log →
+          </Link>
           <Link to="/progress" className="font-semibold text-[var(--accent)]">
             Progress Monitoring →
           </Link>
-          <Link to="/caseload" className="font-semibold text-[var(--accent)]">
-            Caseload / SOAP →
+          <Link to="/reminders" className="font-semibold text-[var(--accent)]">
+            Enrich Reminders →
           </Link>
           <Link to="/game" className="font-semibold text-[var(--accent)]">
             Motivation Game →

@@ -110,3 +110,10 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 - **Caseload Binder** (`/binder`, feature `print`): browser-side jsPDF download — roster, parent log, progress/gradebook snapshot, weekly planner, motivation/attendance pages. FERPA: generated locally, never uploaded.
 - **Motivation Game** (`/game`): ClassDojo-style points + Candyland/Chutes board — attendance check-in, dice, chance cards, year-long prize board; links to Progress + Binder.
 - Offline-first — does **not** require Azure Functions.
+
+## Decisions locked (Dashboard Hub + Enrich Reminders + Parent Contacts)
+
+- **Dashboard Compliance Hub:** merges annual/overdue, NOM lead-time from `meetingDate`, Progress Monitoring due/overdue, and SOAP age reminders into clickable alerts; local To-Do list (`prism_dashboard_todos_v1`).
+- **Enrich Reminders** (`/reminders`, feature `enrichReminders`): per-student checklist from `enrichFinalizeSequence`, NOM sent date, Copy-for-Enrich — Companion only, no live sync.
+- **Parent Contact Log** (`/contacts`): CRUD family contacts (`prism_parent_contacts_v1`) with follow-up flags; feeds Caseload Binder PDF parent-log section.
+- Offline-first — does **not** require Azure Functions.

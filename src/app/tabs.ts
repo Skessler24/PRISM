@@ -40,6 +40,21 @@ export const APP_TABS: AppTab[] = [
     shortLabel: 'Game',
     icon: '🎲',
   },
+  {
+    id: 'reminders',
+    path: '/reminders',
+    label: 'Enrich Reminders',
+    shortLabel: 'Reminders',
+    icon: '📨',
+    featureId: 'enrichReminders',
+  },
+  {
+    id: 'contacts',
+    path: '/contacts',
+    label: 'Parent Contact Log',
+    shortLabel: 'Contacts',
+    icon: '📞',
+  },
   { id: 'mtss', path: '/mtss', label: 'MTSS Hub', shortLabel: 'MTSS', icon: '📋', featureId: 'mtss' },
   {
     id: 'evaluations',

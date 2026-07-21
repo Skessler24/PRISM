@@ -347,6 +347,14 @@ export function CaseloadPage() {
               Progress Monitoring
             </Link>
             {' · '}
+            <Link to="/contacts" className="font-semibold text-[var(--accent)]">
+              Parent Contact Log
+            </Link>
+            {' · '}
+            <Link to="/reminders" className="font-semibold text-[var(--accent)]">
+              Enrich Reminders
+            </Link>
+            {' · '}
             <Link to="/binder" className="font-semibold text-[var(--accent)]">
               Caseload Binder PDF
             </Link>

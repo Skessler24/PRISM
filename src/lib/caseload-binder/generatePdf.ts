@@ -3,6 +3,7 @@ import type { Student } from '../students/types'
 import type { SoapNote } from '../session-notes/store'
 import type { ProbeSession, ExitTicket } from '../progress-monitoring/store'
 import type { GameState } from '../motivation-game/store'
+import type { ParentContact } from '../parent-contacts/store'
 
 type BinderInput = {
   districtName: string
@@ -13,6 +14,7 @@ type BinderInput = {
   sessions: ProbeSession[]
   tickets: ExitTicket[]
   game: GameState
+  parentContacts?: ParentContact[]
 }
 
 function pageHeader(doc: jsPDF, title: string, subtitle: string) {
@@ -69,14 +71,31 @@ export function downloadCaseloadBinderPdf(input: BinderInput) {
   pageHeader(doc, '2 · Parent / Contact Log', sub)
   y = 44
   doc.setFontSize(9)
-  doc.text('Use this paper log for family contacts; enter official notes in your SoR as required.', 14, y)
-  y += 8
+  const contacts = input.parentContacts || []
+  if (contacts.length) {
+    doc.text('Logged contacts from PRISM (also leave blank lines for paper notes):', 14, y)
+    y += 7
+    for (const c of contacts.slice(0, 20)) {
+      const s = input.students.find((x) => x.id === c.studentId)
+      y = ensureSpace(doc, y, 10)
+      doc.setFont('helvetica', 'bold')
+      doc.text(`${c.date} · ${s?.name || c.studentId} · ${c.method}`, 14, y)
+      doc.setFont('helvetica', 'normal')
+      const note = `${c.contactName || '—'} — ${c.notes || ''}${c.followUpNeeded ? ' [FOLLOW-UP]' : ''}`
+      doc.text(note.slice(0, 110), 14, y + 4)
+      y += 10
+    }
+    y += 4
+  } else {
+    doc.text('No digital contacts yet — use blank lines below or the Parent Contact Log tab.', 14, y)
+    y += 8
+  }
   const headers = ['Date', 'Student', 'Contact', 'Notes']
   doc.setFont('helvetica', 'bold')
   doc.text(headers.join('   |   '), 14, y)
   doc.setFont('helvetica', 'normal')
   y += 6
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 8; i++) {
     y = ensureSpace(doc, y, 10)
     doc.setDrawColor(200)
     doc.line(14, y + 2, 196, y + 2)
