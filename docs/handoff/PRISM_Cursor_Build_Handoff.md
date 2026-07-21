@@ -126,3 +126,10 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 - **FBA sessions** persist (`prism_fba_sessions_v1`); **+/- tally pop-out** `/fba/tally/:sessionId` syncs live via `localStorage` + BroadcastChannel into ABC rows + tally log.
 - **Dashboard:** today's scheduled materials + open FBA alerts.
 - Azure TTS (`/api/ai-speak`) still pending; browser `speechSynthesis` used for TV boards.
+
+## Decisions locked (Dashboard Team Chat)
+
+- **Team Chat** on Main Dashboard: toggle **PRISM** (invite-only channels) vs **Teams** (district-approved messenger deep link).
+- PRISM mode: channels (`#general`, `#coverage`, create more), members, invite codes, live multi-tab sync via BroadcastChannel (`prism_team_chat_v1`). FERPA banner — no PHI in chat.
+- Teams mode: configurable Teams/channel URL; opens external messenger. Full Graph Chat / Azure AD sync later with MSAL (same track as OneDrive).
+- Cross-device PRISM chat will need a small Functions/SignalR backend when Azure recovers — local invite model stays the UX.
