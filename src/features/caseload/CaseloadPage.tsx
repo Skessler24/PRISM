@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { PageShell } from '../../components/PageShell'
 import { useDistrictProfile } from '../../lib/district-profiles/useDistrictProfile'
 import { useStudents } from '../../lib/students/useStudents'
@@ -340,6 +341,20 @@ export function CaseloadPage() {
       {tab === 'progress' && (
         <section className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card">
           <h2 className="font-heading text-sm font-bold">Progress monitoring</h2>
+          <p className="mt-1 text-xs">
+            Quick probe bars here · full ESGI-style probes, exit tickets, and due alerts live in{' '}
+            <Link to="/progress" className="font-semibold text-[var(--accent)]">
+              Progress Monitoring
+            </Link>
+            {' · '}
+            <Link to="/binder" className="font-semibold text-[var(--accent)]">
+              Caseload Binder PDF
+            </Link>
+            {' · '}
+            <Link to="/game" className="font-semibold text-[var(--accent)]">
+              Motivation Game
+            </Link>
+          </p>
           <FieldTip tipId="progress-monitoring" className="mb-2 mt-2" />
           <div className="mt-3 space-y-3">
             {rows.slice(0, 12).map((s) => {
