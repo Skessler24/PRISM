@@ -1,0 +1,68 @@
+[
+  {
+    "name": "Arrowhead MTSS-20260721T071502Z-1-001.zip",
+    "size_mb": 44.17,
+    "entry_count": 89,
+    "extensions": {".docx": 51, ".pdf": 33, ".pptx": 2},
+    "prism_module": "mtss"
+  },
+  {
+    "name": "Assessment + Data-20260721T071506Z-1-001.zip",
+    "size_mb": 350.8,
+    "entry_count": 417,
+    "extensions": {".pdf": 373, ".docx": 16, ".pptx": 15, ".xlsx": 6, ".jpg": 3},
+    "prism_module": "evaluations",
+    "phi_risk": "high_filenames_may_include_student_names"
+  },
+  {
+    "name": "Assessment resources-20260721T071508Z-1-001.zip",
+    "size_mb": 10.82,
+    "entry_count": 63,
+    "extensions": {".docx": 35, ".pdf": 17, ".xlsx": 7, ".pptx": 3, ".jpg": 1},
+    "prism_module": "evaluations"
+  },
+  {
+    "name": "BOE HARD COPY.docx",
+    "size_mb": 0.37,
+    "prism_module": "cld-help-assist"
+  },
+  {
+    "name": "BUNDLEFirstThenBoardVisualScheduleFlipBooksclipartrealpictures-20260721T071512Z-1-001.zip",
+    "size_mb": 1925.52,
+    "entry_count": 36,
+    "extensions": {".pptx": 19, ".pdf": 15, ".zip": 2},
+    "prism_module": "templates"
+  },
+  {
+    "name": "CLD Topics-20260721T071514Z-1-001.zip",
+    "size_mb": 20.03,
+    "entry_count": 10,
+    "extensions": {".pptx": 9, ".xlsx": 1},
+    "prism_module": "cld-help-assist"
+  },
+  {
+    "name": "DAT Proceedures.docx",
+    "size_mb": 0.3,
+    "prism_module": "evaluations"
+  },
+  {
+    "name": "ECE Information Hub.xlsx",
+    "size_mb": 1.79,
+    "prism_module": "resources"
+  },
+  {
+    "name": "ELS_SpEd Hub.xlsx",
+    "size_mb": 0.26,
+    "prism_module": "resources"
+  },
+  {
+    "name": "Enrich User's Guide.docx",
+    "size_mb": 9.87,
+    "prism_module": "district-profile"
+  },
+  {
+    "name": "PRISM-SPED Command Center — Master Platform Plan.txt",
+    "size_mb": 0.08,
+    "prism_module": "docs"
+  }
+]

@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local CCSD artifact binaries (too large for GitHub)
+docs/ccsd/artifacts-intake/raw/
+docs/ccsd/artifacts-intake/extracted/
