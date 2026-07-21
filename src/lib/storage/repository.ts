@@ -1,17 +1,28 @@
 /** Storage repository interface — mock impl now; Graph/OneDrive in Prompt 6. */
+import type { Student } from '../students/types'
+
 export interface StorageRepository {
-  getStudents(): Promise<unknown[]>
-  saveStudents(students: unknown[]): Promise<void>
+  getStudents(): Promise<Student[]>
+  saveStudents(students: Student[]): Promise<void>
 }
 
-export class MockStorageRepository implements StorageRepository {
+const KEY = 'prism_students_v1'
+
+export class LocalStorageStudentsRepository implements StorageRepository {
   async getStudents() {
-    return []
+    try {
+      const raw = localStorage.getItem(KEY)
+      if (!raw) return []
+      const parsed = JSON.parse(raw) as Student[]
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
   }
 
-  async saveStudents(students: unknown[]) {
-    console.info('[storage stub] saveStudents()', students.length, 'records')
+  async saveStudents(students: Student[]) {
+    localStorage.setItem(KEY, JSON.stringify(students))
   }
 }
 
-export const storage: StorageRepository = new MockStorageRepository()
+export const storage: StorageRepository = new LocalStorageStudentsRepository()
