@@ -1,8 +1,253 @@
 {
-  "_comment": "Full CCSD profile JSON lands in Prompt 2 — extracted from Enrich User's Guide + prototype RULES.",
   "id": "cherry-creek",
   "name": "Cherry Creek School District",
   "state": "CO",
   "iepSystem": "Enrich",
-  "status": "scaffold-placeholder"
+  "storageProviders": ["onedrive", "google-drive"],
+  "aiProvider": "district-choice",
+  "sources": [
+    "docs/ccsd/Enrich_Users_Guide.pdf",
+    "docs/ccsd/artifacts-intake/raw/Enrich User's Guide.docx",
+    "docs/ccsd/artifacts-intake/raw/DAT Proceedures.docx",
+    "archive/index.prototype.html RULES/FEATURES"
+  ],
+  "rules": {
+    "nomLeadTimeDays": 10,
+    "evaluationWindowDays": 60,
+    "evaluationWindowAppliesTo": "initials_only",
+    "rtiMinimumCycles": 2,
+    "rtiCycleLengthWeeks": 6,
+    "reevaluationCycleYears": 3,
+    "annualReviewRule": "Must occur before anniversary date; schedule meeting 1–2 weeks prior to due date",
+    "parentReferralNotificationDays": 5,
+    "manifestationDeterminationSchoolDays": 10,
+    "serviceLogHours": 48,
+    "consentRevocationServiceStopDays": 15,
+    "transferCompleteDays": 5,
+    "transferAdoptAnnualDays": 30,
+    "transferReevalDays": 60,
+    "meetingScheduleLeadWeeksMin": 1,
+    "meetingScheduleLeadWeeksMax": 2,
+    "teamLeadMustBe": ["SpEd teacher", "SLP"],
+    "enrichFinalizeSequence": [
+      "Consent for Evaluation",
+      "Evaluation Reports",
+      "Eligibility Determination",
+      "Consent for Initial Services (initials only)",
+      "Eligibility Prior Written Notice",
+      "IEP",
+      "Convert → Validate → Finalize"
+    ]
+  },
+  "ruleTable": [
+    {
+      "id": "nom",
+      "rule": "Notice of Meeting (NOM)",
+      "requirement": "Must be sent at least 10 calendar days before the meeting (legal NOM from Enrich — email/text alone is not sufficient)",
+      "source": "IDEA / CCSD Enrich Guide",
+      "active": true,
+      "valueDays": 10,
+      "unit": "calendar_days"
+    },
+    {
+      "id": "eval-60",
+      "rule": "60-Day Evaluation Window (Initials)",
+      "requirement": "Begins on the date signed consent is received; eligibility meeting must be held within 60 calendar days. Does not apply to reevaluations by law — reevals must be finalized by the next eligibility due date.",
+      "source": "IDEA 2004 / Colorado / Enrich Guide",
+      "active": true,
+      "valueDays": 60,
+      "unit": "calendar_days"
+    },
+    {
+      "id": "finalize-order",
+      "rule": "Enrich Finalize Sequence",
+      "requirement": "Finalize Consent → Evaluations → Eligibility → Consent for Services (initials) → Eligibility PWN → IEP in order so dates populate correctly on the student grid.",
+      "source": "CCSD Enrich User's Guide §1",
+      "active": true
+    },
+    {
+      "id": "annual",
+      "rule": "Annual IEP Review",
+      "requirement": "Must occur before anniversary date; schedule 1–2 weeks prior to avoid a lapsed IEP.",
+      "source": "IDEA 2004 / Enrich Guide",
+      "active": true
+    },
+    {
+      "id": "reeval",
+      "rule": "Reevaluation",
+      "requirement": "Required every 3 years (or sooner if needed); complete by eligibility due date.",
+      "source": "IDEA 2004",
+      "active": true,
+      "valueDays": 3,
+      "unit": "years"
+    },
+    {
+      "id": "parent-referral",
+      "rule": "Parent Referral Notification",
+      "requirement": "Parent must be notified within 5 days of referral.",
+      "source": "CCSD",
+      "active": true,
+      "valueDays": 5,
+      "unit": "calendar_days"
+    },
+    {
+      "id": "rti",
+      "rule": "RTI / Intervention Data",
+      "requirement": "Minimum 2 intervention cycles (about 6 weeks each) before SPED referral when intervention has not already occurred; DAT notes 6 weeks if deficits lack intervention.",
+      "source": "CCSD / DAT Procedures",
+      "active": true,
+      "valueDays": 6,
+      "unit": "weeks"
+    },
+    {
+      "id": "team-lead",
+      "rule": "Team Lead / Primary Provider",
+      "requirement": "Primary service provider / team lead must be a SpEd teacher or SLP.",
+      "source": "CCSD Enrich Guide",
+      "active": true
+    },
+    {
+      "id": "service-log",
+      "rule": "Service Log Requirement",
+      "requirement": "Minutes logged in Enrich within 48 hours of service.",
+      "source": "CCSD",
+      "active": true,
+      "valueDays": 48,
+      "unit": "hours"
+    },
+    {
+      "id": "progress",
+      "rule": "Progress Reports",
+      "requirement": "Issued quarterly, aligned with report cards.",
+      "source": "CCSD",
+      "active": true
+    },
+    {
+      "id": "revocation",
+      "rule": "Consent Revocation",
+      "requirement": "Parent can revoke consent; document via PWN. Services stop per IDEA timelines (tracked as 15 days in profile calculator).",
+      "source": "IDEA 2004 / Enrich Guide",
+      "active": true,
+      "valueDays": 15,
+      "unit": "calendar_days"
+    },
+    {
+      "id": "mdr",
+      "rule": "Manifestation Determination",
+      "requirement": "Required within 10 school days of a discipline removal totaling more than 10 days.",
+      "source": "IDEA 2004",
+      "active": true,
+      "valueDays": 10,
+      "unit": "school_days"
+    },
+    {
+      "id": "sop",
+      "rule": "Summary of Performance",
+      "requirement": "Required for students graduating or aging out.",
+      "source": "IDEA 2004",
+      "active": true
+    },
+    {
+      "id": "cld",
+      "rule": "CLD Assessment",
+      "requirement": "Non-biased assessments in primary language when possible.",
+      "source": "IDEA 2004 / CCSD",
+      "active": true
+    },
+    {
+      "id": "pwn",
+      "rule": "Prior Written Notice (PWN)",
+      "requirement": "Required for all changes to identification, evaluation, placement, or FAPE.",
+      "source": "IDEA 2004",
+      "active": true
+    },
+    {
+      "id": "transfer",
+      "rule": "Transfer Timeline",
+      "requirement": "Complete transfer within 5 days of notice student has an IEP. If IEP not adopted, hold Review IEP within 30 calendar days; reevaluation within 60 calendar days when required.",
+      "source": "CCSD Enrich Guide §6",
+      "active": true,
+      "valueDays": 5,
+      "unit": "calendar_days"
+    },
+    {
+      "id": "convert-validate-finalize",
+      "rule": "Convert → Validate → Finalize",
+      "requirement": "Enrich draft documents must follow Convert (when needed), Validate, then Finalize. Do not skip validation; overdue finalize requires state delay codes.",
+      "source": "CCSD Enrich User's Guide",
+      "active": true
+    }
+  ],
+  "features": {
+    "MTSS/RTI Module": true,
+    "FBA/BIP Engine": true,
+    "Transfer Wizard": true,
+    "Action Builder": true,
+    "Manifestation Determination": true,
+    "CLD Guidance": true,
+    "Private School Service Plans": false,
+    "Transportation Documentation": true,
+    "ESY Tracking": true,
+    "Progress Monitoring Probes": true,
+    "AI Draft Engine": true,
+    "Help Assist Mode": true,
+    "Dual Cloud Storage": true,
+    "Print Center Export": true,
+    "Enrich Reminder Workflow": true
+  },
+  "dat": {
+    "dualReferralRequired": true,
+    "interventionWeeksIfMissing": 6,
+    "paths": [
+      "MTSS meeting → fill referral → discuss evaluation with parents → if evaluating, Move to Evaluation + separate DAT referral on Groups page",
+      "New evaluation / team decides DAT → Groups page DAT referral (sender receives IEIF) + Enrich referral"
+    ],
+    "notes": [
+      "DAT referral and Enrich referral are TWO SEPARATE steps.",
+      "Whoever sends the DAT referral receives the IEIF form and must share with teammates (including nurse).",
+      "Do not move or copy IEIF links — DAT loses access.",
+      "Ensure Drive links grant DAT view permission.",
+      "Intervention must be in place for academic and social/emotional needs; if none, plan ~6 weeks.",
+      "Nurse completes health history; nurse attends if health concerns.",
+      "Online IEP meetings: each person on own device (muted). If parents in person, one DAT member attends in person."
+    ]
+  },
+  "complianceTicker": [
+    {
+      "icon": "📋",
+      "text": "IDEA / Colorado: 60-day initial evaluation window from signed consent"
+    },
+    {
+      "icon": "📨",
+      "text": "NOM: Send legal Enrich notice at least 10 calendar days before meeting (CCSD)"
+    },
+    {
+      "icon": "📅",
+      "text": "Annual IEP: Review before anniversary — schedule 1–2 weeks early"
+    },
+    {
+      "icon": "🔒",
+      "text": "FERPA: Student records confidential — need-to-know basis only"
+    },
+    {
+      "icon": "🏥",
+      "text": "HIPAA: Protected health info — secure storage required; no live Enrich sync from PRISM"
+    },
+    {
+      "icon": "📝",
+      "text": "Enrich: Convert → Validate → Finalize; service logs within 48 hours"
+    },
+    {
+      "icon": "🌍",
+      "text": "CLD: Non-biased assessment in primary language when possible"
+    },
+    {
+      "icon": "🏛️",
+      "text": "DAT: Dual referral required (Groups DAT form + Enrich) — do not move IEIF links"
+    },
+    {
+      "icon": "⚖️",
+      "text": "PWN required for ALL changes to identification, evaluation, placement, or FAPE"
+    }
+  ]
 }

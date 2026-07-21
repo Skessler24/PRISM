@@ -11,30 +11,15 @@ export function TopBar() {
       className="fixed inset-x-0 top-0 z-[1000] flex h-16 items-center justify-between px-3 md:px-4"
       style={{ background: 'var(--header-bg)', color: 'var(--header-txt)' }}
     >
-      <div className="flex items-center gap-2">
-        <div className="flex items-center font-heading text-xl font-extrabold tracking-tight">
-          <span className="bg-gradient-to-br from-pink-400 to-orange-400 bg-clip-text text-transparent">
-            PR
-          </span>
-          <svg className="mx-0.5 h-7 w-7" viewBox="0 0 40 40" aria-hidden>
-            <defs>
-              <linearGradient id="prism-grad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#60A5FA" />
-                <stop offset="100%" stopColor="#A78BFA" />
-              </linearGradient>
-            </defs>
-            <polygon points="20,4 36,34 4,34" fill="url(#prism-grad)" opacity="0.85" />
-          </svg>
-          <span className="bg-gradient-to-br from-blue-400 to-violet-400 bg-clip-text text-transparent">
-            SM
-          </span>
-        </div>
-        <span className="hidden text-xs opacity-80 sm:inline md:text-sm">
-          Reflect the Whole Child
-        </span>
-      </div>
+      <NavLink to="/" className="flex min-w-0 items-center gap-2" aria-label="PRISM home">
+        <img
+          src="/prism-logo.svg"
+          alt="PRISM — Reflect the Whole Human"
+          className="h-11 w-auto max-w-[min(52vw,280px)] object-contain object-left"
+        />
+      </NavLink>
 
-      <div className="flex items-center gap-2 md:gap-3">
+      <div className="flex shrink-0 items-center gap-2 md:gap-3">
         <button
           type="button"
           onClick={toggle}

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 160" role="img" aria-label="PRISM  Reflect the Whole Human">
+  <defs>
+    <linearGradient id="pGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F472B6"/>
+      <stop offset="100%" stop-color="#FB7185"/>
+    </linearGradient>
+    <linearGradient id="rGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FB923C"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+    <linearGradient id="sGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#22D3EE"/>
+    </linearGradient>
+    <linearGradient id="mGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#C4B5FD"/>
+    </linearGradient>
+    <linearGradient id="prismBody" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#67E8F9"/>
+      <stop offset="45%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+    <linearGradient id="prismShine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FDE68A"/>
+      <stop offset="35%" stop-color="#67E8F9" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- PRISM wordmark: I replaced by vertical prism -->
+  <text x="28" y="92" font-family="Poppins, Arial Black, sans-serif" font-size="92" font-weight="800" fill="url(#pGrad)">P</text>
+  <text x="118" y="92" font-family="Poppins, Arial Black, sans-serif" font-size="92" font-weight="800" fill="url(#rGrad)">R</text>
+
+  <!-- Stylized prism as the letter I -->
+  <g transform="translate(214,18)">
+    <polygon points="28,0 56,128 0,128" fill="url(#prismBody)" opacity="0.95"/>
+    <polygon points="28,0 56,128 28,128" fill="#1E3A5F" opacity="0.18"/>
+    <polygon points="28,0 28,128 0,128" fill="url(#prismShine)" opacity="0.85"/>
+    <line x1="28" y1="0" x2="0" y2="128" stroke="#E0F2FE" stroke-width="2" opacity="0.7"/>
+    <line x1="28" y1="0" x2="56" y2="128" stroke="#E0F2FE" stroke-width="2" opacity="0.5"/>
+    <line x1="0" y1="128" x2="56" y2="128" stroke="#E0F2FE" stroke-width="2" opacity="0.6"/>
+    <polygon points="28,0 36,18 20,18" fill="#FDE68A" opacity="0.95"/>
+  </g>
+
+  <text x="286" y="92" font-family="Poppins, Arial Black, sans-serif" font-size="92" font-weight="800" fill="url(#sGrad)">S</text>
+  <text x="376" y="92" font-family="Poppins, Arial Black, sans-serif" font-size="92" font-weight="800" fill="url(#mGrad)">M</text>
+
+  <!-- Tagline with flanking gradient lines -->
+  <line x1="48" y1="128" x2="150" y2="128" stroke="#F472B6" stroke-width="2" stroke-linecap="round"/>
+  <text x="260" y="134" text-anchor="middle" font-family="Figtree, Helvetica, sans-serif" font-size="16" font-weight="500" fill="#F8FAFC" letter-spacing="0.5">Reflect the Whole Human</text>
+  <line x1="370" y1="128" x2="472" y2="128" stroke="#A78BFA" stroke-width="2" stroke-linecap="round"/>
+</svg>

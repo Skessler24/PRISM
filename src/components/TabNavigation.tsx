@@ -57,7 +57,7 @@ export function TabNavigation() {
             aria-label="Close menu"
             onClick={closeDrawer}
           />
-          <aside className="fixed right-0 top-[116px] z-[999] flex h-[calc(100vh-116px)] w-72 max-w-[90vw] flex-col gap-1 border-l border-[var(--border)] bg-[var(--card-bg)] p-3 shadow-xl">
+          <aside className="fixed right-0 top-[140px] z-[999] flex h-[calc(100vh-140px)] w-72 max-w-[90vw] flex-col gap-1 border-l border-[var(--border)] bg-[var(--card-bg)] p-3 shadow-xl">
             <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-[var(--subtext)]">
               More modules
             </p>

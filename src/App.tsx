@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from './app/AppShell'
 import { ThemeProvider } from './app/ThemeProvider'
 import { HelpAssistProvider } from './lib/help-assist/HelpAssistProvider'
+import { DistrictProfileProvider } from './lib/district-profiles/DistrictProfileProvider'
 import { DashboardPage } from './features/dashboard/DashboardPage'
 import { StudentTilesPage } from './features/student-tiles/StudentTilesPage'
 import { CaseloadPage } from './features/caseload/CaseloadPage'
@@ -16,22 +17,24 @@ export default function App() {
   return (
     <ThemeProvider>
       <HelpAssistProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route element={<AppShell />}>
-              <Route index element={<DashboardPage />} />
-              <Route path="students" element={<StudentTilesPage />} />
-              <Route path="caseload" element={<CaseloadPage />} />
-              <Route path="mtss" element={<MtssPage />} />
-              <Route path="evaluations" element={<EvaluationsPage />} />
-              <Route path="accessibility" element={<AccessibilityPage />} />
-              <Route path="templates" element={<TemplatesPage />} />
-              <Route path="resources" element={<ResourcesPage />} />
-              <Route path="district" element={<DistrictProfilePage />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
+        <DistrictProfileProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route element={<AppShell />}>
+                <Route index element={<DashboardPage />} />
+                <Route path="students" element={<StudentTilesPage />} />
+                <Route path="caseload" element={<CaseloadPage />} />
+                <Route path="mtss" element={<MtssPage />} />
+                <Route path="evaluations" element={<EvaluationsPage />} />
+                <Route path="accessibility" element={<AccessibilityPage />} />
+                <Route path="templates" element={<TemplatesPage />} />
+                <Route path="resources" element={<ResourcesPage />} />
+                <Route path="district" element={<DistrictProfilePage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </DistrictProfileProvider>
       </HelpAssistProvider>
     </ThemeProvider>
   )
