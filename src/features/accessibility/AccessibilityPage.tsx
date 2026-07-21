@@ -1,10 +1,158 @@
+import { useState } from 'react'
 import { PageShell } from '../../components/PageShell'
+import { useStudents } from '../../lib/students/useStudents'
+
+const CLD_STEPS = [
+  'Home language survey / family interview completed',
+  'Interpreter arranged for meetings (if needed)',
+  'Prior schooling & language history documented',
+  'Rule out language difference vs. disability before SPED referral',
+  'Use non-discriminatory / CLD-appropriate assessments',
+  'Include ELD teacher on IEP/504 team when relevant',
+  'Provide notices in preferred language when available',
+  'Document Acculturation / CLD considerations in present levels',
+]
+
+const LANGS = ['Spanish', 'Arabic', 'Vietnamese', 'Mandarin', 'Amharic', 'Russian'] as const
 
 export function AccessibilityPage() {
+  const { students } = useStudents()
+  const [tab, setTab] = useState<'cld' | 'multi' | 'contrast'>('cld')
+  const [highContrast, setHighContrast] = useState(false)
+  const [lang, setLang] = useState<(typeof LANGS)[number]>('Spanish')
+  const [mllId, setMllId] = useState('')
+
+  const mllStudents = students.filter((s) => s.hasMLL)
+
   return (
     <PageShell
       title="♿ Accessibility Studio"
-      description="Audio forms, multilingual recordings, high-contrast templates, and Braille-ready exports."
-    />
+      description="CLD safeguards, multilingual meeting helpers, and high-contrast reading mode for long compliance workdays."
+    >
+      <div className="mb-4 flex flex-wrap gap-2">
+        {(
+          [
+            ['cld', 'CLD Guidance'],
+            ['multi', 'Multilingual'],
+            ['contrast', 'High Contrast'],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setTab(id)}
+            className={`rounded-lg border px-3 py-1.5 text-xs font-semibold ${
+              tab === id
+                ? 'border-[var(--accent)] bg-[var(--accent)] text-white'
+                : 'border-[var(--border)] bg-[var(--card-bg)] text-[var(--subtext)]'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'cld' && (
+        <section
+          className={`rounded-2xl border border-[var(--border)] p-4 shadow-card ${
+            highContrast ? 'bg-black text-white' : 'bg-[var(--card-bg)]'
+          }`}
+        >
+          <h2 className="font-heading text-sm font-bold">CLD-safe evaluation checklist</h2>
+          <select
+            className="mt-2 w-full max-w-xs rounded-lg border border-[var(--border)] px-2 py-2 text-xs text-[var(--text)]"
+            value={mllId}
+            onChange={(e) => setMllId(e.target.value)}
+          >
+            <option value="">Select MLL student (optional)…</option>
+            {mllStudents.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name} · {s.homeLanguage || 'language TBD'}
+              </option>
+            ))}
+          </select>
+          {mllId && (
+            <p className="mt-2 text-xs opacity-80">
+              {(() => {
+                const s = students.find((x) => x.id === mllId)
+                return s
+                  ? `${s.name}: ${s.homeLanguage || '—'} · ELD ${s.eldLevel || '—'} · Interpreter ${
+                      s.interpreterNeeded ? 'YES' : 'No'
+                    }`
+                  : ''
+              })()}
+            </p>
+          )}
+          <div className="mt-3 space-y-2">
+            {CLD_STEPS.map((step, i) => (
+              <label key={step} className="flex items-start gap-2 text-xs">
+                <input type="checkbox" className="mt-0.5" />
+                <span className="font-semibold">
+                  {i + 1}. {step}
+                </span>
+              </label>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {tab === 'multi' && (
+        <section className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card">
+          <h2 className="font-heading text-sm font-bold">Multilingual meeting helper</h2>
+          <p className="mt-1 text-xs text-[var(--subtext)]">
+            Draft reminder language for interpreters / translated NOM. Full audio TTS comes with the AI
+            backend (Prompt 4).
+          </p>
+          <label className="mt-3 block text-xs font-semibold">
+            Preferred language
+            <select
+              className="mt-1 w-full max-w-xs rounded-lg border border-[var(--border)] px-2 py-2"
+              value={lang}
+              onChange={(e) => setLang(e.target.value as (typeof LANGS)[number])}
+            >
+              {LANGS.map((l) => (
+                <option key={l}>{l}</option>
+              ))}
+            </select>
+          </label>
+          <pre className="mt-3 whitespace-pre-wrap rounded-xl bg-[var(--slate)] p-3 text-xs">
+            {`MEETING LANGUAGE SUPPORT REQUEST
+
+Please arrange an interpreter for ${lang}.
+Provide NOM / parent rights in ${lang} when a translation is available.
+Confirm family preferred contact language before the meeting.
+
+Generated by PRISM Accessibility Studio`}
+          </pre>
+          <button
+            type="button"
+            className="mt-3 rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-semibold"
+            onClick={() =>
+              navigator.clipboard.writeText(
+                `Please arrange an interpreter for ${lang}. Provide NOM / parent rights in ${lang} when available.`,
+              )
+            }
+          >
+            Copy request
+          </button>
+        </section>
+      )}
+
+      {tab === 'contrast' && (
+        <section className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card">
+          <h2 className="font-heading text-sm font-bold">High contrast mode</h2>
+          <p className="mt-1 text-xs text-[var(--subtext)]">
+            Session toggle for this page&apos;s CLD panel. Theme Studio still owns full-app palettes.
+          </p>
+          <button
+            type="button"
+            className="mt-3 rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white"
+            onClick={() => setHighContrast((v) => !v)}
+          >
+            {highContrast ? 'Turn off high contrast preview' : 'Preview high contrast on CLD panel'}
+          </button>
+        </section>
+      )}
+    </PageShell>
   )
 }
