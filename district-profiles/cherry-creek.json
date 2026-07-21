@@ -1,0 +1,8 @@
+{
+  "_comment": "Full CCSD profile JSON lands in Prompt 2 — extracted from Enrich User's Guide + prototype RULES.",
+  "id": "cherry-creek",
+  "name": "Cherry Creek School District",
+  "state": "CO",
+  "iepSystem": "Enrich",
+  "status": "scaffold-placeholder"
+}
