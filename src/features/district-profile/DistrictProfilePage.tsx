@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { PageShell } from '../../components/PageShell'
 import { useDistrictProfile } from '../../lib/district-profiles/useDistrictProfile'
-import type { FeatureName } from '../../lib/district-profiles/types'
+import { FEATURE_LABELS, type FeatureName } from '../../lib/district-profiles/types'
 import type { TimelineEventType } from '../../lib/district-profiles/loadProfile'
 
 const EVENT_OPTIONS: TimelineEventType[] = [
@@ -169,7 +169,7 @@ export function DistrictProfilePage() {
                 onClick={() => toggleFeature(name)}
                 className="flex items-center justify-between rounded-xl bg-[var(--slate)] px-3 py-3 text-left text-xs font-semibold"
               >
-                <span>{name}</span>
+                <span>{FEATURE_LABELS[name] || name}</span>
                 <span
                   className={`relative h-6 w-11 rounded-full transition ${on ? 'bg-green-500' : 'bg-slate-300'}`}
                   aria-hidden
