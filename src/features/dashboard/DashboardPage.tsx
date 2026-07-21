@@ -8,6 +8,8 @@ import { buildDashboardAlerts } from '../../lib/compliance/buildDashboardAlerts'
 import { loadProbeSessions } from '../../lib/progress-monitoring/store'
 import { loadSoapNotes } from '../../lib/session-notes/store'
 import { loadTodos, saveTodos, type TodoItem } from '../../lib/dashboard/todoStore'
+import { materialsDueOn } from '../../lib/classroom-materials/store'
+import { openFbaSessions } from '../../lib/fba/store'
 
 function formatTimer(totalSec: number) {
   const h = String(Math.floor(totalSec / 3600)).padStart(2, '0')
@@ -53,6 +55,8 @@ export function DashboardPage() {
         nomLeadTimeDays: profile.rules.nomLeadTimeDays,
         serviceLogHours: profile.rules.serviceLogHours,
         iepSystem: profile.iepSystem,
+        materialsToday: materialsDueOn(new Date().toISOString().slice(0, 10)),
+        openFba: openFbaSessions(),
       }),
     [students, profile.rules.nomLeadTimeDays, profile.rules.serviceLogHours, profile.iepSystem],
   )

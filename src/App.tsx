@@ -24,6 +24,8 @@ import { CaseloadBinderPage } from './features/caseload-binder/CaseloadBinderPag
 import { MotivationGamePage } from './features/motivation-game/MotivationGamePage'
 import { EnrichRemindersPage } from './features/enrich-reminders/EnrichRemindersPage'
 import { ParentContactsPage } from './features/parent-contacts/ParentContactsPage'
+import { MaterialSessionPage } from './features/classroom-materials/MaterialSessionPage'
+import { FbaTallyPopoutPage } from './features/fba-bip/FbaTallyPopoutPage'
 
 export default function App() {
   return (
@@ -34,6 +36,9 @@ export default function App() {
             <StudentsProvider>
               <BrowserRouter>
                 <Routes>
+                  {/* Fullscreen / pop-out surfaces (no main chrome) */}
+                  <Route path="materials/session/:id" element={<MaterialSessionPage />} />
+                  <Route path="fba/tally/:sessionId" element={<FbaTallyPopoutPage />} />
                   <Route element={<AppShell />}>
                     <Route index element={<DashboardPage />} />
                     <Route path="students" element={<StudentTilesPage />} />

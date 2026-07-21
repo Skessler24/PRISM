@@ -117,3 +117,12 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 - **Enrich Reminders** (`/reminders`, feature `enrichReminders`): per-student checklist from `enrichFinalizeSequence`, NOM sent date, Copy-for-Enrich — Companion only, no live sync.
 - **Parent Contact Log** (`/contacts`): CRUD family contacts (`prism_parent_contacts_v1`) with follow-up flags; feeds Caseload Binder PDF parent-log section.
 - Offline-first — does **not** require Azure Functions.
+
+## Decisions locked (Interactive Materials + FBA live tally)
+
+- **Classroom Materials Studio v2:** token / schedule / behavior / social / comm — Save to student tile (`studentId` + structured payload), **PDF laminate/poster sizes** (letter → 36×48″), **Smart TV session** at `/materials/session/:id` (fullscreen, animated tokens, schedule advance, TouchChat-style tap-to-speak via browser speech).
+- **AI communication boards:** prompt → `/api/ai-chat` vocabulary list (offline edit fallback).
+- **Student Tiles drawer:** materials shelf + open FBA + tally pop-out links.
+- **FBA sessions** persist (`prism_fba_sessions_v1`); **+/- tally pop-out** `/fba/tally/:sessionId` syncs live via `localStorage` + BroadcastChannel into ABC rows + tally log.
+- **Dashboard:** today's scheduled materials + open FBA alerts.
+- Azure TTS (`/api/ai-speak`) still pending; browser `speechSynthesis` used for TV boards.
