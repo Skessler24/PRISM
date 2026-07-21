@@ -4,10 +4,14 @@ import { TabNavigation } from '../components/TabNavigation'
 import { ThemeStudioModal } from '../components/ThemeStudioModal'
 import { useHelpAssist } from '../lib/help-assist/help-assist-context'
 import { useDistrictProfile } from '../lib/district-profiles/useDistrictProfile'
+import { useAdminRole } from '../lib/admin/admin-role-context'
+import { readSuiteMode } from '../lib/templates/catalog'
 
 export function AppShell() {
   const { enabled } = useHelpAssist()
   const { profile, isFeatureEnabled } = useDistrictProfile()
+  const { isAdmin } = useAdminRole()
+  const suite = readSuiteMode()
   const ticker = profile.complianceTicker
   const doubled = [...ticker, ...ticker]
 
@@ -38,8 +42,9 @@ export function AppShell() {
       </main>
       <ThemeStudioModal />
       <footer className="fixed inset-x-0 bottom-0 z-[900] border-t border-[var(--border)] bg-[var(--card-bg)] px-3 py-1.5 text-center text-[10px] text-[var(--subtext)]">
-        PRISM · Reflect the Whole Human · {profile.name} profile · No live Enrich sync · Demo data
-        only
+        PRISM · Reflect the Whole Human · {profile.name} ·{' '}
+        {suite === 'standalone' ? 'Standalone' : 'Companion'} · {isAdmin ? 'Admin' : 'Staff'} · No
+        live Enrich sync · Demo data only
       </footer>
     </div>
   )
