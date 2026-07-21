@@ -1,24 +1,10 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from 'react'
+import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import demoStudents from '../../data/students.mock.json'
 import { normalizeStudent } from './normalizeStudent'
+import { StudentsContext } from './students-context'
 import type { Student } from './types'
 
 const STORAGE_KEY = 'prism_students_v1'
-
-type StudentsContextValue = {
-  students: Student[]
-  restoreDemo: () => void
-  setStudents: (next: Student[]) => void
-}
-
-const StudentsContext = createContext<StudentsContextValue | null>(null)
 
 function readStudents(): Student[] {
   try {
@@ -80,10 +66,4 @@ export function StudentsProvider({ children }: { children: ReactNode }) {
   )
 
   return <StudentsContext.Provider value={value}>{children}</StudentsContext.Provider>
-}
-
-export function useStudents() {
-  const ctx = useContext(StudentsContext)
-  if (!ctx) throw new Error('useStudents must be used within StudentsProvider')
-  return ctx
 }

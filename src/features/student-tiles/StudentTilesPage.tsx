@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { PageShell } from '../../components/PageShell'
-import { useStudents } from '../../lib/students/StudentsProvider'
+import { useStudents } from '../../lib/students/useStudents'
 import { daysUntil, statusBadgeClass } from '../../lib/students/normalizeStudent'
 import type { Student } from '../../lib/students/types'
 
