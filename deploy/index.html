@@ -99,7 +99,7 @@ textarea{min-height:80px;resize:vertical}
 <header data-id="2" class="topbar">
 <div data-id="3" class="flex items-center gap-2">
 <a href="/" aria-label="PRISM home" style="display:flex;align-items:center;text-decoration:none">
-<img src="/prism-logo.svg" alt="PRISM — Reflect the Whole Human" style="height:52px;width:auto;max-width:min(70vw,340px);object-fit:contain;object-position:left;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))" />
+<img src="/prism-wordmark.png" alt="PRISM — Reflect the Whole Human" style="height:52px;width:auto;max-width:min(70vw,360px);object-fit:contain;object-position:left" />
 </a>
 </div>
 <div data-id="14" class="flex items-center gap-3">
@@ -262,9 +262,9 @@ textarea{min-height:80px;resize:vertical}
 <div data-id="231" class="flex items-center gap-2 flex-wrap">
 <input data-id="232" type="text" id="studentSearch" placeholder="Search students..." class="w-48" />
 <input type="file" id="caseloadCsvInput" accept=".csv,text/csv" class="hidden" />
-<input type="file" id="enrichmentInput" accept=".csv,.text,.txt,.tsv,.pdf,text/plain,text/csv,application/pdf" class="hidden" multiple />
+<input type="file" id="enrichmentInput" accept=".csv,.text,.txt,.tsv,text/plain,text/csv" class="hidden" multiple />
 <button class="btn-outlined btn-sm" id="importCaseloadBtn" title="Import ARR Special Pops CSV — stays in this browser only"><i data-lucide="upload" class="w-4 h-4 inline"></i> Import CSV</button>
-<button class="btn-outlined btn-sm" id="importEnrichmentBtn" title="Import parent/contact exports, ALP & BIP PDFs — browser only"><i data-lucide="files" class="w-4 h-4 inline"></i> Import Docs</button>
+<button class="btn-outlined btn-sm" id="importEnrichmentBtn" title="Import parent/contact or address CSV/.text exports — browser only (PDF later)"><i data-lucide="files" class="w-4 h-4 inline"></i> Import Docs</button>
 <button class="btn-outlined btn-sm" id="restoreDemoBtn" title="Clear imported caseload and restore demo students">Restore Demo</button>
 <button data-id="233" class="btn-filled btn-sm" id="newStudentBtn"><i data-id="234" data-lucide="plus" class="w-4 h-4 inline"></i> New Student</button>
 </div>
@@ -295,7 +295,7 @@ textarea{min-height:80px;resize:vertical}
 <button data-id="241" class="sub-tab-btn" data-filter="AUT">AUT</button>
 <button data-id="242" class="sub-tab-btn" data-filter="SLD">SLD</button>
 </div>
-<div data-id="243" class="help-assist-panel"><strong data-id="244">💡 Help Assist:</strong> <strong>Import CSV</strong> loads the Special Pops caseload. <strong>Import Docs</strong> merges parent/contact exports plus ALP/BIP PDFs (whole-school rosters are filtered to your caseload). Everything stays in this browser only.</div>
+<div data-id="243" class="help-assist-panel"><strong data-id="244">💡 Help Assist:</strong> <strong>Import CSV</strong> loads the Special Pops caseload. <strong>Import Docs</strong> merges parent/contact or address exports saved as <strong>CSV or .text</strong> (browser only). PDF import is paused for now — ALP/BIP can wait.</div>
 <div data-id="245" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3" id="studentGrid"></div>
 </div>
 </div>
@@ -1542,7 +1542,8 @@ sum.innerHTML=`Contacts matched <strong>${(r.contactsMatched||[]).length}</stron
 &nbsp;|&nbsp; ALP matched <strong>${(r.alpMatched||[]).length}</strong>
 &nbsp;|&nbsp; BIP matched <strong>${(r.bipMatched||[]).length}</strong>
 <span class="text-subtext"> · files: ${(ENRICH_REPORT.files||[]).join(', ')}</span>
-<p class="mt-1">Not in this upload yet: <strong>IEP snapshots</strong>, <strong>latest evaluations</strong>, <strong>progress reports</strong> — add those with Import Docs when ready.</p>`;
+${(ENRICH_REPORT.warnings&&ENRICH_REPORT.warnings.length)?`<p class="mt-1">${ENRICH_REPORT.warnings.slice(0,3).join(' · ')}</p>`:''}
+<p class="mt-1">PDF import is paused — use CSV/.text contact exports for now. IEP/eval/progress and ALP/BIP PDFs can wait.</p>`;
 det.innerHTML=`
 <div><strong>Missing parent/contact match (${(r.contactsMissing||[]).length})</strong><ul class="list-disc pl-4">${list(r.contactsMissing)||'<li>None</li>'}</ul></div>
 <div><strong>Spelling / alias links</strong><ul class="list-disc pl-4">${list(r.spellingNotes,20)||'<li>None</li>'}</ul></div>
@@ -1554,9 +1555,6 @@ det.innerHTML=`
 
 async function applyEnrichmentFiles(fileList){
 if(!window.PrismEnrichment)throw new Error('Enrichment module failed to load');
-if(typeof pdfjsLib!=='undefined'){
-pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-}
 showToast('Reading files (browser only)…');
 const packs=await PrismEnrichment.ingestFiles(fileList);
 if(packs.arrCsvText){
@@ -1570,11 +1568,12 @@ enrichedAt:new Date().toLocaleString('en-US',{timeZone:'America/Denver'}),
 enrichFiles:packs.files
 });
 persistStudents(meta);
-ENRICH_REPORT={report,files:packs.files,at:meta.enrichedAt};
+ENRICH_REPORT={report,files:packs.files,at:meta.enrichedAt,warnings:packs.warnings||[],skipped:packs.skipped||[]};
 localStorage.setItem(PRISM_ENRICH_META_KEY,JSON.stringify(ENRICH_REPORT));
 refreshAllStudentViews();
 renderGapPanel();
-showToast('Merged docs: '+(packs.contacts.length||0)+' contacts, '+(packs.alps.length||0)+' ALP, '+(packs.bips.length||0)+' BIP');
+const warn=(packs.warnings&&packs.warnings.length)?' · '+(packs.skipped||[]).length+' skipped':'';
+showToast('Merged docs: '+(packs.contacts.length||0)+' contacts, '+(packs.addresses.length||0)+' addresses'+warn);
 }
 
 function refreshAllStudentViews(){

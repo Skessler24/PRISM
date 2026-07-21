@@ -13,9 +13,9 @@ export function TopBar() {
     >
       <NavLink to="/" className="flex min-w-0 items-center gap-2" aria-label="PRISM home">
         <img
-          src="/prism-logo.svg"
+          src="/prism-wordmark.png"
           alt="PRISM — Reflect the Whole Human"
-          className="h-[52px] w-auto max-w-[min(70vw,340px)] object-contain object-left drop-shadow"
+          className="h-[52px] w-auto max-w-[min(70vw,360px)] object-contain object-left"
         />
       </NavLink>
 
