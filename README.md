@@ -17,9 +17,10 @@ That file came from your latest complete build (`archive/index.prototype.html` /
 | `deploy/` | **What Azure publishes** — full working app |
 | `api/` | Azure Functions AI proxy (`/api/ai-chat`, `/api/ai-speak`) — keys stay server-side |
 | `archive/index.prototype.html` | Backup of the full HTML build |
-| `src/` | Vite + React rewrite (Prompts 1–6 in progress) |
+| `src/` | Vite + React rewrite (Prompts 1–7 on `main`) |
 | `district-profiles/` | CCSD Enrich + DAT rules (used by React District Profile) |
 | `docs/` | Enrich guide, handoff, design refs, intake catalogs |
+| `docs/ops/AZURE_RECOVERY_CHECKLIST.md` | **When Azure is healthy** — API attach, secrets, smoke tests |
 
 ## Run locally
 
