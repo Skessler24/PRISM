@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { PageShell } from '../../components/PageShell'
 import { useDistrictProfile } from '../../lib/district-profiles/useDistrictProfile'
 import { readSuiteMode } from '../../lib/templates/catalog'
@@ -6,23 +7,27 @@ import { readSuiteMode } from '../../lib/templates/catalog'
 const TRAINING = [
   {
     title: 'Enrich IEP System Basics',
-    desc: 'Navigate, enter data, Convert → Validate → Finalize',
+    desc: 'Navigate, enter data, Convert → Validate → Finalize. PRISM drafts; Enrich remains SoR in Companion mode.',
   },
   {
     title: 'FBA/BIP Process',
-    desc: 'Operational definition, ABC data, function, BIP sections',
+    desc: 'Operational definition, ABC data, function hypothesis, then BIP. Open React FBA/BIP Engine for guided drafts.',
   },
   {
     title: 'MTSS/RTI Referral Steps',
-    desc: 'Intervention fidelity, dual referral, consent clock',
+    desc: 'Intervention fidelity, dual DAT referral when required, consent clock starts on signed consent.',
   },
   {
     title: 'IEP Goal Writing',
-    desc: 'SMART goals with measurable criteria',
+    desc: 'SMART goals with measurable criteria — Generation Studio can draft; human review required.',
   },
   {
     title: 'Meeting & NOM Procedures',
-    desc: '10-day NOM lead time and attendance documentation',
+    desc: 'Use district profile NOM lead time (not a hardcoded 10). Dashboard meeting timer for local notes.',
+  },
+  {
+    title: 'Transfer & MDR',
+    desc: 'Eval Tracker Transfer Wizard + Manifestation Determination within district school-day window.',
   },
 ]
 
@@ -36,12 +41,54 @@ export function ResourcesPage() {
   const { profile } = useDistrictProfile()
   const mode = readSuiteMode()
   const [open, setOpen] = useState<string | null>(TRAINING[0].title)
+  const r = profile.rules
 
   return (
     <PageShell
       title="📚 Resource Hub"
-      description="Training library, Companion vs Standalone SoR reference, and community links — district-agnostic framing with CCSD as Pilot #1."
+      description="Training library, district rule cheat sheet, Companion vs Standalone SoR reference, and community links."
     >
+      <section className="mb-3 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card">
+        <h2 className="font-heading text-sm font-bold">{profile.name} rule cheat sheet</h2>
+        <p className="mt-1 text-xs text-[var(--subtext)]">
+          Pulled from district profile JSON — not hardcoded UI constants.
+        </p>
+        <ul className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
+          <li>
+            <strong>NOM lead time:</strong> {r.nomLeadTimeDays} calendar days
+          </li>
+          <li>
+            <strong>Eval window:</strong> {r.evaluationWindowDays} days ({r.evaluationWindowAppliesTo})
+          </li>
+          <li>
+            <strong>RTI gate:</strong> {r.rtiMinimumCycles} × {r.rtiCycleLengthWeeks} weeks
+          </li>
+          <li>
+            <strong>Service log:</strong> within {r.serviceLogHours} hours
+          </li>
+          <li>
+            <strong>MDR:</strong> {r.manifestationDeterminationSchoolDays} school days
+          </li>
+          <li>
+            <strong>Transfer finalize:</strong> {r.transferCompleteDays} days
+          </li>
+          <li className="sm:col-span-2">
+            <strong>Finalize sequence:</strong> {r.enrichFinalizeSequence.join(' → ')}
+          </li>
+        </ul>
+        <div className="mt-3 flex flex-wrap gap-2 text-xs">
+          <Link to="/district" className="font-semibold text-[var(--accent)]">
+            Open District Profile →
+          </Link>
+          <Link to="/evaluations" className="font-semibold text-[var(--accent)]">
+            Eval Validation →
+          </Link>
+          <Link to="/fba" className="font-semibold text-[var(--accent)]">
+            FBA/BIP →
+          </Link>
+        </div>
+      </section>
+
       <section className="mb-3 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card">
         <h2 className="font-heading text-sm font-bold">PRISM vs official IEP system</h2>
         <p className="mt-1 text-xs text-[var(--subtext)]">
@@ -62,6 +109,7 @@ export function ResourcesPage() {
                 ['Draft present levels / goals', 'PRISM → copy', 'PRISM can own'],
                 ['Finalize IEP / 504', profile.iepSystem, 'PRISM (when enabled)'],
                 ['Reminders / checklists', 'PRISM', 'PRISM'],
+                ['Classroom materials', 'PRISM (local)', 'PRISM (local)'],
                 ['Live Enrich sync', 'Never', 'Never'],
               ].map((row) => (
                 <tr key={row[0]} className="border-b border-[var(--border)] last:border-0">
@@ -98,20 +146,16 @@ export function ResourcesPage() {
           {COMMUNITY.map((c) => (
             <li key={c.url}>
               <a
-                className="font-semibold text-[var(--accent)] underline"
                 href={c.url}
                 target="_blank"
                 rel="noreferrer"
+                className="font-semibold text-[var(--accent)] underline"
               >
                 {c.name}
               </a>
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-[10px] text-[var(--subtext)]">
-          Sources tracked on this profile: {profile.sources.slice(0, 3).join(' · ')}
-          {profile.sources.length > 3 ? '…' : ''}
-        </p>
       </section>
     </PageShell>
   )
