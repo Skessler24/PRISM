@@ -39,3 +39,6 @@ local-data/
 **/*BIP*CCSD*
 uploads/**
 *.caseload.json
+
+api/local.settings.json
+api/node_modules/

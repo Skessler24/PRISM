@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "api:install": "npm --prefix api install",
+    "api:start": "npm --prefix api start"
   },
   "dependencies": {
     "react": "^19.2.7",

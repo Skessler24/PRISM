@@ -15,8 +15,9 @@ That file came from your latest complete build (`archive/index.prototype.html` /
 | Path | What it is |
 |---|---|
 | `deploy/` | **What Azure publishes** — full working app |
+| `api/` | Azure Functions AI proxy (`/api/ai-chat`, `/api/ai-speak`) — keys stay server-side |
 | `archive/index.prototype.html` | Backup of the full HTML build |
-| `src/` | Vite + React rewrite (in progress — Prompt 3 will port tab content here) |
+| `src/` | Vite + React rewrite (Prompts 1–6 in progress) |
 | `district-profiles/` | CCSD Enrich + DAT rules (used by React District Profile) |
 | `docs/` | Enrich guide, handoff, design refs, intake catalogs |
 
@@ -34,9 +35,17 @@ npm install
 npm run dev
 ```
 
+**AI proxy (optional, for Generation Studio / AI polish):**
+```bash
+cp api/local.settings.json.example api/local.settings.json
+# set ANTHROPIC_API_KEY (or OPENAI_API_KEY + AI_PROVIDER=openai)
+npm run api:install
+npm run api:start   # http://localhost:7071 — Vite proxies /api
+```
+
 ## Deploy
 
-GitHub Actions on push to `main` uploads the `deploy/` folder to Azure Static Web Apps.
+GitHub Actions on push to `main` uploads the `deploy/` folder to Azure Static Web Apps (with `api/` as the Functions backend when Azure recovers).
 
 ## Compliance
 

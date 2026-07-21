@@ -57,6 +57,14 @@ export const APP_TABS: AppTab[] = [
     featureId: 'templates',
   },
   {
+    id: 'generation',
+    path: '/generation',
+    label: 'Generation Studio',
+    shortLabel: 'Generate',
+    icon: '✨',
+    featureId: 'ai',
+  },
+  {
     id: 'resources',
     path: '/resources',
     label: 'Resource Hub',
