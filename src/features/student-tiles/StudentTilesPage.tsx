@@ -1,8 +1,12 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { PageShell } from '../../components/PageShell'
 import { useStudents } from '../../lib/students/useStudents'
 import { daysUntil, statusBadgeClass } from '../../lib/students/normalizeStudent'
 import type { Student } from '../../lib/students/types'
+import { materialsForStudent, type SavedMaterial } from '../../lib/classroom-materials/store'
+import { downloadMaterialPdf } from '../../lib/classroom-materials/generateMaterialPdf'
+import { loadFbaSessions, openFbaSessions } from '../../lib/fba/store'
 
 const FILTERS = ['All', 'IEP', '504', 'MLL', 'SLP', 'OT', 'Behavior', 'Academic'] as const
 
@@ -24,7 +28,17 @@ function matchesFilter(s: Student, filter: string) {
   return s.discipline.includes(filter) || s.disability === filter
 }
 
-function StudentCard({ student: s }: { student: Student }) {
+function StudentCard({
+  student: s,
+  materials,
+  openFba,
+  onOpen,
+}: {
+  student: Student
+  materials: SavedMaterial[]
+  openFba: boolean
+  onOpen: () => void
+}) {
   const dueDate = s.hasIEP ? s.iepDue : s.has504 ? s.section504Due : ''
   const dueLabel = s.hasIEP ? 'IEP Due' : s.has504 ? '504 Review' : 'Due'
   const days = daysUntil(dueDate || undefined)
@@ -32,8 +46,14 @@ function StudentCard({ student: s }: { student: Student }) {
 
   return (
     <article
-      className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
+      className="cursor-pointer rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card transition hover:border-[var(--accent)]"
       style={{ borderTop: `4px solid ${s.color}` }}
+      onClick={onOpen}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') onOpen()
+      }}
+      role="button"
+      tabIndex={0}
     >
       <div className="mb-2 flex items-center gap-2">
         <div
@@ -66,6 +86,16 @@ function StudentCard({ student: s }: { student: Student }) {
             MLL
           </span>
         )}
+        {materials.length > 0 && (
+          <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold text-sky-900">
+            {materials.length} materials
+          </span>
+        )}
+        {openFba && (
+          <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-semibold text-rose-900">
+            Open FBA
+          </span>
+        )}
         {s.discipline.map((d) => (
           <span
             key={d}
@@ -74,9 +104,6 @@ function StudentCard({ student: s }: { student: Student }) {
             {d}
           </span>
         ))}
-        <span className="rounded-full bg-[var(--lav)] px-2 py-0.5 text-[10px] font-semibold text-slate-700">
-          {s.disability}
-        </span>
       </div>
       <div className="flex items-end justify-between gap-2">
         <div>
@@ -91,13 +118,6 @@ function StudentCard({ student: s }: { student: Student }) {
           </p>
         </div>
       </div>
-      {s.hasMLL && (
-        <p className="mt-2 text-[10px] text-[var(--subtext)]">
-          {s.homeLanguage || 'Language TBD'}
-          {s.eldLevel ? ` · ELD ${s.eldLevel}` : ''}
-          {s.interpreterNeeded ? ' · Interpreter' : ''}
-        </p>
-      )}
     </article>
   )
 }
@@ -106,6 +126,8 @@ export function StudentTilesPage() {
   const { students, restoreDemo } = useStudents()
   const [filter, setFilter] = useState<string>('All')
   const [search, setSearch] = useState('')
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [, bump] = useState(0)
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -121,10 +143,17 @@ export function StudentTilesPage() {
     })
   }, [students, filter, search])
 
+  const selected = students.find((s) => s.id === selectedId) || null
+  const shelf = selected ? materialsForStudent(selected.id) : []
+  const fbaOpen = selected
+    ? loadFbaSessions().some((f) => f.studentId === selected.id && f.open)
+    : false
+  const openFbaIds = new Set(openFbaSessions().map((f) => f.studentId))
+
   return (
     <PageShell
       title="🧩 Student Tiles"
-      description="Individual student data walls with IEP / 504 / MLL program flags. Demo data is fictional; real caseloads stay in browser localStorage only (FERPA)."
+      description="Individual student data walls — materials (token / schedule / comm / behavior), open FBA sessions, and program flags. Demo data is fictional; real caseloads stay in browser localStorage only (FERPA)."
     >
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-[var(--subtext)]">
@@ -172,8 +201,115 @@ export function StudentTilesPage() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map((s) => (
-            <StudentCard key={s.id} student={s} />
+            <StudentCard
+              key={s.id}
+              student={s}
+              materials={materialsForStudent(s.id)}
+              openFba={openFbaIds.has(s.id)}
+              onOpen={() => {
+                setSelectedId(s.id)
+                bump((n) => n + 1)
+              }}
+            />
           ))}
+        </div>
+      )}
+
+      {selected && (
+        <div className="fixed inset-0 z-40 flex justify-end bg-black/40" onClick={() => setSelectedId(null)}>
+          <aside
+            className="h-full w-full max-w-md overflow-y-auto bg-[var(--card-bg)] p-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-3 flex items-start justify-between gap-2">
+              <div>
+                <h2 className="font-heading text-lg font-bold">{selected.name}</h2>
+                <p className="text-xs text-[var(--subtext)]">
+                  {selected.grade} · {selected.disability}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="rounded-lg border border-[var(--border)] px-2 py-1 text-xs"
+                onClick={() => setSelectedId(null)}
+              >
+                Close
+              </button>
+            </div>
+
+            <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--subtext)]">
+              Materials shelf
+            </p>
+            {!shelf.length && (
+              <p className="mb-3 text-xs text-[var(--subtext)]">
+                No materials yet.{' '}
+                <Link to="/templates" className="font-semibold text-[var(--accent)]">
+                  Create in Materials Studio →
+                </Link>
+              </p>
+            )}
+            <ul className="mb-4 space-y-2">
+              {shelf.map((m) => (
+                <li key={m.id} className="rounded-xl border border-[var(--border)] p-3 text-xs">
+                  <strong>
+                    {m.title} · {m.kind}
+                  </strong>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <Link
+                      to={`/materials/session/${m.id}`}
+                      className="rounded bg-emerald-600 px-2 py-1 font-semibold text-white"
+                    >
+                      Smart TV
+                    </Link>
+                    <button
+                      type="button"
+                      className="rounded border border-[var(--border)] px-2 py-1 font-semibold"
+                      onClick={() => downloadMaterialPdf(m, 'letter')}
+                    >
+                      PDF
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--subtext)]">
+              FBA / behavior
+            </p>
+            {fbaOpen ? (
+              <div className="mb-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs">
+                <p className="font-semibold">Open FBA session</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <Link to={`/fba?session=${loadFbaSessions().find((f) => f.studentId === selected.id && f.open)?.id || ''}`} className="font-semibold text-[var(--accent)]">
+                    Open FBA sheet →
+                  </Link>
+                  <button
+                    type="button"
+                    className="rounded bg-emerald-600 px-2 py-1 font-semibold text-white"
+                    onClick={() => {
+                      const sid = loadFbaSessions().find(
+                        (f) => f.studentId === selected.id && f.open,
+                      )?.id
+                      if (sid) window.open(`/fba/tally/${sid}`, 'prism-fba-tally', 'width=420,height=640')
+                    }}
+                  >
+                    +/- tally pop-out
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p className="mb-3 text-xs text-[var(--subtext)]">
+                No open FBA.{' '}
+                <Link to="/fba" className="font-semibold text-[var(--accent)]">
+                  Start one →
+                </Link>
+              </p>
+            )}
+
+            <p className="text-[10px] text-[var(--subtext)]">
+              Goals: {selected.goals.join(' · ') || '—'}
+            </p>
+          </aside>
         </div>
       )}
     </PageShell>

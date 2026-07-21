@@ -3,13 +3,15 @@ import { daysUntil } from '../students/normalizeStudent'
 import { buildProgressAlerts } from '../progress-monitoring/store'
 import type { ProbeSession } from '../progress-monitoring/store'
 import type { SoapNote } from '../session-notes/store'
+import type { SavedMaterial } from '../classroom-materials/store'
+import type { FbaSession } from '../fba/store'
 
 export type DashboardAlert = {
   id: string
   tone: 'danger' | 'warn' | 'info'
   text: string
   href: string
-  category: 'annual' | 'nom' | 'progress' | 'soap'
+  category: 'annual' | 'nom' | 'progress' | 'soap' | 'schedule' | 'fba'
 }
 
 function addDaysIso(iso: string, days: number): string {
@@ -26,6 +28,8 @@ export function buildDashboardAlerts(input: {
   serviceLogHours: number
   iepSystem?: string
   today?: string
+  materialsToday?: SavedMaterial[]
+  openFba?: FbaSession[]
 }): DashboardAlert[] {
   const today = input.today || new Date().toISOString().slice(0, 10)
   const out: DashboardAlert[] = []
@@ -101,6 +105,26 @@ export function buildDashboardAlerts(input: {
     }
   }
 
+  for (const m of input.materialsToday || []) {
+    out.push({
+      id: `mat-${m.id}`,
+      tone: 'info',
+      text: `${m.studentName || 'Student'} — today's ${m.kind}: ${m.title}`,
+      href: `/materials/session/${m.id}`,
+      category: 'schedule',
+    })
+  }
+
+  for (const f of input.openFba || []) {
+    out.push({
+      id: `fba-${f.id}`,
+      tone: 'warn',
+      text: `${f.studentName || 'Student'} — open FBA (${f.targetBehavior || 'target TBD'}) · use +/- tally pop-out`,
+      href: `/fba?session=${f.id}`,
+      category: 'fba',
+    })
+  }
+
   const rank = { danger: 0, warn: 1, info: 2 }
-  return out.sort((a, b) => rank[a.tone] - rank[b.tone]).slice(0, 18)
+  return out.sort((a, b) => rank[a.tone] - rank[b.tone]).slice(0, 24)
 }
