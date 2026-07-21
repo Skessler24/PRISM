@@ -15,7 +15,10 @@ export function AppShell() {
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
       <TopBar />
       <TabNavigation />
-      <div className="fixed inset-x-0 top-[116px] z-[997] overflow-hidden bg-navy py-1.5 font-mono text-[11px] text-sky-300">
+      <div
+        className="fixed inset-x-0 top-[116px] z-[997] overflow-hidden py-1.5 font-mono text-[11px]"
+        style={{ background: 'var(--header-bg)', color: 'var(--header-txt)', opacity: 0.95 }}
+      >
         <div className="animate-marquee whitespace-nowrap">
           {doubled.map((item, i) => (
             <span key={`${item.text}-${i}`} className="mx-8">

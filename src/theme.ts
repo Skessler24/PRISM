@@ -1,12 +1,13 @@
 /**
- * Core PRISM design tokens — ported from archive/index.prototype.html
- * Keep hex values exact; theme families live in ./themes.ts
+ * Core PRISM design tokens — exact values from uploaded index.html
+ * (:root + tailwind.config colors). Theme families live in ./lib/themes.ts
  */
 
 export const prismColors = {
   navy: '#1E3A5F',
   accent: '#2563EB',
   accentHover: '#1D4ED8',
+  /** Tailwind token `sky` in index.html */
   sky: '#F0F9FF',
   cardBg: '#FFFFFF',
   border: '#E2E8F0',
@@ -21,28 +22,32 @@ export const prismColors = {
   slate: '#F1F5F9',
 } as const
 
+/** Matches index.html `:root` block exactly (Classic Blue / default chrome). */
 export const defaultCssVars = {
-  '--bg': prismColors.sky,
-  '--card-bg': prismColors.cardBg,
-  '--text': prismColors.text,
-  '--subtext': prismColors.subtext,
-  '--border': prismColors.border,
+  '--bg': '#F0F9FF',
+  '--card-bg': '#FFFFFF',
+  '--text': '#1E293B',
+  '--subtext': '#64748B',
+  '--border': '#E2E8F0',
   '--shadow': '0 1px 3px rgba(0,0,0,.08)',
-  '--accent': prismColors.accent,
-  '--nav-active': prismColors.accent,
-  '--nav-active-txt': '#FFFFFF',
+  '--accent': '#2563EB',
+  '--accent-h': '#1D4ED8',
+  '--nav-active': '#2563EB',
+  '--nav-active-txt': '#fff',
   '--nav-inactive': '#E2E8F0',
   '--nav-inactive-txt': '#475569',
   '--sky': '#DBEAFE',
-  '--mint': prismColors.mint,
-  '--coral': prismColors.coral,
-  '--sun': prismColors.sun,
-  '--lav': prismColors.lav,
-  '--softorange': prismColors.softorange,
-  '--pink': prismColors.pink,
-  '--slate': prismColors.slate,
-  '--header-bg': prismColors.navy,
-  '--header-txt': '#FFFFFF',
+  '--mint': '#D1FAE5',
+  '--coral': '#FEE2E2',
+  '--sun': '#FEF3C7',
+  '--lav': '#EDE9FE',
+  '--softorange': '#FFEDD5',
+  '--pink': '#FCE7F3',
+  '--slate': '#F1F5F9',
+  '--header-bg': '#1E3A5F',
+  '--header-txt': '#fff',
+  '--font-heading': "'Inter', sans-serif",
+  '--font-body': "'Inter', sans-serif",
 } as const
 
 export type CssVarMap = Record<string, string>

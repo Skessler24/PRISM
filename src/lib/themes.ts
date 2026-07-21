@@ -1,6 +1,7 @@
 /**
- * Theme families ported from archive/Style_Vision_Board_v2.html
- * Typed data only — no JSX. Applied via ThemeProvider.
+ * Theme families — exact values from Style_Vision_Board_v2.1
+ * Default app chrome tokens (navy/accent/mint/…) come from index.html.
+ * Typed data only — applied via ThemeProvider.
  */
 
 export type ThemePalette = {
@@ -32,16 +33,17 @@ export type ThemeFamily = {
   palettes: ThemePalette[]
 }
 
+/** Canonical Vision Board v2.1 families + palettes (do not drift). */
 export const themeFamilies: ThemeFamily[] = [
   {
     id: 'calm-clinical',
     name: 'Calm & Clinical',
     dot: '#2563EB',
     vibe: 'Trustworthy, clean, and professional. Feels like a well-organized SPED office — serious but approachable. Easy on the eyes for long workdays.',
-    fontPrimary: "'Poppins', sans-serif",
-    fontSecondary: "'Figtree', sans-serif",
-    fontPrimaryName: 'Poppins',
-    fontSecondaryName: 'Figtree',
+    fontPrimary: "'Inter', sans-serif",
+    fontSecondary: "'Inter', sans-serif",
+    fontPrimaryName: 'Inter',
+    fontSecondaryName: 'Inter',
     palettes: [
       {
         name: 'Classic Blue',
@@ -130,10 +132,10 @@ export const themeFamilies: ThemeFamily[] = [
     name: 'Soft Pastel Pro',
     dot: '#A78BFA',
     vibe: 'The SPED sweet spot — cheerful and friendly without being childish. Feels like it was designed specifically for education professionals who care deeply about their students.',
-    fontPrimary: "'Poppins', sans-serif",
-    fontSecondary: "'Figtree', sans-serif",
-    fontPrimaryName: 'Poppins',
-    fontSecondaryName: 'Figtree',
+    fontPrimary: "'Nunito', sans-serif",
+    fontSecondary: "'Nunito', sans-serif",
+    fontPrimaryName: 'Nunito',
+    fontSecondaryName: 'Nunito',
     palettes: [
       {
         name: 'Lavender Dream',
@@ -223,9 +225,9 @@ export const themeFamilies: ThemeFamily[] = [
     dot: '#818CF8',
     vibe: 'Sleek, sophisticated, and seriously powerful. For the provider who spends long hours in front of a screen and wants an environment that feels elite. Reduces eye strain and looks incredible.',
     fontPrimary: "'Space Grotesk', sans-serif",
-    fontSecondary: "'Figtree', sans-serif",
+    fontSecondary: "'Inter', sans-serif",
     fontPrimaryName: 'Space Grotesk',
-    fontSecondaryName: 'Figtree',
+    fontSecondaryName: 'Inter',
     palettes: [
       {
         name: 'Indigo Glow',
@@ -321,7 +323,16 @@ export function getPalette(familyId: string, paletteName: string): ThemePalette 
   return family?.palettes.find((p) => p.name === paletteName)
 }
 
-export function paletteToCssVars(palette: ThemePalette): Record<string, string> {
+export function getFamily(familyId: string): ThemeFamily | undefined {
+  return themeFamilies.find((f) => f.id === familyId)
+}
+
+/** Map a Vision Board palette (+ family fonts) onto index.html CSS variables. */
+export function paletteToCssVars(
+  palette: ThemePalette,
+  family?: ThemeFamily,
+): Record<string, string> {
+  const isDark = family?.id === 'dark-mode' || palette.bg.startsWith('#0') || palette.bg.startsWith('#1C')
   return {
     '--bg': palette.bg,
     '--card-bg': palette.card,
@@ -329,11 +340,23 @@ export function paletteToCssVars(palette: ThemePalette): Record<string, string> 
     '--subtext': palette.muted,
     '--border': palette.border,
     '--accent': palette.primary,
+    '--accent-h': palette.accent,
     '--nav-active': palette.navActive,
     '--nav-active-txt': palette.navActiveTxt,
     '--nav-inactive': palette.navInactive,
     '--nav-inactive-txt': palette.navInactiveTxt,
     '--header-bg': palette.header,
     '--header-txt': palette.headerTxt,
+    '--sky': isDark ? palette.border : '#DBEAFE',
+    '--mint': isDark ? palette.border : '#D1FAE5',
+    '--coral': isDark ? palette.border : '#FEE2E2',
+    '--sun': isDark ? palette.border : '#FEF3C7',
+    '--lav': isDark ? palette.border : '#EDE9FE',
+    '--softorange': isDark ? palette.border : '#FFEDD5',
+    '--pink': isDark ? palette.border : '#FCE7F3',
+    '--slate': isDark ? palette.navInactive : '#F1F5F9',
+    '--font-heading': family?.fontPrimary ?? "'Inter', sans-serif",
+    '--font-body': family?.fontSecondary ?? "'Inter', sans-serif",
+    '--shadow': isDark ? '0 1px 3px rgba(0,0,0,.35)' : '0 1px 3px rgba(0,0,0,.08)',
   }
 }

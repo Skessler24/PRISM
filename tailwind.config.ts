@@ -1,14 +1,17 @@
 import type { Config } from 'tailwindcss'
 
-/** Design tokens ported from archive/index.prototype.html */
+/** Design tokens ported exactly from uploaded index.html tailwind.config */
 const config: Config = {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       fontFamily: {
-        heading: ['Poppins', 'sans-serif'],
-        body: ['Figtree', 'sans-serif'],
+        heading: ['var(--font-heading)', 'Inter', 'sans-serif'],
+        body: ['var(--font-body)', 'Inter', 'sans-serif'],
         mono: ['Space Grotesk', 'monospace'],
+        inter: ['Inter', 'sans-serif'],
+        nunito: ['Nunito', 'sans-serif'],
+        grotesk: ['Space Grotesk', 'sans-serif'],
       },
       colors: {
         navy: '#1E3A5F',

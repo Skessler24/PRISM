@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Exact :root tokens from uploaded index.html (Classic Blue default) */
 :root {
   --bg: #f0f9ff;
   --card-bg: #ffffff;
@@ -10,8 +11,9 @@
   --border: #e2e8f0;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   --accent: #2563eb;
+  --accent-h: #1d4ed8;
   --nav-active: #2563eb;
-  --nav-active-txt: #ffffff;
+  --nav-active-txt: #fff;
   --nav-inactive: #e2e8f0;
   --nav-inactive-txt: #475569;
   --sky: #dbeafe;
@@ -23,7 +25,9 @@
   --pink: #fce7f3;
   --slate: #f1f5f9;
   --header-bg: #1e3a5f;
-  --header-txt: #ffffff;
+  --header-txt: #fff;
+  --font-heading: 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
 }
 
 html,
@@ -34,7 +38,7 @@ body,
 
 body {
   margin: 0;
-  font-family: 'Figtree', sans-serif;
+  font-family: var(--font-body);
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
@@ -44,7 +48,7 @@ h1,
 h2,
 h3,
 .font-heading {
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-heading);
 }
 
 @layer components {
@@ -62,6 +66,14 @@ h3,
 
   .help-assist-panel.block {
     display: block;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 16px;
   }
 }
 

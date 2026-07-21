@@ -13,7 +13,7 @@ export function TabNavigation() {
     `whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-semibold transition min-h-9 ${
       isActive
         ? 'bg-[var(--nav-active)] text-[var(--nav-active-txt)]'
-        : 'bg-[var(--nav-inactive)] text-[var(--nav-inactive-txt)] hover:bg-slate-300'
+        : 'bg-[var(--nav-inactive)] text-[var(--nav-inactive-txt)] hover:brightness-95'
     }`
 
   return (
