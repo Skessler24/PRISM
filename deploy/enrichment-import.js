@@ -413,46 +413,55 @@
   }
 
   async function ingestFiles(fileList) {
-    const packs = { contacts: [], addresses: [], alps: [], bips: [], files: [] };
+    const packs = {
+      contacts: [],
+      addresses: [],
+      alps: [],
+      bips: [],
+      files: [],
+      skipped: [],
+      warnings: [],
+    };
     const files = [...fileList];
     for (const file of files) {
       const name = file.name || "file";
       const lower = name.toLowerCase();
       packs.files.push(name);
       if (lower.endsWith(".pdf")) {
-        const text = await extractPdfText(file);
-        if (/Behavioral Intervention Plan \(BIP\)/i.test(text) || /STRENGTH BASED PROFILE/i.test(text)) {
-          packs.bips = packs.bips.concat(parseBipPackets(text));
-        }
-        if (/Talent Pool/i.test(text) || /Area of Strength/i.test(text)) {
-          packs.alps = packs.alps.concat(parseAlpPackets(text));
-        }
-        // if neither matched strongly, try both parsers
-        if (!packs.bips.length && !packs.alps.length) {
-          packs.bips = packs.bips.concat(parseBipPackets(text));
-          packs.alps = packs.alps.concat(parseAlpPackets(text));
-        }
+        // PDF import is unreliable in some browsers / upload limits — skip for now
+        packs.skipped.push(name);
+        packs.warnings.push(
+          "Skipped PDF (use CSV/.text exports for now): " + name
+        );
+        continue;
+      }
+      const text = await file.text();
+      // ARR CSV special pops?
+      if (
+        (lower.endsWith(".csv") || lower.endsWith(".text") || lower.endsWith(".txt") || lower.endsWith(".tsv")) &&
+        /Case Manager/i.test(text) &&
+        /IEP Date/i.test(text)
+      ) {
+        packs.arrCsvText = text;
+        continue;
+      }
+      // Prefer TSV (tab) but also support CSV commas for Infinite Campus exports saved as CSV
+      let headers, rows;
+      if (text.includes("\t")) {
+        ({ headers, rows } = parseTsv(text));
       } else {
-        const text = await file.text();
-        // ARR CSV special pops?
-        if (lower.endsWith(".csv") && /Case Manager/i.test(text) && /IEP Date/i.test(text)) {
-          packs.arrCsvText = text;
-          continue;
-        }
-        const { headers, rows } = parseTsv(text);
-        const kind = detectExportKind(headers);
-        if (kind === "contacts") packs.contacts = packs.contacts.concat(contactsFromExport(rows));
-        else if (kind === "address") packs.addresses = packs.addresses.concat(addressFromExport(rows));
-        else {
-          // try contacts if Student Name present
-          if (headers.some((h) => /student name/i.test(h))) {
-            packs.contacts = packs.contacts.concat(contactsFromExport(rows));
-          } else if (headers.some((h) => /^student$/i.test(h))) {
-            packs.addresses = packs.addresses.concat(addressFromExport(rows));
-          } else {
-            throw new Error("Unrecognized file: " + name);
-          }
-        }
+        ({ headers, rows } = parseCsvLoose(text));
+      }
+      const kind = detectExportKind(headers);
+      if (kind === "contacts") packs.contacts = packs.contacts.concat(contactsFromExport(rows));
+      else if (kind === "address") packs.addresses = packs.addresses.concat(addressFromExport(rows));
+      else if (headers.some((h) => /student name/i.test(h))) {
+        packs.contacts = packs.contacts.concat(contactsFromExport(rows));
+      } else if (headers.some((h) => /^student$/i.test(h))) {
+        packs.addresses = packs.addresses.concat(addressFromExport(rows));
+      } else {
+        packs.skipped.push(name);
+        packs.warnings.push("Unrecognized file (need parent/contact or address export): " + name);
       }
     }
     // de-dupe packets by name
@@ -468,6 +477,49 @@
     packs.alps = dedupe(packs.alps);
     packs.bips = dedupe(packs.bips);
     return packs;
+  }
+
+  function parseCsvLoose(text) {
+    const lines = String(text || "")
+      .replace(/^\uFEFF/, "")
+      .replace(/\r\n/g, "\n")
+      .replace(/\r/g, "\n")
+      .split("\n")
+      .filter((l) => l.trim());
+    if (!lines.length) return { headers: [], rows: [] };
+    const split = (line) => {
+      const out = [];
+      let cur = "";
+      let q = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (q) {
+          if (ch === '"' && line[i + 1] === '"') {
+            cur += '"';
+            i++;
+          } else if (ch === '"') q = false;
+          else cur += ch;
+        } else if (ch === '"') q = true;
+        else if (ch === ",") {
+          out.push(cur);
+          cur = "";
+        } else cur += ch;
+      }
+      out.push(cur);
+      return out;
+    };
+    const headers = split(lines[0]).map((h) => h.trim());
+    const rows = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = split(lines[i]);
+      while (cols.length < headers.length) cols.push("");
+      const obj = {};
+      headers.forEach((h, idx) => {
+        obj[h] = (cols[idx] || "").trim();
+      });
+      rows.push(obj);
+    }
+    return { headers, rows };
   }
 
   global.PrismEnrichment = {
