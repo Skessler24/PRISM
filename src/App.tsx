@@ -9,6 +9,7 @@ import { StudentTilesPage } from './features/student-tiles/StudentTilesPage'
 import { CaseloadPage } from './features/caseload/CaseloadPage'
 import { MtssPage } from './features/mtss/MtssPage'
 import { EvaluationsPage } from './features/evaluations/EvaluationsPage'
+import { FbaBipPage } from './features/fba-bip/FbaBipPage'
 import { AccessibilityPage } from './features/accessibility/AccessibilityPage'
 import { TemplatesPage } from './features/templates-forms/TemplatesPage'
 import { GenerationPage } from './features/generation/GenerationPage'
@@ -31,6 +32,7 @@ export default function App() {
                   <Route path="caseload" element={<CaseloadPage />} />
                   <Route path="mtss" element={<MtssPage />} />
                   <Route path="evaluations" element={<EvaluationsPage />} />
+                  <Route path="fba" element={<FbaBipPage />} />
                   <Route path="section504" element={<Section504Page />} />
                   <Route path="mll" element={<MllPage />} />
                   <Route path="accessibility" element={<AccessibilityPage />} />
