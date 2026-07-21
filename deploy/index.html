@@ -306,6 +306,9 @@ textarea{min-height:80px;resize:vertical}
 </div>
 <div data-id="235" class="flex flex-wrap gap-2 mb-4" id="studentFilters">
 <button data-id="236" class="sub-tab-btn active" data-filter="All">All</button>
+<button class="sub-tab-btn" data-filter="IEP">IEP</button>
+<button class="sub-tab-btn" data-filter="504">504</button>
+<button class="sub-tab-btn" data-filter="MLL">MLL</button>
 <button data-id="237" class="sub-tab-btn" data-filter="SLP">SLP</button>
 <button data-id="238" class="sub-tab-btn" data-filter="OT">OT</button>
 <button class="sub-tab-btn" data-filter="PT">PT</button>
@@ -376,13 +379,73 @@ textarea{min-height:80px;resize:vertical}
 <div class="tab-content" id="tab-section504">
 <div class="max-w-7xl mx-auto">
 <h2 class="text-lg font-bold font-heading mb-3">📑 504 Plans</h2>
+<div class="flex flex-wrap gap-2 mb-4">
+<button class="sub-tab-btn active" data-s504="s504-dash">Dashboard</button>
+<button class="sub-tab-btn" data-s504="s504-roster">Roster</button>
+<button class="sub-tab-btn" data-s504="s504-checklist">Checklist</button>
+<button class="sub-tab-btn" data-s504="s504-drafts">Parent Notices</button>
+</div>
+
+<div class="sub-content active" id="s504-dash">
+<div class="help-assist-panel show mb-3"><strong>Section 504 workspace:</strong> Track accommodation plans alongside (or instead of) IEPs. Toggle this tab in <strong>Admin → Module toggles</strong>. Companion mode: draft here, enter final plan in your district 504 system. Standalone: PRISM can own the full 504 lifecycle.</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+<div class="card text-center"><p class="text-2xl font-bold font-mono-d text-accent" id="count504">0</p><p class="text-xs text-subtext">Students with 504</p></div>
+<div class="card text-center"><p class="text-2xl font-bold font-mono-d text-amber-600" id="count504Due">0</p><p class="text-xs text-subtext">Reviews due (45d)</p></div>
+<div class="card text-center"><p class="text-2xl font-bold font-mono-d text-red-500" id="count504Overdue">0</p><p class="text-xs text-subtext">Overdue reviews</p></div>
+<div class="card text-center"><p class="text-2xl font-bold font-mono-d text-purple-600" id="count504Dual">0</p><p class="text-xs text-subtext">Also on IEP</p></div>
+</div>
+<div class="card overflow-x-auto">
+<h3 class="text-sm font-bold font-heading mb-3">Upcoming 504 Reviews</h3>
+<table class="w-full text-xs" id="s504DashTable">
+<thead><tr class="border-b"><th class="p-2 text-left">Student</th><th class="p-2">Grade</th><th class="p-2">Impairment</th><th class="p-2">Review Due</th><th class="p-2">Days</th><th class="p-2">Status</th></tr></thead>
+<tbody id="s504DashBody"></tbody>
+</table>
+</div>
+</div>
+
+<div class="sub-content" id="s504-roster">
+<div class="card overflow-x-auto">
+<div class="flex flex-wrap gap-2 mb-3">
+<button class="sub-tab-btn active s504-filter-btn" data-s504filter="All">All</button>
+<button class="sub-tab-btn s504-filter-btn" data-s504filter="DueSoon">Due ≤45d</button>
+<button class="sub-tab-btn s504-filter-btn" data-s504filter="Overdue">Overdue</button>
+<button class="sub-tab-btn s504-filter-btn" data-s504filter="Dual">IEP + 504</button>
+</div>
+<table class="w-full text-xs">
+<thead><tr class="border-b"><th class="p-2 text-left">Student</th><th class="p-2">Grade / Teacher</th><th class="p-2">Case Manager</th><th class="p-2">Impairment</th><th class="p-2">Accommodations</th><th class="p-2">Review Due</th><th class="p-2">Status</th><th class="p-2"></th></tr></thead>
+<tbody id="s504RosterBody"></tbody>
+</table>
+<p id="s504RosterEmpty" class="text-xs text-subtext mt-3" style="display:none">No 504 students yet. Flag students with <code>has504</code> in demo data, or import a CSV with a 504 column / mark them in the student panel later.</p>
+</div>
+</div>
+
+<div class="sub-content" id="s504-checklist">
 <div class="card">
-<p class="text-sm mb-2">Section 504 accommodation plans — first-class PRISM module (toggleable per district).</p>
-<div class="help-assist-panel show"><strong>Coming next build:</strong> 504 caseload list, accommodation checklist, annual review dates, and parent notice drafts. Enable/disable this tab in <strong>Admin → Module toggles</strong>.</div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
-<div class="p-3 rounded-lg bg-slate"><p class="text-xs text-subtext">Students with 504</p><p class="font-bold text-lg" id="count504">—</p></div>
-<div class="p-3 rounded-lg bg-slate"><p class="text-xs text-subtext">Reviews due (45 days)</p><p class="font-bold text-lg">—</p></div>
-<div class="p-3 rounded-lg bg-slate"><p class="text-xs text-subtext">Missing accommodations doc</p><p class="font-bold text-lg">—</p></div>
+<h3 class="text-sm font-bold font-heading mb-3">504 Annual Review Checklist</h3>
+<select id="s504ChecklistStudent" class="w-64 mb-3"><option value="">Select 504 student…</option></select>
+<div id="s504ChecklistContent" class="space-y-2">
+<p class="text-xs text-subtext">Select a student to view their 504 review checklist.</p>
+</div>
+</div>
+</div>
+
+<div class="sub-content" id="s504-drafts">
+<div class="card">
+<h3 class="text-sm font-bold font-heading mb-3">Parent Notice Drafts</h3>
+<div class="help-assist-panel mb-3"><strong>💡 Help Assist:</strong> Section 504 requires prior written notice for evaluation, eligibility, and plan changes. Provide parental rights and meeting notice in the family's preferred language when feasible.</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+<div><label class="text-xs font-semibold">Student</label><select id="s504DraftStudent"><option value="">Select…</option></select></div>
+<div><label class="text-xs font-semibold">Notice type</label>
+<select id="s504DraftType">
+<option>Meeting notice — annual 504 review</option>
+<option>Prior written notice — evaluation</option>
+<option>Prior written notice — eligibility / plan</option>
+<option>Parent rights acknowledgment</option>
+</select></div>
+</div>
+<button class="btn-filled btn-sm" id="s504GenDraftBtn"><i data-lucide="sparkles" class="w-4 h-4 inline"></i> Generate Draft</button>
+<button class="btn-sm btn-outlined ml-2" id="s504CopyDraftBtn" style="display:none">Copy</button>
+<div id="s504DraftOutput" class="mt-3 p-3 rounded-lg bg-slate text-xs whitespace-pre-wrap" style="display:none;max-height:320px;overflow-y:auto"></div>
 </div>
 </div>
 </div>
@@ -392,9 +455,74 @@ textarea{min-height:80px;resize:vertical}
 <div class="tab-content" id="tab-mll">
 <div class="max-w-7xl mx-auto">
 <h2 class="text-lg font-bold font-heading mb-3">🌍 Multilingual Learners</h2>
+<div class="flex flex-wrap gap-2 mb-4">
+<button class="sub-tab-btn active" data-mll="mll-dash">Dashboard</button>
+<button class="sub-tab-btn" data-mll="mll-roster">Roster</button>
+<button class="sub-tab-btn" data-mll="mll-checklist">CLD Checklist</button>
+<button class="sub-tab-btn" data-mll="mll-drafts">Family Communication</button>
+</div>
+
+<div class="sub-content active" id="mll-dash">
+<div class="help-assist-panel show mb-3"><strong>MLL workspace:</strong> Home language, ELD level, interpreter needs, and CLD-safe assessment guidance. Translated NOM/consent helpers also live under Accessibility. Toggle in <strong>Admin → Module toggles</strong>.</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+<div class="card text-center"><p class="text-2xl font-bold font-mono-d text-accent" id="countMll">0</p><p class="text-xs text-subtext">MLL students</p></div>
+<div class="card text-center"><p class="text-2xl font-bold font-mono-d text-amber-600" id="countMllInterp">0</p><p class="text-xs text-subtext">Interpreter needed</p></div>
+<div class="card text-center"><p class="text-2xl font-bold font-mono-d text-blue-600" id="countMllIep">0</p><p class="text-xs text-subtext">MLL + IEP</p></div>
+<div class="card text-center"><p class="text-2xl font-bold font-mono-d text-purple-600" id="countMll504">0</p><p class="text-xs text-subtext">MLL + 504</p></div>
+</div>
+<div class="card overflow-x-auto">
+<h3 class="text-sm font-bold font-heading mb-3">Language Snapshot</h3>
+<table class="w-full text-xs">
+<thead><tr class="border-b"><th class="p-2 text-left">Student</th><th class="p-2">Home Language</th><th class="p-2">ELD Level</th><th class="p-2">Interpreter</th><th class="p-2">Programs</th></tr></thead>
+<tbody id="mllDashBody"></tbody>
+</table>
+</div>
+</div>
+
+<div class="sub-content" id="mll-roster">
+<div class="card overflow-x-auto">
+<div class="flex flex-wrap gap-2 mb-3">
+<button class="sub-tab-btn active mll-filter-btn" data-mllfilter="All">All</button>
+<button class="sub-tab-btn mll-filter-btn" data-mllfilter="Interpreter">Interpreter</button>
+<button class="sub-tab-btn mll-filter-btn" data-mllfilter="WithIEP">With IEP</button>
+<button class="sub-tab-btn mll-filter-btn" data-mllfilter="With504">With 504</button>
+</div>
+<table class="w-full text-xs">
+<thead><tr class="border-b"><th class="p-2 text-left">Student</th><th class="p-2">Grade</th><th class="p-2">Home Language</th><th class="p-2">ELD Level</th><th class="p-2">Interpreter</th><th class="p-2">Case Manager</th><th class="p-2">Programs</th><th class="p-2"></th></tr></thead>
+<tbody id="mllRosterBody"></tbody>
+</table>
+<p id="mllRosterEmpty" class="text-xs text-subtext mt-3" style="display:none">No MLL students flagged yet. ARR CSV <code>ELA=TRUE</code> sets <code>hasMLL</code>; demo students Carlos &amp; Sofia are flagged.</p>
+</div>
+</div>
+
+<div class="sub-content" id="mll-checklist">
 <div class="card">
-<p class="text-sm mb-2">MLL / EL program workspace — language, ELD level, interpreter needs, CLD-safe assessment guidance.</p>
-<div class="help-assist-panel show"><strong>Coming next build:</strong> MLL student roster, home language, ELD tier, interpreter flags, and parent communication drafts. Accessibility already has translated NOM/consent helpers; this tab will own the full MLL ecosystem. Toggle in <strong>Admin → Module toggles</strong>.</div>
+<h3 class="text-sm font-bold font-heading mb-3">CLD-Safe Assessment Checklist</h3>
+<select id="mllChecklistStudent" class="w-64 mb-3"><option value="">Select MLL student…</option></select>
+<div id="mllChecklistContent" class="space-y-2">
+<p class="text-xs text-subtext">Select a student to view CLD evaluation safeguards.</p>
+</div>
+</div>
+</div>
+
+<div class="sub-content" id="mll-drafts">
+<div class="card">
+<h3 class="text-sm font-bold font-heading mb-3">Family Communication Drafts</h3>
+<div class="help-assist-panel mb-3"><strong>💡 Help Assist:</strong> Provide notices in the family's preferred language when possible. Document interpreter use. Cross-check Accessibility → Multilingual for translated NOM/consent templates.</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+<div><label class="text-xs font-semibold">Student</label><select id="mllDraftStudent"><option value="">Select…</option></select></div>
+<div><label class="text-xs font-semibold">Draft type</label>
+<select id="mllDraftType">
+<option>Meeting invitation (preferred language note)</option>
+<option>Interpreter request for IEP/504 meeting</option>
+<option>Family interview / language survey follow-up</option>
+<option>Progress update for ELD + SPED team</option>
+</select></div>
+</div>
+<button class="btn-filled btn-sm" id="mllGenDraftBtn"><i data-lucide="sparkles" class="w-4 h-4 inline"></i> Generate Draft</button>
+<button class="btn-sm btn-outlined ml-2" id="mllCopyDraftBtn" style="display:none">Copy</button>
+<div id="mllDraftOutput" class="mt-3 p-3 rounded-lg bg-slate text-xs whitespace-pre-wrap" style="display:none;max-height:320px;overflow-y:auto"></div>
+</div>
 </div>
 </div>
 </div>
@@ -1249,23 +1377,56 @@ const PRISM_STUDENTS_KEY='prism_students_v1';
 const PRISM_CASELOAD_META_KEY='prism_caseload_meta_v1';
 const STUDENT_COLORS=['#AEE4FF','#B8F2C8','#D7C7FF','#FF9A8B','#FDE68A','#FBCFE8','#C7D2FE','#A7F3D0'];
 const DEMO_STUDENTS=[
-{id:'aiden',name:'Aiden M.',grade:'Gr3',teacher:'Ms. Thompson',discipline:['SLP','Behavior'],provider:'Samantha',tier:3,iepDue:'2026-11-15',reevalDue:'',status:'On Track',color:'#AEE4FF',interests:'Dinosaurs, Minecraft, the color blue',triggers:'Loud noises, unexpected transitions',calming:'Deep breathing, fidget cube, quiet corner',goals:['Produce /r/ in sentences 80%','Follow 2-step directions 75%'],accommodations:['Preferential seating','Visual schedule','Noise-canceling headphones'],disability:'EBD/SLD',lastContact:'2026-07-15',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo'},
-{id:'bella',name:'Bella R.',grade:'Gr4',teacher:'Mr. Davis',discipline:['Academic'],provider:'Samantha',tier:2,iepDue:'2026-09-30',reevalDue:'',status:'On Track',color:'#B8F2C8',interests:'Harry Potter, drawing, cats',triggers:'Written tasks, timed tests',calming:'Drawing break, reading corner',goals:['Read grade-level text 90 wpm','Written expression 3+ sentences'],accommodations:['Extended time','Graphic organizers','Text-to-speech'],disability:'SLD',lastContact:'2026-07-10',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo'},
-{id:'carlos',name:'Carlos T.',grade:'Gr2',teacher:'Ms. Rivera',discipline:['SLP'],provider:'Samantha',tier:2,iepDue:'2026-10-20',reevalDue:'',status:'Upcoming',color:'#AEE4FF',interests:'Soccer, superheroes, the color red',triggers:'Peer conflict',calming:'Movement break, counting',goals:['Produce /s/ blends 80%','Use complete sentences in conversation'],accommodations:['Visual cues','Sentence starters'],disability:'DLD',lastContact:'2026-07-05',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo'},
-{id:'diana',name:'Diana S.',grade:'Gr5',teacher:'Ms. Chen',discipline:['OT'],provider:'Samantha',tier:1,iepDue:'2027-01-15',reevalDue:'',status:'On Track',color:'#D7C7FF',interests:'Art, horses, Taylor Swift',triggers:'Fine motor tasks, handwriting',calming:'Hand stretches, art activities',goals:['Legible handwriting 80%','Independent self-care skills'],accommodations:['Slant board','Pencil grip','Modified worksheets'],disability:'DCD',lastContact:'2026-07-08',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo'},
-{id:'maya',name:'Maya P.',grade:'Gr1',teacher:'Ms. Johnson',discipline:['Behavior','SLP'],provider:'Samantha',tier:3,iepDue:'2026-08-25',reevalDue:'',status:'Overdue',color:'#FF9A8B',interests:'Princesses, glitter, the color pink',triggers:'Transitions, denied requests',calming:'Token board, first-then board, calm corner',goals:['Stay in assigned area 80% of session','Use 3-word requests independently'],accommodations:['Visual schedule','Token economy','1:1 para support'],disability:'AUT',lastContact:'2026-07-18',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo'},
-{id:'jordan',name:'Jordan K.',grade:'Gr3',teacher:'Mr. Park',discipline:['Academic'],provider:'Samantha',tier:2,iepDue:'2026-12-10',reevalDue:'',status:'On Track',color:'#B8F2C8',interests:'Legos, video games, science',triggers:'Reading aloud, new social situations',calming:'Lego break, quiet workspace',goals:['Decode CVC words 90%','Math facts to 20 fluently'],accommodations:['Audio books','Manipulatives','Small group testing'],disability:'SLD',lastContact:'2026-07-12',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo'},
-{id:'sofia',name:'Sofia G.',grade:'Gr4',teacher:'Ms. Anderson',discipline:['SLP'],provider:'Samantha',tier:1,iepDue:'2027-02-28',reevalDue:'',status:'On Track',color:'#AEE4FF',interests:'Dancing, unicorns, the color purple',triggers:'Large group activities',calming:'Drawing, listening to music',goals:['Produce /l/ in conversation 85%','Narrative retell with 5 elements'],accommodations:['Small group instruction','Visual supports'],disability:'DLD',lastContact:'2026-07-14',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo'}
+{id:'aiden',name:'Aiden M.',grade:'Gr3',teacher:'Ms. Thompson',discipline:['SLP','Behavior'],provider:'Samantha',tier:3,iepDue:'2026-11-15',reevalDue:'',status:'On Track',color:'#AEE4FF',interests:'Dinosaurs, Minecraft, the color blue',triggers:'Loud noises, unexpected transitions',calming:'Deep breathing, fidget cube, quiet corner',goals:['Produce /r/ in sentences 80%','Follow 2-step directions 75%'],accommodations:['Preferential seating','Visual schedule','Noise-canceling headphones'],disability:'EBD/SLD',lastContact:'2026-07-15',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo',hasIEP:true,has504:false,hasMLL:false},
+{id:'bella',name:'Bella R.',grade:'Gr4',teacher:'Mr. Davis',discipline:['Academic'],provider:'Samantha',tier:2,iepDue:'2026-09-30',reevalDue:'',status:'On Track',color:'#B8F2C8',interests:'Harry Potter, drawing, cats',triggers:'Written tasks, timed tests',calming:'Drawing break, reading corner',goals:['Read grade-level text 90 wpm','Written expression 3+ sentences'],accommodations:['Extended time','Graphic organizers','Text-to-speech'],disability:'SLD',lastContact:'2026-07-10',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo',hasIEP:true,has504:false,hasMLL:false},
+{id:'carlos',name:'Carlos T.',grade:'Gr2',teacher:'Ms. Rivera',discipline:['SLP','ELA'],provider:'Samantha',tier:2,iepDue:'2026-10-20',reevalDue:'',status:'Upcoming',color:'#AEE4FF',interests:'Soccer, superheroes, the color red',triggers:'Peer conflict',calming:'Movement break, counting',goals:['Produce /s/ blends 80%','Use complete sentences in conversation'],accommodations:['Visual cues','Sentence starters'],disability:'DLD',lastContact:'2026-07-05',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo',hasIEP:true,has504:false,hasMLL:true,homeLanguage:'Spanish',eldLevel:'Emerging',interpreterNeeded:true},
+{id:'diana',name:'Diana S.',grade:'Gr5',teacher:'Ms. Chen',discipline:['OT'],provider:'Samantha',tier:1,iepDue:'',reevalDue:'',status:'On Track',color:'#D7C7FF',interests:'Art, horses, Taylor Swift',triggers:'Fine motor tasks, handwriting',calming:'Hand stretches, art activities',goals:[],accommodations:['Slant board','Pencil grip','Modified worksheets','Extended time on writing tasks'],disability:'504 — ADHD / fine motor',lastContact:'2026-07-08',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo',hasIEP:false,has504:true,hasMLL:false,section504Due:'2026-10-01',section504Impairment:'ADHD / fine motor'},
+{id:'maya',name:'Maya P.',grade:'Gr1',teacher:'Ms. Johnson',discipline:['Behavior','SLP'],provider:'Samantha',tier:3,iepDue:'2026-08-25',reevalDue:'',status:'Overdue',color:'#FF9A8B',interests:'Princesses, glitter, the color pink',triggers:'Transitions, denied requests',calming:'Token board, first-then board, calm corner',goals:['Stay in assigned area 80% of session','Use 3-word requests independently'],accommodations:['Visual schedule','Token economy','1:1 para support'],disability:'AUT',lastContact:'2026-07-18',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo',hasIEP:true,has504:false,hasMLL:false},
+{id:'jordan',name:'Jordan K.',grade:'Gr3',teacher:'Mr. Park',discipline:['Academic'],provider:'Samantha',tier:2,iepDue:'2026-12-10',reevalDue:'',status:'On Track',color:'#B8F2C8',interests:'Legos, video games, science',triggers:'Reading aloud, new social situations',calming:'Lego break, quiet workspace',goals:['Decode CVC words 90%','Math facts to 20 fluently'],accommodations:['Audio books','Manipulatives','Small group testing','Preferential seating'],disability:'SLD',lastContact:'2026-07-12',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo',hasIEP:true,has504:true,hasMLL:false,section504Due:'2026-09-15',section504Impairment:'ADHD (co-occurring with IEP)'},
+{id:'sofia',name:'Sofia G.',grade:'Gr4',teacher:'Ms. Anderson',discipline:['SLP','ELA'],provider:'Samantha',tier:1,iepDue:'2027-02-28',reevalDue:'',status:'On Track',color:'#AEE4FF',interests:'Dancing, unicorns, the color purple',triggers:'Large group activities',calming:'Drawing, listening to music',goals:['Produce /l/ in conversation 85%','Narrative retell with 5 elements'],accommodations:['Small group instruction','Visual supports'],disability:'DLD',lastContact:'2026-07-14',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo',hasIEP:true,has504:false,hasMLL:true,homeLanguage:'Spanish',eldLevel:'Developing',interpreterNeeded:false}
 ];
 
+function normalizeStudent(s){
+const out={...s};
+const disc=Array.isArray(out.discipline)?out.discipline:[];
+if(out.hasIEP==null)out.hasIEP=!!(out.iepDue||out.source==='arr-csv'||out.source==='demo');
+else out.hasIEP=!!out.hasIEP;
+out.has504=!!out.has504;
+out.hasMLL=!!(out.hasMLL||disc.includes('ELA'));
+if(out.has504&&!out.section504Due&&out.iepDue&&!out.hasIEP)out.section504Due=out.iepDue;
+if(out.has504&&!out.section504Impairment)out.section504Impairment=out.disability||'—';
+out.homeLanguage=out.homeLanguage||'';
+out.eldLevel=out.eldLevel||'';
+out.interpreterNeeded=!!out.interpreterNeeded;
+return out;
+}
 function loadStudentsFromStorage(){
 try{
 const raw=localStorage.getItem(PRISM_STUDENTS_KEY);
-if(!raw)return DEMO_STUDENTS.map(s=>({...s}));
+if(!raw)return DEMO_STUDENTS.map(s=>normalizeStudent({...s}));
 const parsed=JSON.parse(raw);
-if(Array.isArray(parsed)&&parsed.length)return parsed;
+if(Array.isArray(parsed)&&parsed.length){
+return parsed.map(s=>{
+const demo=DEMO_STUDENTS.find(d=>d.id===s.id&&s.source==='demo');
+if(demo){
+return normalizeStudent({
+...demo,
+...s,
+hasIEP:s.hasIEP!=null?s.hasIEP:demo.hasIEP,
+has504:s.has504!=null?s.has504:demo.has504,
+hasMLL:s.hasMLL!=null?s.hasMLL:demo.hasMLL,
+homeLanguage:s.homeLanguage||demo.homeLanguage,
+eldLevel:s.eldLevel||demo.eldLevel,
+interpreterNeeded:s.interpreterNeeded!=null?s.interpreterNeeded:demo.interpreterNeeded,
+section504Due:s.section504Due||demo.section504Due,
+section504Impairment:s.section504Impairment||demo.section504Impairment
+});
+}
+return normalizeStudent(s);
+});
+}
 }catch(e){}
-return DEMO_STUDENTS.map(s=>({...s}));
+return DEMO_STUDENTS.map(s=>normalizeStudent({...s}));
 }
 let STUDENTS=loadStudentsFromStorage();
 let CASELOAD_META=JSON.parse(localStorage.getItem(PRISM_CASELOAD_META_KEY)||'null');
@@ -1720,6 +1881,9 @@ const reevalDue=parseArrDate(obj['Re-evaluation Date']);
 const name=formatStudentName(obj['Name']);
 const cm=(obj['Case Manager']||'').trim();
 const program=programFromCM(cm);
+const has504=flagTrue(obj['504'])||flagTrue(obj['Section 504'])||flagTrue(obj['Has 504']);
+const hasMLL=flagTrue(obj['ELA'])||flagTrue(obj['MLL'])||flagTrue(obj['EL']);
+const hasIEP=!(flagTrue(obj['504 Only'])||flagTrue(obj['No IEP']));
 return{
 id:slugId(name,idx),
 name,
@@ -1733,7 +1897,7 @@ tier:discipline.includes('Behavior')?3:2,
 iepDue,
 reevalDue,
 meetingDate:parseArrDate(obj['New Scheduled Meeting Date']),
-status:iepStatusFromDate(iepDue),
+status:iepStatusFromDate(iepDue||(has504?(parseArrDate(obj['504 Review Date'])||parseArrDate(obj['504 Date'])):'' )),
 color:STUDENT_COLORS[idx%STUDENT_COLORS.length],
 interests:'—',
 triggers:'—',
@@ -1743,7 +1907,15 @@ accommodations:[],
 disability:program,
 lastContact:'',
 fallEval:flagTrue(obj['Fall 2026 Evals']),
-source:'arr-csv'
+source:'arr-csv',
+hasIEP,
+has504,
+hasMLL,
+homeLanguage:(obj['Home Language']||obj['Primary Language']||'').trim(),
+eldLevel:(obj['ELD Level']||obj['ELD']||'').trim(),
+interpreterNeeded:flagTrue(obj['Interpreter'])||flagTrue(obj['Interpreter Needed']),
+section504Due:parseArrDate(obj['504 Review Date'])||parseArrDate(obj['504 Date'])||'',
+section504Impairment:(obj['504 Impairment']||obj['Impairment']||'').trim()
 };
 }
 function studentsFromArrCsv(text){
@@ -1786,7 +1958,7 @@ sel.innerHTML='<option>All</option>'+cms.map(c=>'<option>'+c+'</option>').join('
 if(cms.includes(cur))sel.value=cur;
 }
 function applyImportedStudents(list,meta){
-STUDENTS=list;
+STUDENTS=(list||[]).map(normalizeStudent);
 persistStudents(meta);
 refreshAllStudentViews();
 showToast('Loaded '+list.length+' students (browser only)');
@@ -1796,7 +1968,7 @@ const PRISM_ENRICH_META_KEY='prism_enrich_meta_v1';
 let ENRICH_REPORT=JSON.parse(localStorage.getItem(PRISM_ENRICH_META_KEY)||'null');
 
 function restoreDemoStudents(){
-STUDENTS=DEMO_STUDENTS.map(s=>({...s}));
+STUDENTS=DEMO_STUDENTS.map(s=>normalizeStudent({...s}));
 persistStudents(null);
 localStorage.removeItem(PRISM_STUDENTS_KEY);
 localStorage.removeItem(PRISM_ENRICH_META_KEY);
@@ -1867,6 +2039,8 @@ if(typeof renderSessionStudents==='function')renderSessionStudents();
 if(typeof renderProgressMonitor==='function')renderProgressMonitor();
 if(typeof populateStudentSelects==='function')populateStudentSelects();
 if(typeof renderGapPanel==='function')renderGapPanel();
+if(typeof render504Workspace==='function')render504Workspace();
+if(typeof renderMllWorkspace==='function')renderMllWorkspace();
 refreshIcons();
 }
 
@@ -1903,6 +2077,8 @@ setupSubTabs('eval','eval-');
 setupSubTabs('acc','acc-');
 setupSubTabs('tmpl','tmpl-');
 setupSubTabs('dist','dist-');
+setupSubTabs('s504','s504-');
+setupSubTabs('mll','mll-');
 
 // Panel sub-tabs
 document.querySelectorAll('[data-panel]').forEach(btn=>{
@@ -1940,7 +2116,10 @@ function renderStudentGrid(filter='All',search=''){
 const grid=document.getElementById('studentGrid');
 let filtered=STUDENTS;
 if(filter!=='All'){
-filtered=filtered.filter(s=>s.discipline.includes(filter)||s.disability===filter);
+if(filter==='IEP')filtered=filtered.filter(s=>s.hasIEP);
+else if(filter==='504')filtered=filtered.filter(s=>s.has504);
+else if(filter==='MLL')filtered=filtered.filter(s=>s.hasMLL);
+else filtered=filtered.filter(s=>s.discipline.includes(filter)||s.disability===filter);
 }
 if(search){
 const q=search.toLowerCase();
@@ -1948,7 +2127,8 @@ filtered=filtered.filter(s=>
 (s.name||'').toLowerCase().includes(q)||
 (s.rawName||'').toLowerCase().includes(q)||
 (s.caseManager||'').toLowerCase().includes(q)||
-(s.teacher||'').toLowerCase().includes(q)
+(s.teacher||'').toLowerCase().includes(q)||
+(s.homeLanguage||'').toLowerCase().includes(q)
 );
 }
 if(!filtered.length){
@@ -1957,18 +2137,21 @@ refreshIcons();
 return;
 }
 grid.innerHTML=filtered.map(s=>{
-const days=daysUntil(s.iepDue);
+const dueDate=s.hasIEP?s.iepDue:(s.has504?s.section504Due:'');
+const dueLabel=s.hasIEP?'IEP Due':(s.has504?'504 Review':'Due');
+const days=daysUntil(dueDate);
 const dayLabel=typeof days==='number'?days+'d':days;
 const discBadges=s.discipline.map(d=>`<span class="badge badge-sky">${d}</span>`).join(' ');
+const progBadges=(s.hasIEP?'<span class="badge badge-blue">IEP</span>':'')+(s.has504?'<span class="badge badge-amber">504</span>':'')+(s.hasMLL?'<span class="badge badge-green">MLL</span>':'');
 const initials=(s.name||'?').split(/\s+/).filter(Boolean).map(n=>n[0]).join('').slice(0,3).toUpperCase();
 return`<div class="card" style="border-top:4px solid ${s.color}">
 <div class="flex items-center gap-2 mb-2">
 <div class="avatar-circle" style="background:${s.color};color:#1E293B;font-size:12px">${initials}</div>
 <div><p class="font-bold text-sm">${s.name}</p><p class="text-xs text-subtext">${s.grade} · ${s.teacher}${s.caseManager?' · '+s.caseManager:''}</p></div>
 </div>
-<div class="flex flex-wrap gap-1 mb-2">${discBadges}<span class="badge badge-lav">${s.disability}</span>${s.hasBip?'<span class="badge badge-red">BIP</span>':''}${s.hasAlp?'<span class="badge badge-amber">ALP</span>':''}${(s.docs&&s.docs.contacts)?'<span class="badge badge-green">Contacts</span>':''}</div>
+<div class="flex flex-wrap gap-1 mb-2">${progBadges}${discBadges}<span class="badge badge-lav">${s.disability}</span>${s.hasBip?'<span class="badge badge-red">BIP</span>':''}${s.hasAlp?'<span class="badge badge-amber">ALP</span>':''}${(s.docs&&s.docs.contacts)?'<span class="badge badge-green">Contacts</span>':''}</div>
 <div class="flex items-center justify-between">
-<div><p class="text-xs text-subtext">IEP Due: ${s.iepDue||'—'}</p><p class="text-xs">${statusBadge(s.status)} <span class="font-mono-d text-xs">${dayLabel}</span></p></div>
+<div><p class="text-xs text-subtext">${dueLabel}: ${dueDate||'—'}</p><p class="text-xs">${statusBadge(s.status)} <span class="font-mono-d text-xs">${dayLabel}</span></p></div>
 <button class="btn-sm btn-filled open-student-btn" data-student="${s.id}">Open</button>
 </div></div>`}).join('');
 grid.querySelectorAll('.open-student-btn').forEach(b=>{b.addEventListener('click',()=>openStudentPanel(b.dataset.student))});
@@ -2042,14 +2225,20 @@ const goals=(s.goals&&s.goals.length)?s.goals:['Goals not yet entered in PRISM �
 const accs=(s.accommodations&&s.accommodations.length)?s.accommodations:['Accommodations not yet entered — pull from Enrich IEP.'];
 
 // Profile tab
+const progLine=[s.hasIEP?'IEP':null,s.has504?'504':null,s.hasMLL?'MLL':null].filter(Boolean).join(' · ')||'—';
 document.getElementById('panelProfileContent').innerHTML=`
 <div class="space-y-3">
+<div class="required-highlight"><label class="text-xs font-semibold text-subtext">Program flags</label><p class="font-semibold text-sm">${progLine}</p></div>
 <div class="required-highlight"><label class="text-xs font-semibold text-subtext">Program / Category</label><p class="font-semibold text-sm">${s.disability}</p></div>
 <div><label class="text-xs font-semibold text-subtext">Case Manager</label><p class="text-sm">${s.caseManager||s.provider||'—'}</p></div>
 <div><label class="text-xs font-semibold text-subtext">Grade / Teacher</label><p class="text-sm">${s.grade||'—'} · ${s.teacher||'—'}</p></div>
 <div><label class="text-xs font-semibold text-subtext">Related Services</label><p class="text-sm">${(s.discipline||[]).join(', ')||'—'}</p></div>
-<div><label class="text-xs font-semibold text-subtext">IEP Date</label><p class="text-sm">${s.iepDue||'—'} ${statusBadge(s.status)}</p></div>
-<div><label class="text-xs font-semibold text-subtext">Re-evaluation Date</label><p class="text-sm">${s.reevalDue||'—'}</p></div>
+${s.hasIEP?`<div><label class="text-xs font-semibold text-subtext">IEP Date</label><p class="text-sm">${s.iepDue||'—'} ${statusBadge(s.status)}</p></div>
+<div><label class="text-xs font-semibold text-subtext">Re-evaluation Date</label><p class="text-sm">${s.reevalDue||'—'}</p></div>`:''}
+${s.has504?`<div><label class="text-xs font-semibold text-subtext">504 Review Due</label><p class="text-sm">${s.section504Due||'—'} ${statusBadge(iepStatusFromDate(s.section504Due))}</p></div>
+<div><label class="text-xs font-semibold text-subtext">504 Impairment</label><p class="text-sm">${s.section504Impairment||'—'}</p></div>`:''}
+${s.hasMLL?`<div><label class="text-xs font-semibold text-subtext">Home Language</label><p class="text-sm">${s.homeLanguage||'—'}</p></div>
+<div><label class="text-xs font-semibold text-subtext">ELD Level</label><p class="text-sm">${s.eldLevel||'—'}${s.interpreterNeeded?' · <span class="badge badge-amber">Interpreter</span>':''}</p></div>`:''}
 <div><label class="text-xs font-semibold text-subtext">Scheduled Meeting</label><p class="text-sm">${s.meetingDate||'—'}</p></div>
 <div><label class="text-xs font-semibold text-subtext">Fall 2026 Eval</label><p class="text-sm">${s.fallEval?'Yes':'No'}</p></div>
 ${s.contacts?`<div class="required-highlight"><label class="text-xs font-semibold text-subtext">Parent / Guardian contacts</label>
@@ -2205,6 +2394,199 @@ ${steps.map((s,i)=>`<div class="checklist-item"><input type="checkbox" ${i<e.sta
 <button class="btn-sm btn-outlined mt-2">Add to My To-Do</button>`;
 });
 
+// === 504 WORKSPACE ===
+function students504(){return STUDENTS.filter(s=>s.has504)}
+function s504ReviewStatus(s){
+const due=s.section504Due||'';
+return iepStatusFromDate(due);
+}
+function programBadges(s){
+return (s.hasIEP?'<span class="badge badge-blue">IEP</span> ':'')+(s.has504?'<span class="badge badge-amber">504</span> ':'')+(s.hasMLL?'<span class="badge badge-green">MLL</span>':'');
+}
+function fillSelect(sel,list,placeholder){
+if(!sel)return;
+const cur=sel.value;
+sel.innerHTML='<option value="">'+(placeholder||'Select…')+'</option>';
+list.forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.name;sel.appendChild(o)});
+if(cur&&list.some(s=>s.id===cur))sel.value=cur;
+}
+function render504Workspace(filter){
+const list=students504();
+const dueSoon=list.filter(s=>{const d=daysUntil(s.section504Due);return typeof d==='number'&&d>=0&&d<=45});
+const overdue=list.filter(s=>{const d=daysUntil(s.section504Due);return typeof d==='number'&&d<0});
+const dual=list.filter(s=>s.hasIEP);
+const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+set('count504',list.length);
+set('count504Due',dueSoon.length);
+set('count504Overdue',overdue.length);
+set('count504Dual',dual.length);
+const dashBody=document.getElementById('s504DashBody');
+if(dashBody){
+const upcoming=[...list].sort((a,b)=>(a.section504Due||'9999').localeCompare(b.section504Due||'9999')).slice(0,8);
+dashBody.innerHTML=upcoming.length?upcoming.map(s=>{
+const d=daysUntil(s.section504Due);const dc=typeof d==='number'?(d<0?'text-red-600 font-bold':d<=45?'text-amber-600':'text-green-600'):'';
+return`<tr class="border-b"><td class="p-2 font-semibold">${s.name}</td><td class="p-2 text-center">${s.grade}</td><td class="p-2 text-center">${s.section504Impairment||s.disability||'—'}</td><td class="p-2 text-center">${s.section504Due||'—'}</td><td class="p-2 text-center font-mono-d ${dc}">${typeof d==='number'?d+'d':d}</td><td class="p-2 text-center">${statusBadge(s504ReviewStatus(s))}</td></tr>`;
+}).join(''):'<tr><td colspan="6" class="p-3 text-subtext">No 504 students flagged.</td></tr>';
+}
+let roster=list;
+const f=filter||(document.querySelector('.s504-filter-btn.active')||{}).dataset.s504filter||'All';
+if(f==='DueSoon')roster=dueSoon;
+else if(f==='Overdue')roster=overdue;
+else if(f==='Dual')roster=dual;
+const rosterBody=document.getElementById('s504RosterBody');
+const empty=document.getElementById('s504RosterEmpty');
+if(rosterBody){
+rosterBody.innerHTML=roster.map(s=>{
+const acc=(s.accommodations&&s.accommodations.length)?s.accommodations.slice(0,3).join('; ')+(s.accommodations.length>3?'…':''):'—';
+return`<tr class="border-b"><td class="p-2 font-semibold">${s.name}</td><td class="p-2 text-center">${s.grade}<div class="text-subtext">${s.teacher||''}</div></td><td class="p-2 text-center">${s.caseManager||'—'}</td><td class="p-2 text-center">${s.section504Impairment||'—'}</td><td class="p-2 text-left max-w-xs">${acc}</td><td class="p-2 text-center">${s.section504Due||'—'}</td><td class="p-2 text-center">${statusBadge(s504ReviewStatus(s))} ${s.hasIEP?'<span class="badge badge-blue">IEP</span>':''}</td><td class="p-2 text-center"><button class="btn-sm btn-outlined open-student-btn" data-student="${s.id}">Open</button></td></tr>`;
+}).join('');
+rosterBody.querySelectorAll('.open-student-btn').forEach(b=>b.addEventListener('click',()=>openStudentPanel(b.dataset.student)));
+}
+if(empty)empty.style.display=list.length?'none':'block';
+fillSelect(document.getElementById('s504ChecklistStudent'),list,'Select 504 student…');
+fillSelect(document.getElementById('s504DraftStudent'),list,'Select…');
+}
+document.querySelectorAll('.s504-filter-btn').forEach(b=>{
+b.addEventListener('click',()=>{
+document.querySelectorAll('.s504-filter-btn').forEach(x=>x.classList.remove('active'));
+b.classList.add('active');
+render504Workspace(b.dataset.s504filter);
+});
+});
+const s504CheckSel=document.getElementById('s504ChecklistStudent');
+if(s504CheckSel)s504CheckSel.addEventListener('change',()=>{
+const s=STUDENTS.find(x=>x.id===s504CheckSel.value);
+const box=document.getElementById('s504ChecklistContent');
+if(!s||!box){if(box)box.innerHTML='<p class="text-xs text-subtext">Select a student above.</p>';return}
+const steps=['Referral / parent request for 504 evaluation','Parent rights provided','Consent for 504 evaluation obtained','Impairment documented (medical / educational data)','Major life activities impact documented','Team eligibility determination','504 plan drafted with accommodations','Teachers notified of accommodations','Annual review scheduled','Parent notice of plan / changes sent','Plan uploaded to district 504 system (Companion) or finalized in PRISM (Standalone)'];
+const due=s.section504Due||'—';
+box.innerHTML=`<div class="mb-3"><p class="font-bold text-sm">${s.name} — Section 504</p>
+<p class="text-xs text-subtext">Impairment: ${s.section504Impairment||'—'} · Review due: ${due}</p>
+${s.hasIEP?'<p class="text-xs text-amber-700 mt-1">Also has IEP — coordinate accommodations across teams.</p>':''}</div>
+${steps.map((t,i)=>`<div class="checklist-item"><input type="checkbox" /><div><p class="text-sm font-semibold">${i+1}. ${t}</p></div></div>`).join('')}
+<div class="mt-3"><label class="text-xs font-semibold">Accommodations on file</label><ul class="list-disc pl-4 text-sm mt-1">${(s.accommodations&&s.accommodations.length?s.accommodations:['None entered yet']).map(a=>'<li>'+a+'</li>').join('')}</ul></div>`;
+});
+document.getElementById('s504GenDraftBtn')?.addEventListener('click',()=>{
+const s=STUDENTS.find(x=>x.id===document.getElementById('s504DraftStudent').value);
+const typ=document.getElementById('s504DraftType').value;
+const out=document.getElementById('s504DraftOutput');
+const copyBtn=document.getElementById('s504CopyDraftBtn');
+if(!s){showToast('Select a 504 student first');return}
+const mode=(typeof DISTRICT_SETTINGS!=='undefined'&&DISTRICT_SETTINGS.suiteMode)||'companion';
+const modeNote=mode==='standalone'?'This draft can be finalized in PRISM (Standalone mode).':'Copy into your district 504 / Enrich companion workflow — PRISM does not live-sync.';
+out.style.display='block';
+out.textContent=`SECTION 504 — ${typ.toUpperCase()}
+
+Student: ${s.name}
+Grade / Teacher: ${s.grade} · ${s.teacher||'—'}
+Case Manager: ${s.caseManager||'—'}
+Impairment: ${s.section504Impairment||s.disability||'—'}
+Annual review due: ${s.section504Due||'TBD'}
+
+Dear Parent/Guardian,
+
+This notice concerns ${s.name}'s Section 504 plan (${typ}).
+Please contact the case manager to confirm attendance, ask questions, or request an interpreter.
+
+Accommodations currently on file:
+${(s.accommodations&&s.accommodations.length?s.accommodations:['(to be confirmed by team)']).map(a=>'- '+a).join('\n')}
+
+${modeNote}
+
+Generated by PRISM · Reflect the Whole Human`;
+copyBtn.style.display='inline-block';
+showToast('504 draft generated');
+});
+document.getElementById('s504CopyDraftBtn')?.addEventListener('click',()=>{
+const t=document.getElementById('s504DraftOutput').textContent;
+navigator.clipboard.writeText(t).then(()=>showToast('Copied')).catch(()=>showToast('Copy failed — select text manually'));
+});
+
+// === MLL WORKSPACE ===
+function studentsMll(){return STUDENTS.filter(s=>s.hasMLL)}
+function renderMllWorkspace(filter){
+const list=studentsMll();
+const interp=list.filter(s=>s.interpreterNeeded);
+const withIep=list.filter(s=>s.hasIEP);
+const with504=list.filter(s=>s.has504);
+const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+set('countMll',list.length);
+set('countMllInterp',interp.length);
+set('countMllIep',withIep.length);
+set('countMll504',with504.length);
+const dashBody=document.getElementById('mllDashBody');
+if(dashBody){
+dashBody.innerHTML=list.length?list.map(s=>`<tr class="border-b"><td class="p-2 font-semibold">${s.name}</td><td class="p-2 text-center">${s.homeLanguage||'—'}</td><td class="p-2 text-center">${s.eldLevel||'—'}</td><td class="p-2 text-center">${s.interpreterNeeded?'<span class="badge badge-amber">Yes</span>':'No'}</td><td class="p-2 text-center">${programBadges(s)}</td></tr>`).join(''):'<tr><td colspan="5" class="p-3 text-subtext">No MLL students flagged.</td></tr>';
+}
+let roster=list;
+const f=filter||(document.querySelector('.mll-filter-btn.active')||{}).dataset.mllfilter||'All';
+if(f==='Interpreter')roster=interp;
+else if(f==='WithIEP')roster=withIep;
+else if(f==='With504')roster=with504;
+const rosterBody=document.getElementById('mllRosterBody');
+const empty=document.getElementById('mllRosterEmpty');
+if(rosterBody){
+rosterBody.innerHTML=roster.map(s=>`<tr class="border-b"><td class="p-2 font-semibold">${s.name}</td><td class="p-2 text-center">${s.grade}</td><td class="p-2 text-center">${s.homeLanguage||'—'}</td><td class="p-2 text-center">${s.eldLevel||'—'}</td><td class="p-2 text-center">${s.interpreterNeeded?'Yes':'No'}</td><td class="p-2 text-center">${s.caseManager||'—'}</td><td class="p-2 text-center">${programBadges(s)}</td><td class="p-2 text-center"><button class="btn-sm btn-outlined open-student-btn" data-student="${s.id}">Open</button></td></tr>`).join('');
+rosterBody.querySelectorAll('.open-student-btn').forEach(b=>b.addEventListener('click',()=>openStudentPanel(b.dataset.student)));
+}
+if(empty)empty.style.display=list.length?'none':'block';
+fillSelect(document.getElementById('mllChecklistStudent'),list,'Select MLL student…');
+fillSelect(document.getElementById('mllDraftStudent'),list,'Select…');
+}
+document.querySelectorAll('.mll-filter-btn').forEach(b=>{
+b.addEventListener('click',()=>{
+document.querySelectorAll('.mll-filter-btn').forEach(x=>x.classList.remove('active'));
+b.classList.add('active');
+renderMllWorkspace(b.dataset.mllfilter);
+});
+});
+const mllCheckSel=document.getElementById('mllChecklistStudent');
+if(mllCheckSel)mllCheckSel.addEventListener('change',()=>{
+const s=STUDENTS.find(x=>x.id===mllCheckSel.value);
+const box=document.getElementById('mllChecklistContent');
+if(!s||!box){if(box)box.innerHTML='<p class="text-xs text-subtext">Select a student above.</p>';return}
+const steps=['Home language survey / family interview completed','Interpreter arranged for meetings (if needed)','Prior schooling & language history documented','Rule out language difference vs. disability before SPED referral','Use non-discriminatory / CLD-appropriate assessments','Include ELD teacher on IEP/504 team when relevant','Provide notices in preferred language when available','Document Acculturation / CLD considerations in present levels','Coordinate ELD goals with IEP/504 accommodations','Progress monitoring includes language AND disability lens'];
+box.innerHTML=`<div class="mb-3"><p class="font-bold text-sm">${s.name} — Multilingual Learner</p>
+<p class="text-xs text-subtext">Home language: ${s.homeLanguage||'—'} · ELD: ${s.eldLevel||'—'} · Interpreter: ${s.interpreterNeeded?'Yes':'No'}</p>
+<p class="text-xs mt-1">Programs: ${[s.hasIEP?'IEP':null,s.has504?'504':null].filter(Boolean).join(' · ')||'MLL only'}</p></div>
+${steps.map((t,i)=>`<div class="checklist-item"><input type="checkbox" /><div><p class="text-sm font-semibold">${i+1}. ${t}</p></div></div>`).join('')}`;
+});
+document.getElementById('mllGenDraftBtn')?.addEventListener('click',()=>{
+const s=STUDENTS.find(x=>x.id===document.getElementById('mllDraftStudent').value);
+const typ=document.getElementById('mllDraftType').value;
+const out=document.getElementById('mllDraftOutput');
+const copyBtn=document.getElementById('mllCopyDraftBtn');
+if(!s){showToast('Select an MLL student first');return}
+out.style.display='block';
+out.textContent=`MLL / FAMILY COMMUNICATION — ${typ.toUpperCase()}
+
+Student: ${s.name}
+Grade / Teacher: ${s.grade} · ${s.teacher||'—'}
+Home language: ${s.homeLanguage||'—'}
+ELD level: ${s.eldLevel||'—'}
+Interpreter needed: ${s.interpreterNeeded?'YES':'No'}
+Programs: ${[s.hasIEP?'IEP':null,s.has504?'504':null,s.hasMLL?'MLL':null].filter(Boolean).join(', ')}
+
+Dear Family,
+
+This message concerns ${s.name} (${typ}).
+Preferred language for notices: ${s.homeLanguage||'English (confirm with family)'}.
+${s.interpreterNeeded?'An interpreter will be requested for the meeting.':''}
+
+Please reply with questions or preferred meeting times.
+
+Generated by PRISM · Reflect the Whole Human
+(Also see Accessibility → Multilingual for translated NOM/consent helpers.)`;
+copyBtn.style.display='inline-block';
+showToast('MLL draft generated');
+});
+document.getElementById('mllCopyDraftBtn')?.addEventListener('click',()=>{
+const t=document.getElementById('mllDraftOutput').textContent;
+navigator.clipboard.writeText(t).then(()=>showToast('Copied')).catch(()=>showToast('Copy failed — select text manually'));
+});
+render504Workspace();
+renderMllWorkspace();
+
 // === VALIDATION CHECK ===
 document.getElementById('validateAllBtn').addEventListener('click',()=>{
 const c=document.getElementById('validationResults');
@@ -2284,6 +2666,8 @@ const idx=+t.dataset.fidx;FEATURES[idx].on=!FEATURES[idx].on;
 t.classList.toggle('on',FEATURES[idx].on);
 persistDistrictSettings();
 applyFeatureVisibility();
+if(FEATURES[idx].id==='section504'&&typeof render504Workspace==='function')render504Workspace();
+if(FEATURES[idx].id==='mll'&&typeof renderMllWorkspace==='function')renderMllWorkspace();
 showToast(FEATURES[idx].name+' '+(FEATURES[idx].on?'enabled':'disabled'));
 });
 });
