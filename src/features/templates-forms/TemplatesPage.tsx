@@ -18,6 +18,7 @@ import {
 import { FieldTip } from '../../lib/help-assist/FieldTip'
 import { storage } from '../../lib/storage'
 import { chat } from '../../lib/ai/client'
+import { ClassroomMaterialsPanel } from './ClassroomMaterialsPanel'
 
 const CATS = ['All', 'IEP', '504', 'MLL', 'Compliance', 'Behavior', 'Communication', 'Assessment', 'Custom'] as const
 
@@ -35,7 +36,7 @@ export function TemplatesPage() {
   const [createName, setCreateName] = useState('')
   const [createCat, setCreateCat] = useState('IEP')
   const [createBody, setCreateBody] = useState('')
-  const [tab, setTab] = useState<'library' | 'drafts' | 'creator'>('library')
+  const [tab, setTab] = useState<'library' | 'drafts' | 'creator' | 'materials'>('library')
 
   useEffect(() => {
     let cancelled = false
@@ -209,6 +210,7 @@ export function TemplatesPage() {
             ['library', 'Forms Library'],
             ['drafts', 'Saved Drafts'],
             ['creator', 'Template Creator'],
+            ['materials', 'Classroom Materials'],
           ] as const
         ).map(([id, label]) => (
           <button
@@ -225,6 +227,8 @@ export function TemplatesPage() {
           </button>
         ))}
       </div>
+
+      {tab === 'materials' && <ClassroomMaterialsPanel onFlash={flash} />}
 
       {tab === 'library' && (
         <>

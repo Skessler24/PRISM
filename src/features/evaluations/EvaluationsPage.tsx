@@ -12,9 +12,12 @@ import {
 import { FieldTip } from '../../lib/help-assist/FieldTip'
 import { chat } from '../../lib/ai/client'
 import { readSuiteMode } from '../../lib/templates/catalog'
+import { EvalCalendarPanel } from './EvalCalendarPanel'
+import { EvalValidationPanel } from './EvalValidationPanel'
+import { EsyWizard, TransportWizard } from './EsyTransportWizards'
 
 const FILTERS = ['All', 'Initial', 'Annual', 'Reevaluation', 'Transfer'] as const
-type Tab = 'dashboard' | 'checklist' | 'transfer' | 'actions'
+type Tab = 'dashboard' | 'checklist' | 'calendar' | 'transfer' | 'actions' | 'validate'
 
 const ACTION_CARDS: {
   id: string
@@ -76,6 +79,12 @@ const ACTION_CARDS: {
     tip: 'Capture strengths, accommodations, and postsecondary needs.',
   },
   {
+    id: 'esy',
+    title: 'ESY Determination',
+    desc: 'Extended School Year regression / recoupment scaffold',
+    tip: 'District feature flag esy — draft here, finalize in SoR.',
+  },
+  {
     id: 'transport',
     title: 'Transportation Request',
     desc: 'Specialized transportation documentation',
@@ -116,6 +125,7 @@ export function EvaluationsPage() {
   const [mdrChecks, setMdrChecks] = useState<Record<number, boolean>>({})
   const [mdrOut, setMdrOut] = useState('')
   const [actionOut, setActionOut] = useState('')
+  const [wizard, setWizard] = useState<'esy' | 'transport' | null>(null)
 
   const mode = readSuiteMode()
   const iep = profile.iepSystem || 'Enrich'
@@ -203,7 +213,20 @@ Include: adopt vs reevaluate recommendation scaffolding, services-start reminder
 
   async function generateActionDraft(actionId: string, title: string) {
     if (actionId === 'mdr') {
+      setWizard(null)
       setMdrOpen(true)
+      setTab('actions')
+      return
+    }
+    if (actionId === 'esy') {
+      setMdrOpen(false)
+      setWizard('esy')
+      setTab('actions')
+      return
+    }
+    if (actionId === 'transport') {
+      setMdrOpen(false)
+      setWizard('transport')
       setTab('actions')
       return
     }
@@ -272,8 +295,10 @@ Include sections: incident summary placeholder, IEP/BIP review prompts, manifest
           [
             ['dashboard', 'Dashboard'],
             ['checklist', 'Checklists'],
+            ['calendar', 'Calendar'],
             ['transfer', 'Transfer Wizard'],
             ['actions', 'Action Builder'],
+            ['validate', 'Validation'],
           ] as const
         ).map(([id, label]) => (
           <button
@@ -442,6 +467,25 @@ Include sections: incident summary placeholder, IEP/BIP review prompts, manifest
         </section>
       )}
 
+      {tab === 'calendar' && (
+        <EvalCalendarPanel
+          onSelectEval={(name) => {
+            setSelected(name)
+            setTab('checklist')
+          }}
+        />
+      )}
+
+      {tab === 'validate' && (
+        <EvalValidationPanel
+          profile={profile}
+          onOpenChecklist={(name) => {
+            setSelected(name)
+            setTab('checklist')
+          }}
+        />
+      )}
+
       {tab === 'transfer' && (
         <section className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card">
           <h2 className="font-heading text-sm font-bold">Transfer Wizard — {iep} Section 6</h2>
@@ -590,6 +634,9 @@ Include sections: incident summary placeholder, IEP/BIP review prompts, manifest
               {actionOut}
             </pre>
           )}
+
+          {wizard === 'esy' && <EsyWizard profile={profile} onFlash={flash} />}
+          {wizard === 'transport' && <TransportWizard profile={profile} onFlash={flash} />}
 
           {mdrOpen && (
             <div className="mt-4 rounded-xl border border-red-200 bg-red-50/50 p-4">

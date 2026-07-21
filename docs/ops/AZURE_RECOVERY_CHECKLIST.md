@@ -73,4 +73,4 @@ In SWA / linked Function App → Configuration / Application settings:
 
 ---
 
-*Last updated: 2026-07-21 — after Prompt 7 merge (PR #16). API code on `main`; Azure attach still pending.*
+*Last updated: 2026-07-21 — after Prompt 7 completion + Prompt 8 Classroom Materials. API code on `main`; Azure attach still pending. Offline classroom materials / eval validation / meeting timer do **not** require Azure.*
