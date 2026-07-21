@@ -83,6 +83,7 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 
 ## Decisions locked (Prompt 8 — Classroom Materials)
 
-- **Templates → Classroom Materials:** Token boards, visual schedules, social stories (offline-first local drafts; optional `/api/ai-chat` polish that fails gracefully).
+- **Templates → Classroom Materials:** Token boards, visual schedules, social stories, **communication boards** (offline-first; optional `/api/ai-chat` polish; TTS pending Azure `/api/ai-speak`).
 - Materials persist in browser (`prism_classroom_materials_v1`) — never commit PHI.
+- **Resources Hub:** District rule cheat sheet from profile JSON + training links into new modules.
 - Still later: Graph MSAL OAuth, TTS vendor, Private School (`privateSchool: false` for CCSD), React `dist/` Azure cutover.

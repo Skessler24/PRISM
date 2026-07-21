@@ -2,7 +2,7 @@
 
 export type SavedMaterial = {
   id: string
-  kind: 'token' | 'schedule' | 'social'
+  kind: 'token' | 'schedule' | 'social' | 'comm'
   title: string
   studentName: string
   body: string
