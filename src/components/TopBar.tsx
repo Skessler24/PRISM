@@ -15,7 +15,7 @@ export function TopBar() {
         <img
           src="/prism-logo.svg"
           alt="PRISM — Reflect the Whole Human"
-          className="h-12 w-auto max-w-[min(58vw,300px)] object-contain object-left drop-shadow-sm"
+          className="h-[52px] w-auto max-w-[min(70vw,340px)] object-contain object-left drop-shadow"
         />
       </NavLink>
 
