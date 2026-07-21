@@ -26,6 +26,8 @@ import { EnrichRemindersPage } from './features/enrich-reminders/EnrichReminders
 import { ParentContactsPage } from './features/parent-contacts/ParentContactsPage'
 import { MaterialSessionPage } from './features/classroom-materials/MaterialSessionPage'
 import { FbaTallyPopoutPage } from './features/fba-bip/FbaTallyPopoutPage'
+import { WeeklyPlannerPage } from './features/weekly-planner/WeeklyPlannerPage'
+import { MeetingPrepPage } from './features/meeting-prep/MeetingPrepPage'
 
 export default function App() {
   return (
@@ -48,6 +50,8 @@ export default function App() {
                     <Route path="game" element={<MotivationGamePage />} />
                     <Route path="reminders" element={<EnrichRemindersPage />} />
                     <Route path="contacts" element={<ParentContactsPage />} />
+                    <Route path="planner" element={<WeeklyPlannerPage />} />
+                    <Route path="meeting-prep" element={<MeetingPrepPage />} />
                     <Route path="mtss" element={<MtssPage />} />
                     <Route path="evaluations" element={<EvaluationsPage />} />
                     <Route path="fba" element={<FbaBipPage />} />

@@ -133,3 +133,10 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 - PRISM mode: channels (`#general`, `#coverage`, create more), members, invite codes, live multi-tab sync via BroadcastChannel (`prism_team_chat_v1`). FERPA banner — no PHI in chat.
 - Teams mode: configurable Teams/channel URL; opens external messenger. Full Graph Chat / Azure AD sync later with MSAL (same track as OneDrive).
 - Cross-device PRISM chat will need a small Functions/SignalR backend when Azure recovers — local invite model stays the UX.
+
+## Decisions locked (Planner + Meeting Prep + Cloud Chat + Icons)
+
+- **Weekly Planner** (`/planner`): Mon–Fri sessions; Dashboard **Who am I seeing today?** strip; slots link student materials.
+- **Meeting Prep** (`/meeting-prep`): NOM/progress/SOAP/interpreter checklist; assembles agenda + NOM drafts from templates + recent probes/SOAP into a Copy/Print packet.
+- **Team Chat cloud:** `POST /api/team-chat` (join/post/list) — in-memory rooms keyed by invite code; client polls + falls back to local when Azure is down (`src/lib/team-chat/cloud.ts`).
+- **Icon catalog** (`src/lib/icons/`): seed AAC glyphs + README for Claude pack under `public/icons/aac/`; wired into comm board studio + Smart TV session via `resolveIcon` / `IconGlyph`.

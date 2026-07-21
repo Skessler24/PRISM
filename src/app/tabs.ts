@@ -55,6 +55,20 @@ export const APP_TABS: AppTab[] = [
     shortLabel: 'Contacts',
     icon: '📞',
   },
+  {
+    id: 'planner',
+    path: '/planner',
+    label: 'Weekly Planner',
+    shortLabel: 'Planner',
+    icon: '📅',
+  },
+  {
+    id: 'meeting-prep',
+    path: '/meeting-prep',
+    label: 'Meeting Prep',
+    shortLabel: 'Meetings',
+    icon: '📋',
+  },
   { id: 'mtss', path: '/mtss', label: 'MTSS Hub', shortLabel: 'MTSS', icon: '📋', featureId: 'mtss' },
   {
     id: 'evaluations',

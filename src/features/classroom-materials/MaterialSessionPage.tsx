@@ -10,6 +10,8 @@ import {
   type SchedulePayload,
   type TokenPayload,
 } from '../../lib/classroom-materials/store'
+import { resolveIcon } from '../../lib/icons/catalog'
+import { IconGlyph } from '../../lib/icons/IconGlyph'
 import { applyTally, getFbaSession } from '../../lib/fba/store'
 
 export function MaterialSessionPage() {
@@ -222,11 +224,13 @@ export function MaterialSessionPage() {
               {phrase.length ? phrase.join(' ') : 'Tap cells to build a message'}
             </div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-              {comm.cells.map((word) => (
+              {comm.cells.map((word) => {
+                const icon = resolveIcon(word)
+                return (
                 <button
                   key={word}
                   type="button"
-                  className="min-h-[5.5rem] rounded-2xl border-4 border-sky-300/40 bg-sky-600/80 px-2 py-4 text-xl font-bold shadow-lg transition active:scale-95 sm:min-h-[7rem] sm:text-2xl"
+                  className="flex min-h-[5.5rem] flex-col items-center justify-center gap-1 rounded-2xl border-4 border-sky-300/40 bg-sky-600/80 px-2 py-4 text-xl font-bold shadow-lg transition active:scale-95 sm:min-h-[7rem] sm:text-2xl"
                   onClick={() => {
                     setPhrase((p) => [...p, word])
                     speakLocal(word)
@@ -237,9 +241,11 @@ export function MaterialSessionPage() {
                     persist({ ...material, payload: { ...comm, taps } })
                   }}
                 >
-                  {word}
+                  <IconGlyph icon={icon} label={word} size={48} />
+                  <span>{word}</span>
                 </button>
-              ))}
+                )
+              })}
             </div>
             <div className="mt-4 flex flex-wrap justify-center gap-3">
               <button
