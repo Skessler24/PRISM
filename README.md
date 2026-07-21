@@ -17,9 +17,10 @@ That file came from your latest complete build (`archive/index.prototype.html` /
 | `deploy/` | **What Azure publishes** — full working app |
 | `api/` | Azure Functions AI proxy (`/api/ai-chat`, `/api/ai-speak`) — keys stay server-side |
 | `archive/index.prototype.html` | Backup of the full HTML build |
-| `src/` | Vite + React rewrite (Prompts 1–6 in progress) |
+| `src/` | Vite + React rewrite (Prompts 1–7 on `main`) |
 | `district-profiles/` | CCSD Enrich + DAT rules (used by React District Profile) |
 | `docs/` | Enrich guide, handoff, design refs, intake catalogs |
+| `docs/ops/AZURE_RECOVERY_CHECKLIST.md` | **When Azure is healthy** — API attach, secrets, smoke tests |
 
 ## Run locally
 
@@ -46,6 +47,10 @@ npm run api:start   # http://localhost:7071 — Vite proxies /api
 ## Deploy
 
 GitHub Actions on push to `main` uploads the `deploy/` folder to Azure Static Web Apps (with `api/` as the Functions backend when Azure recovers).
+
+**Azure is currently struggling** (cannot add/configure the API in Portal yet). Track everything to finish when it recovers in:
+
+→ [`docs/ops/AZURE_RECOVERY_CHECKLIST.md`](docs/ops/AZURE_RECOVERY_CHECKLIST.md)
 
 ## Compliance
 

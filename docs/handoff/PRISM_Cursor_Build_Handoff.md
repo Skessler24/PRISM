@@ -79,3 +79,4 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 - **Caseload depth:** SOAP/service logs (localStorage, Copy-to-SoR within `serviceLogHours`) + progress probe bars.
 - **MTSS depth:** Interactive DAT checklist + AI eligibility prep; CLD stays in Accessibility for CCSD Companion (MLL tab optional).
 - Still later: Graph MSAL OAuth, TTS vendor, ESY/transport standalone modules, Private School (`privateSchool: false` for CCSD).
+- **Azure outage:** SWA cannot accept API setup yet. Keep [`docs/ops/AZURE_RECOVERY_CHECKLIST.md`](../ops/AZURE_RECOVERY_CHECKLIST.md) updated with post-recovery tasks (attach `api/`, set `ANTHROPIC_API_KEY` / OpenAI settings, smoke-test `/api/ai-*`).
