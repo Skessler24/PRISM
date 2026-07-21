@@ -256,22 +256,34 @@ textarea{min-height:80px;resize:vertical}
 <div data-id="227" class="tab-content" id="tab-students">
 <div data-id="228" class="max-w-7xl mx-auto">
 <div data-id="229" class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
-<h2 data-id="230" class="text-lg font-bold font-heading">🧩 Student Tiles</h2>
+<h2 data-id="230" class="text-lg font-bold font-heading">🧩 Student Tiles <span id="caseloadCountBadge" class="text-xs font-normal text-subtext ml-1"></span></h2>
 <div data-id="231" class="flex items-center gap-2 flex-wrap">
 <input data-id="232" type="text" id="studentSearch" placeholder="Search students..." class="w-48" />
+<input type="file" id="caseloadCsvInput" accept=".csv,text/csv" class="hidden" />
+<button class="btn-outlined btn-sm" id="importCaseloadBtn" title="Import ARR Special Pops CSV — stays in this browser only"><i data-lucide="upload" class="w-4 h-4 inline"></i> Import CSV</button>
+<button class="btn-outlined btn-sm" id="restoreDemoBtn" title="Clear imported caseload and restore demo students">Restore Demo</button>
 <button data-id="233" class="btn-filled btn-sm" id="newStudentBtn"><i data-id="234" data-lucide="plus" class="w-4 h-4 inline"></i> New Student</button>
 </div>
+</div>
+<div id="caseloadImportBanner" class="mb-3" style="display:none;background:#F0F9FF;border:1px solid #7DD3FC;border-left:4px solid #0EA5E9;border-radius:10px;padding:12px;font-size:12px;color:#0C4A6E;line-height:1.6">
+<strong>FERPA:</strong> Caseload CSV is stored only in this browser (<code>localStorage</code>). It is never uploaded to PRISM servers or committed to GitHub. <span id="caseloadImportMeta"></span>
 </div>
 <div data-id="235" class="flex flex-wrap gap-2 mb-4" id="studentFilters">
 <button data-id="236" class="sub-tab-btn active" data-filter="All">All</button>
 <button data-id="237" class="sub-tab-btn" data-filter="SLP">SLP</button>
 <button data-id="238" class="sub-tab-btn" data-filter="OT">OT</button>
+<button class="sub-tab-btn" data-filter="PT">PT</button>
+<button class="sub-tab-btn" data-filter="MH">MH</button>
+<button class="sub-tab-btn" data-filter="NSS">NSS</button>
 <button data-id="239" class="sub-tab-btn" data-filter="Behavior">Behavior</button>
 <button data-id="240" class="sub-tab-btn" data-filter="Academic">Academic</button>
+<button class="sub-tab-btn" data-filter="Mod">Mod</button>
+<button class="sub-tab-btn" data-filter="ILC">ILC</button>
+<button class="sub-tab-btn" data-filter="2e">2e</button>
 <button data-id="241" class="sub-tab-btn" data-filter="AUT">AUT</button>
 <button data-id="242" class="sub-tab-btn" data-filter="SLD">SLD</button>
 </div>
-<div data-id="243" class="help-assist-panel"><strong data-id="244">💡 Help Assist:</strong> Click "Open" on any student tile to view their full profile, service history, materials, continuum data, and Enrich checklist. Use the filter pills above to narrow by discipline or disability category.</div>
+<div data-id="243" class="help-assist-panel"><strong data-id="244">💡 Help Assist:</strong> Click "Open" on any student tile to view their full profile. Use <strong>Import CSV</strong> with your ARR Special Pops export (By Grade sheet). Real student data stays on your device only.</div>
 <div data-id="245" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3" id="studentGrid"></div>
 </div>
 </div>
@@ -288,8 +300,9 @@ textarea{min-height:80px;resize:vertical}
 <h3 data-id="253" class="text-sm font-bold font-heading mb-3">Filters</h3>
 <div data-id="254" class="space-y-3">
 <div data-id="255"><label data-id="256" class="text-xs font-semibold text-subtext">Provider</label><input data-id="257" type="text" value="Samantha K." disabled class="bg-slate" /></div>
-<div data-id="258"><label data-id="259" class="text-xs font-semibold text-subtext">Discipline</label><select data-id="260" id="caseFilterDisc"><option data-id="261">All</option><option data-id="262">SLP</option><option data-id="263">OT</option><option data-id="264">Behavior</option><option data-id="265">Academic</option></select></div>
-<div data-id="266"><label data-id="267" class="text-xs font-semibold text-subtext">Grade</label><select data-id="268" id="caseFilterGrade"><option data-id="269">All</option><option data-id="270">Gr1</option><option data-id="271">Gr2</option><option data-id="272">Gr3</option><option data-id="273">Gr4</option><option data-id="274">Gr5</option></select></div>
+<div data-id="258"><label data-id="259" class="text-xs font-semibold text-subtext">Discipline</label><select data-id="260" id="caseFilterDisc"><option data-id="261">All</option><option data-id="262">SLP</option><option data-id="263">OT</option><option>PT</option><option>MH</option><option>NSS</option><option data-id="264">Behavior</option><option data-id="265">Academic</option></select></div>
+<div data-id="266"><label data-id="267" class="text-xs font-semibold text-subtext">Grade</label><select data-id="268" id="caseFilterGrade"><option data-id="269">All</option><option>K</option><option data-id="270">Gr1</option><option data-id="271">Gr2</option><option data-id="272">Gr3</option><option data-id="273">Gr4</option><option data-id="274">Gr5</option></select></div>
+<div><label class="text-xs font-semibold text-subtext">Case Manager</label><select id="caseFilterCM"><option>All</option></select></div>
 <div data-id="275"><label data-id="276" class="text-xs font-semibold text-subtext">IEP Status</label><select data-id="277" id="caseFilterStatus"><option data-id="278">All</option><option data-id="279">On Track</option><option data-id="280">Upcoming</option><option data-id="281">Overdue</option></select></div>
 </div>
 </div>
@@ -1120,15 +1133,39 @@ textarea{min-height:80px;resize:vertical}
 if(typeof lucide!=="undefined"&&typeof lucide.createIcons==="function"){lucide.createIcons()}
 
 // === DATA ===
-const STUDENTS=[
-{id:'aiden',name:'Aiden M.',grade:'Gr3',teacher:'Ms. Thompson',discipline:['SLP','Behavior'],provider:'Samantha',tier:3,iepDue:'2026-11-15',status:'On Track',color:'#AEE4FF',interests:'Dinosaurs, Minecraft, the color blue',triggers:'Loud noises, unexpected transitions',calming:'Deep breathing, fidget cube, quiet corner',goals:['Produce /r/ in sentences 80%','Follow 2-step directions 75%'],accommodations:['Preferential seating','Visual schedule','Noise-canceling headphones'],disability:'EBD/SLD',lastContact:'2026-07-15'},
-{id:'bella',name:'Bella R.',grade:'Gr4',teacher:'Mr. Davis',discipline:['Academic'],provider:'Samantha',tier:2,iepDue:'2026-09-30',status:'On Track',color:'#B8F2C8',interests:'Harry Potter, drawing, cats',triggers:'Written tasks, timed tests',calming:'Drawing break, reading corner',goals:['Read grade-level text 90 wpm','Written expression 3+ sentences'],accommodations:['Extended time','Graphic organizers','Text-to-speech'],disability:'SLD',lastContact:'2026-07-10'},
-{id:'carlos',name:'Carlos T.',grade:'Gr2',teacher:'Ms. Rivera',discipline:['SLP'],provider:'Samantha',tier:2,iepDue:'2026-10-20',status:'Upcoming',color:'#AEE4FF',interests:'Soccer, superheroes, the color red',triggers:'Peer conflict',calming:'Movement break, counting',goals:['Produce /s/ blends 80%','Use complete sentences in conversation'],accommodations:['Visual cues','Sentence starters'],disability:'DLD',lastContact:'2026-07-05'},
-{id:'diana',name:'Diana S.',grade:'Gr5',teacher:'Ms. Chen',discipline:['OT'],provider:'Samantha',tier:1,iepDue:'2027-01-15',status:'On Track',color:'#D7C7FF',interests:'Art, horses, Taylor Swift',triggers:'Fine motor tasks, handwriting',calming:'Hand stretches, art activities',goals:['Legible handwriting 80%','Independent self-care skills'],accommodations:['Slant board','Pencil grip','Modified worksheets'],disability:'DCD',lastContact:'2026-07-08'},
-{id:'maya',name:'Maya P.',grade:'Gr1',teacher:'Ms. Johnson',discipline:['Behavior','SLP'],provider:'Samantha',tier:3,iepDue:'2026-08-25',status:'Overdue',color:'#FF9A8B',interests:'Princesses, glitter, the color pink',triggers:'Transitions, denied requests',calming:'Token board, first-then board, calm corner',goals:['Stay in assigned area 80% of session','Use 3-word requests independently'],accommodations:['Visual schedule','Token economy','1:1 para support'],disability:'AUT',lastContact:'2026-07-18'},
-{id:'jordan',name:'Jordan K.',grade:'Gr3',teacher:'Mr. Park',discipline:['Academic'],provider:'Samantha',tier:2,iepDue:'2026-12-10',status:'On Track',color:'#B8F2C8',interests:'Legos, video games, science',triggers:'Reading aloud, new social situations',calming:'Lego break, quiet workspace',goals:['Decode CVC words 90%','Math facts to 20 fluently'],accommodations:['Audio books','Manipulatives','Small group testing'],disability:'SLD',lastContact:'2026-07-12'},
-{id:'sofia',name:'Sofia G.',grade:'Gr4',teacher:'Ms. Anderson',discipline:['SLP'],provider:'Samantha',tier:1,iepDue:'2027-02-28',status:'On Track',color:'#AEE4FF',interests:'Dancing, unicorns, the color purple',triggers:'Large group activities',calming:'Drawing, listening to music',goals:['Produce /l/ in conversation 85%','Narrative retell with 5 elements'],accommodations:['Small group instruction','Visual supports'],disability:'DLD',lastContact:'2026-07-14'}
+const PRISM_STUDENTS_KEY='prism_students_v1';
+const PRISM_CASELOAD_META_KEY='prism_caseload_meta_v1';
+const STUDENT_COLORS=['#AEE4FF','#B8F2C8','#D7C7FF','#FF9A8B','#FDE68A','#FBCFE8','#C7D2FE','#A7F3D0'];
+const DEMO_STUDENTS=[
+{id:'aiden',name:'Aiden M.',grade:'Gr3',teacher:'Ms. Thompson',discipline:['SLP','Behavior'],provider:'Samantha',tier:3,iepDue:'2026-11-15',reevalDue:'',status:'On Track',color:'#AEE4FF',interests:'Dinosaurs, Minecraft, the color blue',triggers:'Loud noises, unexpected transitions',calming:'Deep breathing, fidget cube, quiet corner',goals:['Produce /r/ in sentences 80%','Follow 2-step directions 75%'],accommodations:['Preferential seating','Visual schedule','Noise-canceling headphones'],disability:'EBD/SLD',lastContact:'2026-07-15',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo'},
+{id:'bella',name:'Bella R.',grade:'Gr4',teacher:'Mr. Davis',discipline:['Academic'],provider:'Samantha',tier:2,iepDue:'2026-09-30',reevalDue:'',status:'On Track',color:'#B8F2C8',interests:'Harry Potter, drawing, cats',triggers:'Written tasks, timed tests',calming:'Drawing break, reading corner',goals:['Read grade-level text 90 wpm','Written expression 3+ sentences'],accommodations:['Extended time','Graphic organizers','Text-to-speech'],disability:'SLD',lastContact:'2026-07-10',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo'},
+{id:'carlos',name:'Carlos T.',grade:'Gr2',teacher:'Ms. Rivera',discipline:['SLP'],provider:'Samantha',tier:2,iepDue:'2026-10-20',reevalDue:'',status:'Upcoming',color:'#AEE4FF',interests:'Soccer, superheroes, the color red',triggers:'Peer conflict',calming:'Movement break, counting',goals:['Produce /s/ blends 80%','Use complete sentences in conversation'],accommodations:['Visual cues','Sentence starters'],disability:'DLD',lastContact:'2026-07-05',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo'},
+{id:'diana',name:'Diana S.',grade:'Gr5',teacher:'Ms. Chen',discipline:['OT'],provider:'Samantha',tier:1,iepDue:'2027-01-15',reevalDue:'',status:'On Track',color:'#D7C7FF',interests:'Art, horses, Taylor Swift',triggers:'Fine motor tasks, handwriting',calming:'Hand stretches, art activities',goals:['Legible handwriting 80%','Independent self-care skills'],accommodations:['Slant board','Pencil grip','Modified worksheets'],disability:'DCD',lastContact:'2026-07-08',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo'},
+{id:'maya',name:'Maya P.',grade:'Gr1',teacher:'Ms. Johnson',discipline:['Behavior','SLP'],provider:'Samantha',tier:3,iepDue:'2026-08-25',reevalDue:'',status:'Overdue',color:'#FF9A8B',interests:'Princesses, glitter, the color pink',triggers:'Transitions, denied requests',calming:'Token board, first-then board, calm corner',goals:['Stay in assigned area 80% of session','Use 3-word requests independently'],accommodations:['Visual schedule','Token economy','1:1 para support'],disability:'AUT',lastContact:'2026-07-18',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo'},
+{id:'jordan',name:'Jordan K.',grade:'Gr3',teacher:'Mr. Park',discipline:['Academic'],provider:'Samantha',tier:2,iepDue:'2026-12-10',reevalDue:'',status:'On Track',color:'#B8F2C8',interests:'Legos, video games, science',triggers:'Reading aloud, new social situations',calming:'Lego break, quiet workspace',goals:['Decode CVC words 90%','Math facts to 20 fluently'],accommodations:['Audio books','Manipulatives','Small group testing'],disability:'SLD',lastContact:'2026-07-12',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo'},
+{id:'sofia',name:'Sofia G.',grade:'Gr4',teacher:'Ms. Anderson',discipline:['SLP'],provider:'Samantha',tier:1,iepDue:'2027-02-28',reevalDue:'',status:'On Track',color:'#AEE4FF',interests:'Dancing, unicorns, the color purple',triggers:'Large group activities',calming:'Drawing, listening to music',goals:['Produce /l/ in conversation 85%','Narrative retell with 5 elements'],accommodations:['Small group instruction','Visual supports'],disability:'DLD',lastContact:'2026-07-14',caseManager:'Samantha',meetingDate:'',fallEval:false,source:'demo'}
 ];
+
+function loadStudentsFromStorage(){
+try{
+const raw=localStorage.getItem(PRISM_STUDENTS_KEY);
+if(!raw)return DEMO_STUDENTS.map(s=>({...s}));
+const parsed=JSON.parse(raw);
+if(Array.isArray(parsed)&&parsed.length)return parsed;
+}catch(e){}
+return DEMO_STUDENTS.map(s=>({...s}));
+}
+let STUDENTS=loadStudentsFromStorage();
+let CASELOAD_META=JSON.parse(localStorage.getItem(PRISM_CASELOAD_META_KEY)||'null');
+
+function persistStudents(meta){
+localStorage.setItem(PRISM_STUDENTS_KEY,JSON.stringify(STUDENTS));
+if(meta!==undefined){
+CASELOAD_META=meta;
+if(meta)localStorage.setItem(PRISM_CASELOAD_META_KEY,JSON.stringify(meta));
+else localStorage.removeItem(PRISM_CASELOAD_META_KEY);
+}
+}
 
 let TODOS=JSON.parse(localStorage.getItem('prism_todos')||'null')||[
 {id:1,text:'Send NOM for Aiden M. (IEP meeting 08/01)',done:false},
@@ -1239,7 +1276,10 @@ setTimeout(()=>{t.style.display='none'},2500);
 }
 
 function daysUntil(dateStr){
-const d=new Date(dateStr),now=new Date('2026-07-20');
+if(!dateStr)return '—';
+const d=new Date(dateStr);
+if(isNaN(d))return '—';
+const now=new Date();now.setHours(0,0,0,0);
 return Math.ceil((d-now)/(1000*60*60*24));
 }
 
@@ -1261,6 +1301,194 @@ showToast('💾 Autosaved');
 
 function refreshIcons(){
 if(typeof lucide!=="undefined"&&typeof lucide.createIcons==="function"){lucide.createIcons()}
+}
+
+// === CASELOAD CSV IMPORT (browser-only; FERPA) ===
+function parseCsvText(text){
+const rows=[];let row=[],cell='',inQ=false;
+for(let i=0;i<text.length;i++){
+const ch=text[i],next=text[i+1];
+if(inQ){
+if(ch==='"'&&next==='"'){cell+='"';i++;}
+else if(ch==='"'){inQ=false;}
+else cell+=ch;
+}else{
+if(ch==='"')inQ=true;
+else if(ch===','){row.push(cell);cell='';}
+else if(ch==='\n'||(ch==='\r'&&next==='\n')){row.push(cell);rows.push(row);row=[];cell='';if(ch==='\r')i++;}
+else if(ch==='\r'){row.push(cell);rows.push(row);row=[];cell='';}
+else cell+=ch;
+}
+}
+if(cell.length||row.length){row.push(cell);rows.push(row)}
+return rows;
+}
+function findCaseloadHeaderRow(rows){
+for(let i=0;i<Math.min(rows.length,30);i++){
+const cells=(rows[i]||[]).map(c=>String(c||'').trim().toLowerCase());
+if(cells[0]==='name'&&cells.some(c=>c.includes('case manager'))&&cells.some(c=>c==='grade'))return i;
+}
+return -1;
+}
+function parseArrDate(raw){
+const s=String(raw||'').trim();
+if(!s)return '';
+const m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+if(m){
+let y=+m[3];if(y<100)y+=2000;
+return y+'-'+String(+m[1]).padStart(2,'0')+'-'+String(+m[2]).padStart(2,'0');
+}
+const d=new Date(s);if(!isNaN(d))return d.toISOString().slice(0,10);
+return '';
+}
+function mapGrade(raw){
+const g=String(raw||'').trim().toLowerCase();
+if(!g)return '';
+if(g.includes('kind')||g==='0'||g.startsWith('0 '))return 'K';
+if(g.startsWith('1'))return 'Gr1';
+if(g.startsWith('2'))return 'Gr2';
+if(g.startsWith('3'))return 'Gr3';
+if(g.startsWith('4'))return 'Gr4';
+if(g.startsWith('5'))return 'Gr5';
+if(g.startsWith('6'))return 'Gr6';
+return String(raw).trim();
+}
+function formatStudentName(raw){
+const s=String(raw||'').trim();
+const m=s.match(/^([^,]+),\s*([^(]+?)(?:\s*\(([^)]+)\))?\s*$/);
+if(!m)return s;
+const last=m[1].trim(),first=m[2].trim(),nick=(m[3]||'').trim();
+if(nick)return nick+' '+last;
+return first+' '+last;
+}
+function slugId(name,idx){
+const base=String(name||'student').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);
+return (base||'student')+'-'+idx;
+}
+function flagTrue(v){
+const s=String(v||'').trim().toUpperCase();
+return s==='TRUE'||s==='YES'||s==='Y'||s==='1'||s==='X';
+}
+function programFromCM(cm){
+const s=String(cm||'').trim().toLowerCase();
+if(s.startsWith('mod'))return 'Mod';
+if(s.startsWith('ilc'))return 'ILC';
+if(s.startsWith('2e'))return '2e';
+if(s.startsWith('slp'))return 'SLP';
+return 'SPED';
+}
+function iepStatusFromDate(iso){
+if(!iso)return 'On Track';
+const days=daysUntil(iso);
+if(typeof days!=='number')return 'On Track';
+if(days<0)return 'Overdue';
+if(days<=45)return 'Upcoming';
+return 'On Track';
+}
+function mapArrRowToStudent(obj,idx){
+const discFlags=['SLP','OT','PT','MH','NSS','ELA','Nurse','DHH','Vision'];
+const discipline=[];
+discFlags.forEach(f=>{if(flagTrue(obj[f]))discipline.push(f)});
+if(flagTrue(obj['BIP']))discipline.push('Behavior');
+if(!discipline.length){
+const prog=programFromCM(obj['Case Manager']);
+if(prog==='SLP')discipline.push('SLP');
+else if(prog==='Mod'||prog==='ILC'||prog==='2e')discipline.push('Academic');
+}
+const iepDue=parseArrDate(obj['IEP Date']);
+const reevalDue=parseArrDate(obj['Re-evaluation Date']);
+const name=formatStudentName(obj['Name']);
+const cm=(obj['Case Manager']||'').trim();
+const program=programFromCM(cm);
+return{
+id:slugId(name,idx),
+name,
+rawName:(obj['Name']||'').trim(),
+grade:mapGrade(obj['Grade']),
+teacher:(obj['Teacher']||'').trim(),
+discipline,
+provider:cm||'Unassigned',
+caseManager:cm,
+tier:discipline.includes('Behavior')?3:2,
+iepDue,
+reevalDue,
+meetingDate:parseArrDate(obj['New Scheduled Meeting Date']),
+status:iepStatusFromDate(iepDue),
+color:STUDENT_COLORS[idx%STUDENT_COLORS.length],
+interests:'—',
+triggers:'—',
+calming:'—',
+goals:[],
+accommodations:[],
+disability:program,
+lastContact:'',
+fallEval:flagTrue(obj['Fall 2026 Evals']),
+source:'arr-csv'
+};
+}
+function studentsFromArrCsv(text){
+const rows=parseCsvText(text);
+const hi=findCaseloadHeaderRow(rows);
+if(hi<0)throw new Error('Could not find caseload header row (need Name, Case Manager, Grade columns).');
+const hdr=rows[hi].map(h=>String(h||'').trim());
+const out=[];
+for(let r=hi+1;r<rows.length;r++){
+const row=rows[r]||[];
+if(!row.some(c=>String(c||'').trim()))continue;
+const obj={};
+hdr.forEach((h,i)=>{if(h)obj[h]=row[i]||''});
+const name=(obj['Name']||'').trim();
+if(!name||name.toLowerCase()==='name')continue;
+out.push(mapArrRowToStudent(obj,out.length+1));
+}
+if(!out.length)throw new Error('No student rows found in CSV.');
+return out;
+}
+function updateCaseloadBanner(){
+const banner=document.getElementById('caseloadImportBanner');
+const metaEl=document.getElementById('caseloadImportMeta');
+const badge=document.getElementById('caseloadCountBadge');
+if(badge)badge.textContent='('+STUDENTS.length+')';
+if(!banner)return;
+if(CASELOAD_META&&CASELOAD_META.source==='arr-csv'){
+banner.style.display='block';
+if(metaEl)metaEl.textContent='Loaded '+STUDENTS.length+' students from "'+(CASELOAD_META.fileName||'CSV')+'" on '+(CASELOAD_META.importedAt||'')+'.';
+}else{
+banner.style.display='none';
+}
+}
+function rebuildCaseManagerFilter(){
+const sel=document.getElementById('caseFilterCM');
+if(!sel)return;
+const cur=sel.value;
+const cms=[...new Set(STUDENTS.map(s=>s.caseManager||s.provider).filter(Boolean))].sort();
+sel.innerHTML='<option>All</option>'+cms.map(c=>'<option>'+c+'</option>').join('');
+if(cms.includes(cur))sel.value=cur;
+}
+function refreshAllStudentViews(){
+updateCaseloadBanner();
+rebuildCaseManagerFilter();
+const activeFilter=document.querySelector('#studentFilters .sub-tab-btn.active');
+const search=document.getElementById('studentSearch');
+if(typeof renderStudentGrid==='function')renderStudentGrid(activeFilter?activeFilter.dataset.filter:'All',search?search.value:'');
+if(typeof renderCaseload==='function')renderCaseload();
+if(typeof renderSessionStudents==='function')renderSessionStudents();
+if(typeof renderProgressMonitor==='function')renderProgressMonitor();
+if(typeof populateStudentSelects==='function')populateStudentSelects();
+refreshIcons();
+}
+function applyImportedStudents(list,meta){
+STUDENTS=list;
+persistStudents(meta);
+refreshAllStudentViews();
+showToast('Loaded '+list.length+' students (browser only)');
+}
+function restoreDemoStudents(){
+STUDENTS=DEMO_STUDENTS.map(s=>({...s}));
+persistStudents(null);
+localStorage.removeItem(PRISM_STUDENTS_KEY);
+refreshAllStudentViews();
+showToast('Demo caseload restored');
 }
 
 // === TAB SWITCHING ===
@@ -1334,18 +1562,33 @@ let filtered=STUDENTS;
 if(filter!=='All'){
 filtered=filtered.filter(s=>s.discipline.includes(filter)||s.disability===filter);
 }
-if(search){filtered=filtered.filter(s=>s.name.toLowerCase().includes(search.toLowerCase()))}
+if(search){
+const q=search.toLowerCase();
+filtered=filtered.filter(s=>
+(s.name||'').toLowerCase().includes(q)||
+(s.rawName||'').toLowerCase().includes(q)||
+(s.caseManager||'').toLowerCase().includes(q)||
+(s.teacher||'').toLowerCase().includes(q)
+);
+}
+if(!filtered.length){
+grid.innerHTML='<p class="text-sm text-subtext col-span-full">No students match. Import your ARR Special Pops CSV or clear filters.</p>';
+refreshIcons();
+return;
+}
 grid.innerHTML=filtered.map(s=>{
 const days=daysUntil(s.iepDue);
+const dayLabel=typeof days==='number'?days+'d':days;
 const discBadges=s.discipline.map(d=>`<span class="badge badge-sky">${d}</span>`).join(' ');
+const initials=(s.name||'?').split(/\s+/).filter(Boolean).map(n=>n[0]).join('').slice(0,3).toUpperCase();
 return`<div class="card" style="border-top:4px solid ${s.color}">
 <div class="flex items-center gap-2 mb-2">
-<div class="avatar-circle" style="background:${s.color};color:#1E293B;font-size:12px">${s.name.split(' ').map(n=>n[0]).join('')}</div>
-<div><p class="font-bold text-sm">${s.name}</p><p class="text-xs text-subtext">${s.grade} · ${s.teacher}</p></div>
+<div class="avatar-circle" style="background:${s.color};color:#1E293B;font-size:12px">${initials}</div>
+<div><p class="font-bold text-sm">${s.name}</p><p class="text-xs text-subtext">${s.grade} · ${s.teacher}${s.caseManager?' · '+s.caseManager:''}</p></div>
 </div>
 <div class="flex flex-wrap gap-1 mb-2">${discBadges}<span class="badge badge-lav">${s.disability}</span></div>
 <div class="flex items-center justify-between">
-<div><p class="text-xs text-subtext">IEP Due: ${s.iepDue}</p><p class="text-xs">${statusBadge(s.status)} <span class="font-mono-d text-xs">${days}d</span></p></div>
+<div><p class="text-xs text-subtext">IEP Due: ${s.iepDue||'—'}</p><p class="text-xs">${statusBadge(s.status)} <span class="font-mono-d text-xs">${dayLabel}</span></p></div>
 <button class="btn-sm btn-filled open-student-btn" data-student="${s.id}">Open</button>
 </div></div>`}).join('');
 grid.querySelectorAll('.open-student-btn').forEach(b=>{b.addEventListener('click',()=>openStudentPanel(b.dataset.student))});
@@ -1365,25 +1608,57 @@ renderStudentGrid(btn.dataset.filter,document.getElementById('studentSearch').va
 });
 });
 
+document.getElementById('importCaseloadBtn').addEventListener('click',()=>document.getElementById('caseloadCsvInput').click());
+document.getElementById('caseloadCsvInput').addEventListener('change',async(e)=>{
+const file=e.target.files&&e.target.files[0];
+e.target.value='';
+if(!file)return;
+try{
+const text=await file.text();
+const list=studentsFromArrCsv(text);
+applyImportedStudents(list,{
+source:'arr-csv',
+fileName:file.name,
+importedAt:new Date().toLocaleString('en-US',{timeZone:'America/Denver'}),
+count:list.length
+});
+}catch(err){
+showToast('Import failed: '+(err.message||'invalid CSV'));
+console.error(err);
+}
+});
+document.getElementById('restoreDemoBtn').addEventListener('click',()=>{
+if(CASELOAD_META&&!confirm('Clear imported caseload from this browser and restore demo students?'))return;
+restoreDemoStudents();
+});
+
 // === STUDENT PANEL ===
 function openStudentPanel(sid){
 const s=STUDENTS.find(x=>x.id===sid);if(!s)return;
 document.getElementById('panelStudentName').textContent=s.name;
 document.getElementById('panelOverlay').classList.add('show');
 document.getElementById('studentPanel').classList.add('open');
+const goals=(s.goals&&s.goals.length)?s.goals:['Goals not yet entered in PRISM — pull from Enrich IEP.'];
+const accs=(s.accommodations&&s.accommodations.length)?s.accommodations:['Accommodations not yet entered — pull from Enrich IEP.'];
 
 // Profile tab
 document.getElementById('panelProfileContent').innerHTML=`
 <div class="space-y-3">
-<div class="required-highlight"><label class="text-xs font-semibold text-subtext">Disability</label><p class="font-semibold text-sm">${s.disability}</p></div>
-<div><label class="text-xs font-semibold text-subtext">Grade / Teacher</label><p class="text-sm">${s.grade} · ${s.teacher}</p></div>
-<div><label class="text-xs font-semibold text-subtext">Interests</label><p class="text-sm">${s.interests}</p></div>
-<div><label class="text-xs font-semibold text-subtext">Triggers</label><p class="text-sm">${s.triggers}</p></div>
-<div><label class="text-xs font-semibold text-subtext">Calming Strategies</label><p class="text-sm">${s.calming}</p></div>
-<div><label class="text-xs font-semibold text-subtext">Current Goals</label><ul class="list-disc pl-4 text-sm">${s.goals.map(g=>'<li>'+g+'</li>').join('')}</ul></div>
-<div><label class="text-xs font-semibold text-subtext">Accommodations</label><ul class="list-disc pl-4 text-sm">${s.accommodations.map(a=>'<li>'+a+'</li>').join('')}</ul></div>
-<div><label class="text-xs font-semibold text-subtext">Last Contact</label><p class="text-sm">${s.lastContact}</p></div>
-<div class="help-assist-panel"><strong>💡 Help Assist:</strong> This profile should include: current academic and functional performance levels, how the disability affects involvement in general curriculum, communication style, sensory profile, and AT/AAC devices if applicable. Update before every IEP meeting.</div>
+<div class="required-highlight"><label class="text-xs font-semibold text-subtext">Program / Category</label><p class="font-semibold text-sm">${s.disability}</p></div>
+<div><label class="text-xs font-semibold text-subtext">Case Manager</label><p class="text-sm">${s.caseManager||s.provider||'—'}</p></div>
+<div><label class="text-xs font-semibold text-subtext">Grade / Teacher</label><p class="text-sm">${s.grade||'—'} · ${s.teacher||'—'}</p></div>
+<div><label class="text-xs font-semibold text-subtext">Related Services</label><p class="text-sm">${(s.discipline||[]).join(', ')||'—'}</p></div>
+<div><label class="text-xs font-semibold text-subtext">IEP Date</label><p class="text-sm">${s.iepDue||'—'} ${statusBadge(s.status)}</p></div>
+<div><label class="text-xs font-semibold text-subtext">Re-evaluation Date</label><p class="text-sm">${s.reevalDue||'—'}</p></div>
+<div><label class="text-xs font-semibold text-subtext">Scheduled Meeting</label><p class="text-sm">${s.meetingDate||'—'}</p></div>
+<div><label class="text-xs font-semibold text-subtext">Fall 2026 Eval</label><p class="text-sm">${s.fallEval?'Yes':'No'}</p></div>
+<div><label class="text-xs font-semibold text-subtext">Interests</label><p class="text-sm">${s.interests||'—'}</p></div>
+<div><label class="text-xs font-semibold text-subtext">Triggers</label><p class="text-sm">${s.triggers||'—'}</p></div>
+<div><label class="text-xs font-semibold text-subtext">Calming Strategies</label><p class="text-sm">${s.calming||'—'}</p></div>
+<div><label class="text-xs font-semibold text-subtext">Current Goals</label><ul class="list-disc pl-4 text-sm">${goals.map(g=>'<li>'+g+'</li>').join('')}</ul></div>
+<div><label class="text-xs font-semibold text-subtext">Accommodations</label><ul class="list-disc pl-4 text-sm">${accs.map(a=>'<li>'+a+'</li>').join('')}</ul></div>
+<div><label class="text-xs font-semibold text-subtext">Last Contact</label><p class="text-sm">${s.lastContact||'—'}</p></div>
+<div class="help-assist-panel"><strong>💡 Help Assist:</strong> Spreadsheet import fills identity, dates, and related services. Enrich remains the system of record for goals and accommodations — copy those in before IEP meetings.</div>
 </div>`;
 
 // Continuum
@@ -1395,7 +1670,7 @@ ${domains.map(d=>{const v=Math.floor(Math.random()*60+20);const c=v>60?'#22C55E'
 // Enrich Checklist
 const checks=['Consent received','Eligibility determined','Services documented','PWN sent','Annual date tracked','Reevaluation date tracked'];
 document.getElementById('panelEnrichContent').innerHTML=`<h4 class="text-sm font-bold mb-3">Enrich Required Sequence</h4>
-${checks.map(c=>`<div class="checklist-item"><input type="checkbox" /><div><p class="text-sm font-semibold">${c}</p><input type="date" class="w-36 mt-1" /></div></div>`).join('')}
+${checks.map(c=>`<div class="checklist-item"><input type="checkbox" /><div><p class="text-sm font-semibold">${c}</p><input type="date" class="w-36 mt-1" value="${c.includes('Annual')&&s.iepDue?s.iepDue:(c.includes('Reevaluation')&&s.reevalDue?s.reevalDue:'')}" /></div></div>`).join('')}
 <div class="help-assist-panel mt-2"><strong>💡 Help Assist:</strong> Complete all items in order. Each step must be documented in Enrich with dates. The IEP cannot be finalized until all required sequence items are checked.</div>`;
 
 // Reset to profile tab
@@ -1419,29 +1694,35 @@ const body=document.getElementById('caseloadBody');
 const disc=document.getElementById('caseFilterDisc').value;
 const grade=document.getElementById('caseFilterGrade').value;
 const status=document.getElementById('caseFilterStatus').value;
+const cmSel=document.getElementById('caseFilterCM');
+const cm=cmSel?cmSel.value:'All';
 let data=STUDENTS;
 if(disc!=='All')data=data.filter(s=>s.discipline.includes(disc));
 if(grade!=='All')data=data.filter(s=>s.grade===grade);
 if(status!=='All')data=data.filter(s=>s.status===status);
+if(cm&&cm!=='All')data=data.filter(s=>(s.caseManager||s.provider)===cm);
+const daysLabel=d=>typeof d==='number'?d:'—';
 body.innerHTML=data.map(s=>{
 const days=daysUntil(s.iepDue);
-return`<tr class="border-b"><td class="p-2 font-semibold">${s.name}</td><td class="p-2 text-center">${s.grade}</td><td class="p-2 text-center">${s.discipline.join(', ')}</td><td class="p-2 text-center">${s.iepDue}</td><td class="p-2 text-center font-mono-d">${days}</td><td class="p-2 text-center">${statusBadge(s.status)}</td><td class="p-2 text-center"><button class="btn-sm btn-outlined session-log-btn" data-sid="${s.id}">Log</button></td></tr>`
-}).join('');
+return`<tr class="border-b"><td class="p-2 font-semibold">${s.name}<div class="text-subtext font-normal">${s.caseManager||''}</div></td><td class="p-2 text-center">${s.grade}</td><td class="p-2 text-center">${s.discipline.join(', ')}</td><td class="p-2 text-center">${s.iepDue||'—'}</td><td class="p-2 text-center font-mono-d">${daysLabel(days)}</td><td class="p-2 text-center">${statusBadge(s.status)}</td><td class="p-2 text-center"><button class="btn-sm btn-outlined session-log-btn" data-sid="${s.id}">Log</button></td></tr>`
+}).join('')||'<tr><td colspan="7" class="p-3 text-subtext">No students match filters.</td></tr>';
 body.querySelectorAll('.session-log-btn').forEach(b=>{b.addEventListener('click',()=>showToast('Session log opened for '+STUDENTS.find(s=>s.id===b.dataset.sid).name))});
 }
 renderCaseload();
-['caseFilterDisc','caseFilterGrade','caseFilterStatus'].forEach(id=>{
-document.getElementById(id).addEventListener('change',renderCaseload);
+['caseFilterDisc','caseFilterGrade','caseFilterStatus','caseFilterCM'].forEach(id=>{
+const el=document.getElementById(id);
+if(el)el.addEventListener('change',renderCaseload);
 });
 
 // Session students
 function renderSessionStudents(){
 const c=document.getElementById('sessionStudentList');
-c.innerHTML=STUDENTS.slice(0,4).map(s=>`
+const list=STUDENTS.slice(0,6);
+c.innerHTML=(list.length?list:[]).map(s=>`
 <div class="p-3 rounded-lg bg-slate">
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-2"><input type="checkbox" class="session-check" /><span class="font-semibold text-sm">${s.name}</span><span class="text-xs text-subtext">${s.discipline.join(', ')}</span></div>
-<span class="text-xs text-subtext">Goal: ${s.goals[0]}</span>
+<span class="text-xs text-subtext">Goal: ${(s.goals&&s.goals[0])||'Add goal from Enrich'}</span>
 </div>
 <div class="soap-note mt-2" style="display:none">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
@@ -1452,7 +1733,7 @@ c.innerHTML=STUDENTS.slice(0,4).map(s=>`
 </div>
 <div class="flex gap-2 mt-2"><button class="btn-sm btn-outlined">Copy to Enrich</button><button class="btn-sm btn-outlined">Copy for Medicaid</button></div>
 </div>
-</div>`).join('');
+</div>`).join('')+(STUDENTS.length>6?`<p class="text-xs text-subtext">Showing 6 of ${STUDENTS.length} — filter caseload or open Student Tiles for full list.</p>`:'');
 c.querySelectorAll('.session-check').forEach(cb=>{
 cb.addEventListener('change',()=>{
 const note=cb.closest('.p-3').querySelector('.soap-note');
@@ -1569,9 +1850,16 @@ document.getElementById('trainModal').style.display='block';
 });
 
 // === POPULATE STUDENT SELECTS ===
-document.querySelectorAll('select.tmpl-student-sel, #fbaStudent, #socialStudent, #eligStudentSelect, #genStudent').forEach(sel=>{
+function populateStudentSelects(){
+document.querySelectorAll('select.tmpl-student-sel, #fbaStudent, #socialStudent, #eligStudentSelect, #genStudent, #commStudent').forEach(sel=>{
+const cur=sel.value;
+const keepFirst=sel.options.length&&sel.options[0].value==='';
+sel.innerHTML=keepFirst?'<option value="">Select student...</option>':'';
 STUDENTS.forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.name+' ('+s.grade+')';sel.appendChild(o)});
+if([...sel.options].some(o=>o.value===cur))sel.value=cur;
 });
+}
+populateStudentSelects();
 
 // === CALENDAR TOGGLE ===
 document.getElementById('calWeekBtn').addEventListener('click',()=>{
@@ -2018,6 +2306,8 @@ document.querySelectorAll('.topbar,.footer-bar').forEach(el=>el.style.background
 }
 
 // Final icon refresh
+updateCaseloadBanner();
+rebuildCaseManagerFilter();
 refreshIcons();
 </script>
 </body>

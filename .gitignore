@@ -26,3 +26,11 @@ dist-ssr
 # Local CCSD artifact binaries (too large for GitHub)
 docs/ccsd/artifacts-intake/raw/
 docs/ccsd/artifacts-intake/extracted/
+
+# FERPA — never commit real student caseload exports
+local-data/
+**/*Special*Pops*.csv
+**/*Master*SPED*.csv
+**/caseload*.csv
+**/*ARR*SPED*.csv
+uploads/**/*.csv
