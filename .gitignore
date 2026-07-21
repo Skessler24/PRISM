@@ -27,10 +27,15 @@ dist-ssr
 docs/ccsd/artifacts-intake/raw/
 docs/ccsd/artifacts-intake/extracted/
 
-# FERPA — never commit real student caseload exports
+# FERPA — never commit real student caseload / roster / plan exports
 local-data/
 **/*Special*Pops*.csv
 **/*Master*SPED*.csv
 **/caseload*.csv
 **/*ARR*SPED*.csv
-uploads/**/*.csv
+**/student.export*
+**/*student.export*
+**/*Gifted*ALP*
+**/*BIP*CCSD*
+uploads/**
+*.caseload.json

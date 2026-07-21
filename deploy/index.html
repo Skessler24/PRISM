@@ -9,6 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Figtree:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="enrichment-import.js"></script>
 <script>
 tailwind.config={theme:{extend:{fontFamily:{heading:['Poppins','sans-serif'],body:['Figtree','sans-serif'],mono:['Space Grotesk','monospace']},colors:{navy:'#1E3A5F',accent:'#2563EB','accent-h':'#1D4ED8',sky:'#F0F9FF','card-bg':'#FFFFFF',border:'#E2E8F0',subtext:'#64748B',mint:'#D1FAE5',coral:'#FEE2E2',sun:'#FEF3C7',lav:'#EDE9FE',softorange:'#FFEDD5',pink:'#FCE7F3',slate:'#F1F5F9'}}}}
 </script>
@@ -260,13 +262,23 @@ textarea{min-height:80px;resize:vertical}
 <div data-id="231" class="flex items-center gap-2 flex-wrap">
 <input data-id="232" type="text" id="studentSearch" placeholder="Search students..." class="w-48" />
 <input type="file" id="caseloadCsvInput" accept=".csv,text/csv" class="hidden" />
+<input type="file" id="enrichmentInput" accept=".csv,.text,.txt,.tsv,.pdf,text/plain,text/csv,application/pdf" class="hidden" multiple />
 <button class="btn-outlined btn-sm" id="importCaseloadBtn" title="Import ARR Special Pops CSV — stays in this browser only"><i data-lucide="upload" class="w-4 h-4 inline"></i> Import CSV</button>
+<button class="btn-outlined btn-sm" id="importEnrichmentBtn" title="Import parent/contact exports, ALP & BIP PDFs — browser only"><i data-lucide="files" class="w-4 h-4 inline"></i> Import Docs</button>
 <button class="btn-outlined btn-sm" id="restoreDemoBtn" title="Clear imported caseload and restore demo students">Restore Demo</button>
 <button data-id="233" class="btn-filled btn-sm" id="newStudentBtn"><i data-id="234" data-lucide="plus" class="w-4 h-4 inline"></i> New Student</button>
 </div>
 </div>
 <div id="caseloadImportBanner" class="mb-3" style="display:none;background:#F0F9FF;border:1px solid #7DD3FC;border-left:4px solid #0EA5E9;border-radius:10px;padding:12px;font-size:12px;color:#0C4A6E;line-height:1.6">
-<strong>FERPA:</strong> Caseload CSV is stored only in this browser (<code>localStorage</code>). It is never uploaded to PRISM servers or committed to GitHub. <span id="caseloadImportMeta"></span>
+<strong>FERPA:</strong> Student data is stored only in this browser (<code>localStorage</code>). It is never uploaded to PRISM servers or committed to GitHub. <span id="caseloadImportMeta"></span>
+</div>
+<div id="enrichmentGapPanel" class="mb-3" style="display:none;background:#FFFBEB;border:1px solid #FCD34D;border-left:4px solid #F59E0B;border-radius:10px;padding:12px;font-size:12px;color:#78350F;line-height:1.55">
+<div class="flex items-center justify-between gap-2 mb-1">
+<strong>Coverage gaps</strong>
+<button class="btn-sm btn-outlined" id="toggleGapDetailsBtn" type="button">Show details</button>
+</div>
+<div id="enrichmentGapSummary" class="text-xs"></div>
+<div id="enrichmentGapDetails" style="display:none;margin-top:8px" class="text-xs space-y-2"></div>
 </div>
 <div data-id="235" class="flex flex-wrap gap-2 mb-4" id="studentFilters">
 <button data-id="236" class="sub-tab-btn active" data-filter="All">All</button>
@@ -1465,6 +1477,78 @@ const cms=[...new Set(STUDENTS.map(s=>s.caseManager||s.provider).filter(Boolean)
 sel.innerHTML='<option>All</option>'+cms.map(c=>'<option>'+c+'</option>').join('');
 if(cms.includes(cur))sel.value=cur;
 }
+function applyImportedStudents(list,meta){
+STUDENTS=list;
+persistStudents(meta);
+refreshAllStudentViews();
+showToast('Loaded '+list.length+' students (browser only)');
+}
+
+const PRISM_ENRICH_META_KEY='prism_enrich_meta_v1';
+let ENRICH_REPORT=JSON.parse(localStorage.getItem(PRISM_ENRICH_META_KEY)||'null');
+
+function restoreDemoStudents(){
+STUDENTS=DEMO_STUDENTS.map(s=>({...s}));
+persistStudents(null);
+localStorage.removeItem(PRISM_STUDENTS_KEY);
+localStorage.removeItem(PRISM_ENRICH_META_KEY);
+ENRICH_REPORT=null;
+refreshAllStudentViews();
+showToast('Demo caseload restored');
+}
+
+function renderGapPanel(){
+const panel=document.getElementById('enrichmentGapPanel');
+const sum=document.getElementById('enrichmentGapSummary');
+const det=document.getElementById('enrichmentGapDetails');
+if(!panel||!sum)return;
+if(!ENRICH_REPORT||!ENRICH_REPORT.report){panel.style.display='none';return}
+panel.style.display='block';
+const r=ENRICH_REPORT.report;
+const list=(arr,limit)=>{
+const a=arr||[];
+const shown=a.slice(0,limit||40);
+return shown.map(x=>'<li>'+x+'</li>').join('')+(a.length>shown.length?'<li>… +'+(a.length-shown.length)+' more</li>':'');
+};
+sum.innerHTML=`Contacts matched <strong>${(r.contactsMatched||[]).length}</strong> · missing <strong>${(r.contactsMissing||[]).length}</strong>
+&nbsp;|&nbsp; ALP matched <strong>${(r.alpMatched||[]).length}</strong>
+&nbsp;|&nbsp; BIP matched <strong>${(r.bipMatched||[]).length}</strong>
+<span class="text-subtext"> · files: ${(ENRICH_REPORT.files||[]).join(', ')}</span>
+<p class="mt-1">Not in this upload yet: <strong>IEP snapshots</strong>, <strong>latest evaluations</strong>, <strong>progress reports</strong> — add those with Import Docs when ready.</p>`;
+det.innerHTML=`
+<div><strong>Missing parent/contact match (${(r.contactsMissing||[]).length})</strong><ul class="list-disc pl-4">${list(r.contactsMissing)||'<li>None</li>'}</ul></div>
+<div><strong>Spelling / alias links</strong><ul class="list-disc pl-4">${list(r.spellingNotes,20)||'<li>None</li>'}</ul></div>
+<div><strong>ALP packets not on caseload</strong><ul class="list-disc pl-4">${list(r.alpUnmatchedPackets)||'<li>None</li>'}</ul></div>
+<div><strong>BIP packets not on caseload</strong><ul class="list-disc pl-4">${list(r.bipUnmatchedPackets)||'<li>None</li>'}</ul></div>
+<div><strong>Caseload with BIP from upload</strong><ul class="list-disc pl-4">${list(r.bipMatched)||'<li>None</li>'}</ul></div>
+<div><strong>Caseload with ALP from upload</strong><ul class="list-disc pl-4">${list(r.alpMatched)||'<li>None</li>'}</ul></div>`;
+}
+
+async function applyEnrichmentFiles(fileList){
+if(!window.PrismEnrichment)throw new Error('Enrichment module failed to load');
+if(typeof pdfjsLib!=='undefined'){
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+showToast('Reading files (browser only)…');
+const packs=await PrismEnrichment.ingestFiles(fileList);
+if(packs.arrCsvText){
+const list=studentsFromArrCsv(packs.arrCsvText);
+STUDENTS=list;
+}
+const {students,report}=PrismEnrichment.mergeEnrichmentIntoStudents(STUDENTS,packs);
+STUDENTS=students;
+const meta=Object.assign({},CASELOAD_META||{},{
+enrichedAt:new Date().toLocaleString('en-US',{timeZone:'America/Denver'}),
+enrichFiles:packs.files
+});
+persistStudents(meta);
+ENRICH_REPORT={report,files:packs.files,at:meta.enrichedAt};
+localStorage.setItem(PRISM_ENRICH_META_KEY,JSON.stringify(ENRICH_REPORT));
+refreshAllStudentViews();
+renderGapPanel();
+showToast('Merged docs: '+(packs.contacts.length||0)+' contacts, '+(packs.alps.length||0)+' ALP, '+(packs.bips.length||0)+' BIP');
+}
+
 function refreshAllStudentViews(){
 updateCaseloadBanner();
 rebuildCaseManagerFilter();
@@ -1475,20 +1559,8 @@ if(typeof renderCaseload==='function')renderCaseload();
 if(typeof renderSessionStudents==='function')renderSessionStudents();
 if(typeof renderProgressMonitor==='function')renderProgressMonitor();
 if(typeof populateStudentSelects==='function')populateStudentSelects();
+if(typeof renderGapPanel==='function')renderGapPanel();
 refreshIcons();
-}
-function applyImportedStudents(list,meta){
-STUDENTS=list;
-persistStudents(meta);
-refreshAllStudentViews();
-showToast('Loaded '+list.length+' students (browser only)');
-}
-function restoreDemoStudents(){
-STUDENTS=DEMO_STUDENTS.map(s=>({...s}));
-persistStudents(null);
-localStorage.removeItem(PRISM_STUDENTS_KEY);
-refreshAllStudentViews();
-showToast('Demo caseload restored');
 }
 
 // === TAB SWITCHING ===
@@ -1586,7 +1658,7 @@ return`<div class="card" style="border-top:4px solid ${s.color}">
 <div class="avatar-circle" style="background:${s.color};color:#1E293B;font-size:12px">${initials}</div>
 <div><p class="font-bold text-sm">${s.name}</p><p class="text-xs text-subtext">${s.grade} · ${s.teacher}${s.caseManager?' · '+s.caseManager:''}</p></div>
 </div>
-<div class="flex flex-wrap gap-1 mb-2">${discBadges}<span class="badge badge-lav">${s.disability}</span></div>
+<div class="flex flex-wrap gap-1 mb-2">${discBadges}<span class="badge badge-lav">${s.disability}</span>${s.hasBip?'<span class="badge badge-red">BIP</span>':''}${s.hasAlp?'<span class="badge badge-amber">ALP</span>':''}${(s.docs&&s.docs.contacts)?'<span class="badge badge-green">Contacts</span>':''}</div>
 <div class="flex items-center justify-between">
 <div><p class="text-xs text-subtext">IEP Due: ${s.iepDue||'—'}</p><p class="text-xs">${statusBadge(s.status)} <span class="font-mono-d text-xs">${dayLabel}</span></p></div>
 <button class="btn-sm btn-filled open-student-btn" data-student="${s.id}">Open</button>
@@ -1627,8 +1699,28 @@ showToast('Import failed: '+(err.message||'invalid CSV'));
 console.error(err);
 }
 });
+document.getElementById('importEnrichmentBtn').addEventListener('click',()=>document.getElementById('enrichmentInput').click());
+document.getElementById('enrichmentInput').addEventListener('change',async(e)=>{
+const files=e.target.files;
+e.target.value='';
+if(!files||!files.length)return;
+try{
+await applyEnrichmentFiles(files);
+}catch(err){
+showToast('Doc import failed: '+(err.message||'error'));
+console.error(err);
+}
+});
+document.getElementById('toggleGapDetailsBtn').addEventListener('click',()=>{
+const det=document.getElementById('enrichmentGapDetails');
+const btn=document.getElementById('toggleGapDetailsBtn');
+if(!det)return;
+const open=det.style.display!=='none';
+det.style.display=open?'none':'block';
+btn.textContent=open?'Show details':'Hide details';
+});
 document.getElementById('restoreDemoBtn').addEventListener('click',()=>{
-if(CASELOAD_META&&!confirm('Clear imported caseload from this browser and restore demo students?'))return;
+if((CASELOAD_META||ENRICH_REPORT)&&!confirm('Clear imported caseload/docs from this browser and restore demo students?'))return;
 restoreDemoStudents();
 });
 
@@ -1652,6 +1744,14 @@ document.getElementById('panelProfileContent').innerHTML=`
 <div><label class="text-xs font-semibold text-subtext">Re-evaluation Date</label><p class="text-sm">${s.reevalDue||'—'}</p></div>
 <div><label class="text-xs font-semibold text-subtext">Scheduled Meeting</label><p class="text-sm">${s.meetingDate||'—'}</p></div>
 <div><label class="text-xs font-semibold text-subtext">Fall 2026 Eval</label><p class="text-sm">${s.fallEval?'Yes':'No'}</p></div>
+${s.contacts?`<div class="required-highlight"><label class="text-xs font-semibold text-subtext">Parent / Guardian contacts</label>
+<p class="text-sm"><strong>${s.contacts.parent1Name||'—'}</strong>${s.contacts.parent1Email?' · '+s.contacts.parent1Email:''}${s.contacts.parent1Phone?' · '+s.contacts.parent1Phone:''}</p>
+${s.contacts.parent2Name?`<p class="text-sm"><strong>${s.contacts.parent2Name}</strong>${s.contacts.parent2Email?' · '+s.contacts.parent2Email:''}${s.contacts.parent2Phone?' · '+s.contacts.parent2Phone:''}</p>`:''}
+${s.contacts.hh2Parent1Name?`<p class="text-xs text-subtext mt-1">HH2: ${s.contacts.hh2Parent1Name}${s.contacts.hh2Parent1Email?' · '+s.contacts.hh2Parent1Email:''}</p>`:''}
+</div>`:''}
+${s.address?`<div><label class="text-xs font-semibold text-subtext">Address</label><p class="text-sm">${s.address.street||''}<br>${s.address.city||''}, ${s.address.state||''} ${s.address.zip||''}</p></div>`:''}
+${s.alp?`<div><label class="text-xs font-semibold text-subtext">ALP / Talent Pool</label><p class="text-xs text-subtext mb-1">${s.alp.profile||''}</p><p class="text-sm"><strong>Strengths:</strong> ${s.alp.strengths||'—'}</p><p class="text-sm mt-1"><strong>Goals:</strong> ${s.alp.goals||'—'}</p></div>`:''}
+${s.bip?`<div><label class="text-xs font-semibold text-subtext">BIP snapshot</label><p class="text-sm"><strong>Strengths:</strong> ${s.bip.strengths||'—'}</p><p class="text-sm mt-1"><strong>FBA summary:</strong> ${s.bip.fba||'—'}</p></div>`:''}
 <div><label class="text-xs font-semibold text-subtext">Interests</label><p class="text-sm">${s.interests||'—'}</p></div>
 <div><label class="text-xs font-semibold text-subtext">Triggers</label><p class="text-sm">${s.triggers||'—'}</p></div>
 <div><label class="text-xs font-semibold text-subtext">Calming Strategies</label><p class="text-sm">${s.calming||'—'}</p></div>
@@ -2308,6 +2408,7 @@ document.querySelectorAll('.topbar,.footer-bar').forEach(el=>el.style.background
 // Final icon refresh
 updateCaseloadBanner();
 rebuildCaseManagerFilter();
+renderGapPanel();
 refreshIcons();
 </script>
 </body>

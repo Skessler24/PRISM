@@ -37,4 +37,6 @@ Goals, accommodations, interests, triggers, and clinical notes are not on this s
 
 ## FERPA / git hygiene
 
-Do not add real caseload exports under the repo. Patterns are gitignored (e.g. `*Special*Pops*.csv`, `*Master*SPED*.csv`, `local-data/`). Demo students in `deploy/index.html` are fictional only.
+Do not add real caseload exports under the repo. Patterns are gitignored (e.g. `*Special*Pops*.csv`, `student.export*`, ALP/BIP student PDFs, `local-data/`). Demo students in `deploy/index.html` are fictional only.
+
+See also: [caseload-enrichment-import.md](./caseload-enrichment-import.md) for parent/contact, ALP, and BIP doc imports.
