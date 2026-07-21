@@ -71,3 +71,11 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 - **Help Assist:** Field tips on District timeline, Eval checklist, and Templates; gated by TopBar toggle + district `features.help`. Tip copy comes from district profile rules.
 - **Storage:** `StorageRepository` with Local default + Graph/OneDrive stub (`VITE_STORAGE_BACKEND=graph` delegates to Local until MSAL OAuth is wired). Students + template drafts go through this layer.
 - Next prompts: deeper phase modules; real Graph MSAL OAuth; TTS vendor for `/api/ai-speak`.
+
+## Decisions locked (Prompt 7 — phase depth)
+
+- **FBA/BIP Engine:** React workspace at `/fba` (`features.fba`) with ABC table, function hypothesis, AI FBA summary + BIP draft, Companion Copy.
+- **Eval depth:** Transfer Wizard (district transfer deadlines) + Action Builder with real MDR wizard (`manifestationDeterminationSchoolDays`).
+- **Caseload depth:** SOAP/service logs (localStorage, Copy-to-SoR within `serviceLogHours`) + progress probe bars.
+- **MTSS depth:** Interactive DAT checklist + AI eligibility prep; CLD stays in Accessibility for CCSD Companion (MLL tab optional).
+- Still later: Graph MSAL OAuth, TTS vendor, ESY/transport standalone modules, Private School (`privateSchool: false` for CCSD).

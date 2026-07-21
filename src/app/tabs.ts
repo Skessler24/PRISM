@@ -25,6 +25,14 @@ export const APP_TABS: AppTab[] = [
     featureId: 'eval',
   },
   {
+    id: 'fba',
+    path: '/fba',
+    label: 'FBA / BIP Engine',
+    shortLabel: 'FBA/BIP',
+    icon: '🔍',
+    featureId: 'fba',
+  },
+  {
     id: 'section504',
     path: '/section504',
     label: '504 Plans',
