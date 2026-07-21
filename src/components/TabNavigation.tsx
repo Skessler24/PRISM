@@ -1,11 +1,27 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { DRAWER_TABS, PRIMARY_TABS, getTabByPath } from '../app/tabs'
+import { APP_TABS, PRIMARY_TAB_IDS, getTabByPath } from '../app/tabs'
+import { useDistrictProfile } from '../lib/district-profiles/useDistrictProfile'
 
 export function TabNavigation() {
   const location = useLocation()
   const active = getTabByPath(location.pathname)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const { isFeatureEnabled } = useDistrictProfile()
+
+  const visibleTabs = useMemo(
+    () =>
+      APP_TABS.filter((t) => {
+        if (!t.featureId) return true
+        return isFeatureEnabled(t.featureId)
+      }),
+    [isFeatureEnabled],
+  )
+
+  const primaryTabs = visibleTabs.filter((t) =>
+    (PRIMARY_TAB_IDS as readonly string[]).includes(t.id),
+  )
+  const drawerTabs = visibleTabs.filter((t) => !(PRIMARY_TAB_IDS as readonly string[]).includes(t.id))
 
   const closeDrawer = () => setDrawerOpen(false)
 
@@ -20,7 +36,7 @@ export function TabNavigation() {
     <>
       <nav className="fixed inset-x-0 top-16 z-[999] flex h-[52px] items-center gap-1 border-b border-[var(--border)] bg-[var(--card-bg)] px-2 md:px-3">
         <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
-          {PRIMARY_TABS.map((tab) => (
+          {primaryTabs.map((tab) => (
             <NavLink
               key={tab.id}
               to={tab.path}
@@ -40,7 +56,7 @@ export function TabNavigation() {
           aria-expanded={drawerOpen}
           onClick={() => setDrawerOpen((v) => !v)}
           className={`ml-auto shrink-0 rounded-lg border border-[var(--border)] px-3 py-2 text-sm font-bold ${
-            DRAWER_TABS.some((t) => t.id === active.id)
+            drawerTabs.some((t) => t.id === active.id)
               ? 'bg-[var(--nav-active)] text-[var(--nav-active-txt)]'
               : 'bg-[var(--card-bg)] text-[var(--text)]'
           }`}
@@ -61,7 +77,7 @@ export function TabNavigation() {
             <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-[var(--subtext)]">
               More modules
             </p>
-            {DRAWER_TABS.map((tab) => (
+            {drawerTabs.map((tab) => (
               <NavLink
                 key={tab.id}
                 to={tab.path}
@@ -78,6 +94,9 @@ export function TabNavigation() {
                 {tab.label}
               </NavLink>
             ))}
+            {!drawerTabs.length && (
+              <p className="px-2 text-xs text-[var(--subtext)]">No extra modules enabled.</p>
+            )}
           </aside>
         </>
       )}

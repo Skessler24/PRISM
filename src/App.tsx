@@ -13,6 +13,8 @@ import { AccessibilityPage } from './features/accessibility/AccessibilityPage'
 import { TemplatesPage } from './features/templates-forms/TemplatesPage'
 import { ResourcesPage } from './features/resources/ResourcesPage'
 import { DistrictProfilePage } from './features/district-profile/DistrictProfilePage'
+import { Section504Page } from './features/section504/Section504Page'
+import { MllPage } from './features/mll/MllPage'
 
 export default function App() {
   return (
@@ -28,6 +30,8 @@ export default function App() {
                   <Route path="caseload" element={<CaseloadPage />} />
                   <Route path="mtss" element={<MtssPage />} />
                   <Route path="evaluations" element={<EvaluationsPage />} />
+                  <Route path="section504" element={<Section504Page />} />
+                  <Route path="mll" element={<MllPage />} />
                   <Route path="accessibility" element={<AccessibilityPage />} />
                   <Route path="templates" element={<TemplatesPage />} />
                   <Route path="resources" element={<ResourcesPage />} />
