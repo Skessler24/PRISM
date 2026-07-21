@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { PageShell } from '../../components/PageShell'
 import { useDistrictProfile } from '../../lib/district-profiles/useDistrictProfile'
 import { useStudents } from '../../lib/students/useStudents'
@@ -12,6 +13,7 @@ const DOC_TYPES = [
   'NOM Letter',
   'BIP Draft',
   'FBA Summary',
+  'LRE / Placement Summary',
   'Parent Summary',
   'Accommodation Sheet',
   'Social Story',
@@ -60,6 +62,13 @@ export function GenerationPage() {
       title="✨ Generation Studio"
       description={`AI drafts via /api/ai-chat (keys stay on the server). Provider is configured with AI_PROVIDER — never call Anthropic/OpenAI from the browser.`}
     >
+      <p className="mb-3 text-xs text-[var(--subtext)]">
+        For exact LRE % math from service minutes, use{' '}
+        <Link to="/tools" className="font-semibold text-[var(--accent)]">
+          Quick Tools → LRE Calculator
+        </Link>
+        , then paste results into Extra context below (or choose &quot;LRE / Placement Summary&quot;).
+      </p>
       <FieldTip tipId="templates-suite" className="mb-3" />
 
       <div className="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card md:grid-cols-2">

@@ -87,3 +87,10 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 - Materials persist in browser (`prism_classroom_materials_v1`) — never commit PHI.
 - **Resources Hub:** District rule cheat sheet from profile JSON + training links into new modules.
 - Still later: Graph MSAL OAuth, TTS vendor, Private School (`privateSchool: false` for CCSD), React `dist/` Azure cutover.
+
+## Decisions locked (Quick Tools — LRE + Age)
+
+- **Quick Tools** tab (`/tools`): LRE Calculator (from Samantha's IEP LRE CSV) + chronological Age Calculator.
+- LRE: weekly minutes **outside** GE only (no push-in); school minutes default override **1,965**/week matching the sheet; bands 80–100 / 40–79 / 0–39.
+- Linked from Eval Tracker, Generation Studio (LRE / Placement Summary doc type), and Dashboard.
+- Source sheet archived: `docs/tools/LRE_Calculation_Tool_for_IEPs.csv`.

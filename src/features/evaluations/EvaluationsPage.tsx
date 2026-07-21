@@ -282,7 +282,7 @@ Include sections: incident summary placeholder, IEP/BIP review prompts, manifest
   return (
     <PageShell
       title="📊 Evaluation Tracker"
-      description={`Compliance timelines for ${profile.name}. Transfer Wizard, Action Builder, and MDR use district rules — drafts only, no live ${iep} sync.`}
+      description={`Compliance timelines for ${profile.name}. Transfer Wizard, Action Builder, and MDR use district rules — drafts only, no live ${iep} sync. LRE & age tools: Quick Tools.`}
     >
       {toast && (
         <div className="mb-3 rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white">
@@ -290,6 +290,12 @@ Include sections: incident summary placeholder, IEP/BIP review prompts, manifest
         </div>
       )}
 
+      <p className="mb-3 text-xs text-[var(--subtext)]">
+        Need LRE % or chronological age for an IEP?{' '}
+        <Link to="/tools" className="font-semibold text-[var(--accent)]">
+          Open Quick Tools (LRE + Age) →
+        </Link>
+      </p>
       <div className="mb-4 flex flex-wrap gap-2">
         {(
           [

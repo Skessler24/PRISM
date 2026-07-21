@@ -73,6 +73,13 @@ export const APP_TABS: AppTab[] = [
     featureId: 'ai',
   },
   {
+    id: 'tools',
+    path: '/tools',
+    label: 'Quick Tools',
+    shortLabel: 'Tools',
+    icon: '🧮',
+  },
+  {
     id: 'resources',
     path: '/resources',
     label: 'Resource Hub',
