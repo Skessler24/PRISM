@@ -61,4 +61,5 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 - District Profile lives in a **permission-gated Admin menu**, not the main tab bar.
 - Module toggles (504, MLL, MTSS, etc.) hide main tabs when a district uses another system for that work.
 - Student program flags: `hasIEP` / `has504` / `hasMLL` (504 + MLL workspaces filter the shared caseload; tabs default off for CCSD Companion).
+- Template engine: Forms Library fills student placeholders; **Companion = Copy** into SoR; **Standalone = Save as district draft** (`prism_template_instances_v1`) + custom templates (`prism_district_templates_v1`).
 - No live Enrich sync in either mode.

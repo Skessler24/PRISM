@@ -859,8 +859,10 @@ textarea{min-height:80px;resize:vertical}
 <div data-id="857" class="tab-content" id="tab-templates">
 <div data-id="858" class="max-w-7xl mx-auto">
 <h2 data-id="859" class="text-lg font-bold font-heading mb-3">🎨 Templates & Forms</h2>
+<div id="tmplSuiteBanner" class="help-assist-panel show mb-3"></div>
 <div data-id="860" class="flex flex-wrap gap-2 mb-4">
 <button data-id="861" class="sub-tab-btn active" data-tmpl="tmpl-forms">Forms Library</button>
+<button class="sub-tab-btn" data-tmpl="tmpl-drafts">Saved Drafts</button>
 <button data-id="862" class="sub-tab-btn" data-tmpl="tmpl-creator">Template Creator</button>
 <button data-id="863" class="sub-tab-btn" data-tmpl="tmpl-fba">FBA/BIP Engine</button>
 <button data-id="864" class="sub-tab-btn" data-tmpl="tmpl-icons">Icon Library</button>
@@ -871,18 +873,54 @@ textarea{min-height:80px;resize:vertical}
 </div>
 
 <div data-id="869" class="sub-content active" id="tmpl-forms">
+<div class="flex flex-wrap gap-2 mb-3" id="formsFilterBar">
+<button class="sub-tab-btn active forms-filter-btn" data-formscat="All">All</button>
+<button class="sub-tab-btn forms-filter-btn" data-formscat="IEP">IEP</button>
+<button class="sub-tab-btn forms-filter-btn" data-formscat="504">504</button>
+<button class="sub-tab-btn forms-filter-btn" data-formscat="MLL">MLL</button>
+<button class="sub-tab-btn forms-filter-btn" data-formscat="Compliance">Compliance</button>
+<button class="sub-tab-btn forms-filter-btn" data-formscat="Behavior">Behavior</button>
+<button class="sub-tab-btn forms-filter-btn" data-formscat="Communication">Communication</button>
+<button class="sub-tab-btn forms-filter-btn" data-formscat="Assessment">Assessment</button>
+<button class="sub-tab-btn forms-filter-btn" data-formscat="Custom">Custom</button>
+</div>
 <div data-id="870" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="formsGrid"></div>
+
+<div class="card mt-4" id="tmplDraftPanel">
+<h3 class="text-sm font-bold font-heading mb-2">Draft from template</h3>
+<p class="text-xs text-subtext mb-3" id="tmplDraftHint">Select a template above, pick a student, then Copy (Companion) or Save as district draft (Standalone).</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+<div><label class="text-xs font-semibold">Template</label><p class="text-sm font-semibold" id="tmplDraftTitle">—</p></div>
+<div><label class="text-xs font-semibold">Student</label><select id="tmplDraftStudent"><option value="">Select student…</option></select></div>
+</div>
+<textarea id="tmplDraftBody" rows="12" class="w-full text-xs font-mono-d" placeholder="Filled template will appear here…"></textarea>
+<div class="flex flex-wrap gap-2 mt-3">
+<button class="btn-filled btn-sm" id="tmplDraftFillBtn">Fill with student data</button>
+<button class="btn-sm btn-outlined" id="tmplDraftCopyBtn">Copy</button>
+<button class="btn-sm btn-outlined" id="tmplDraftPrintBtn">Print</button>
+<button class="btn-sm btn-filled" id="tmplDraftSaveBtn" style="display:none">Save as district draft</button>
+</div>
+</div>
+</div>
+
+<div class="sub-content" id="tmpl-drafts">
+<div class="card">
+<h3 class="text-sm font-bold font-heading mb-2">Saved district drafts</h3>
+<p class="text-xs text-subtext mb-3" id="tmplInstancesHint">Standalone mode saves template instances here (browser-only). Companion mode focuses on Copy into Enrich / external SoR.</p>
+<div id="tmplInstancesList" class="space-y-2"></div>
+</div>
 </div>
 
 <div data-id="871" class="sub-content" id="tmpl-creator">
 <div data-id="872" class="card">
 <h3 data-id="873" class="text-sm font-bold font-heading mb-3">Custom Template Creator</h3>
+<p class="text-xs text-subtext mb-3">Use placeholders: <code>{{name}}</code> <code>{{grade}}</code> <code>{{teacher}}</code> <code>{{caseManager}}</code> <code>{{disability}}</code> <code>{{goals}}</code> <code>{{accommodations}}</code> <code>{{homeLanguage}}</code> <code>{{iepDue}}</code> <code>{{section504Due}}</code> <code>{{date}}</code></p>
 <div data-id="874" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-<div data-id="875"><label data-id="876" class="text-xs font-semibold">Template Name</label><input data-id="877" type="text" placeholder="My Custom Template" /></div>
-<div data-id="878"><label data-id="879" class="text-xs font-semibold">Category</label><select data-id="880"><option data-id="881">IEP</option><option data-id="882">Behavior</option><option data-id="883">Assessment</option><option data-id="884">Communication</option><option data-id="885">Parent</option></select></div>
+<div data-id="875"><label data-id="876" class="text-xs font-semibold">Template Name</label><input data-id="877" type="text" id="tmplCreateName" placeholder="My Custom Template" /></div>
+<div data-id="878"><label data-id="879" class="text-xs font-semibold">Category</label><select data-id="880" id="tmplCreateCat"><option>IEP</option><option>504</option><option>MLL</option><option>Behavior</option><option>Assessment</option><option>Communication</option><option>Compliance</option><option>Parent</option></select></div>
 </div>
-<textarea data-id="886" class="mt-3" placeholder="Template content..." rows="6"></textarea>
-<button data-id="887" class="btn-filled btn-sm mt-2">Save Template</button>
+<textarea data-id="886" id="tmplCreateBody" class="mt-3" placeholder="Template content..." rows="8"></textarea>
+<button data-id="887" class="btn-filled btn-sm mt-2" id="tmplCreateSave">Save Template</button>
 </div>
 </div>
 
@@ -934,8 +972,8 @@ textarea{min-height:80px;resize:vertical}
 </div>
 <div data-id="968" class="flex gap-2 mt-3">
 <button data-id="969" class="btn-filled btn-sm" id="genBipBtn"><i data-id="970" data-lucide="sparkles" class="w-4 h-4 inline"></i> Generate BIP Draft</button>
-<button data-id="971" class="btn-sm btn-outlined">Save to Student</button>
-<button data-id="972" class="btn-sm btn-outlined">Print</button>
+<button data-id="971" class="btn-sm btn-outlined" id="bipSaveBtn">Save to Student</button>
+<button data-id="972" class="btn-sm btn-outlined" id="bipPrintBtn">Print</button>
 </div>
 <div data-id="973" id="bipOutput" class="mt-3 p-3 rounded-lg bg-slate text-xs whitespace-pre-wrap" style="display:none;max-height:400px;overflow-y:auto"></div>
 </div>
@@ -1458,16 +1496,258 @@ const EVAL_STUDENTS=[
 
 const EVAL_STAGES=['Referral Received','Consent Obtained','Assessment Underway','Report Writing','Eligibility Meeting','IEP Meeting'];
 
-const FORMS=[
-{name:'IEP Meeting Agenda',cat:'IEP',status:'Ready'},
-{name:'NOM Template',cat:'Compliance',status:'Ready'},
-{name:'Progress Report Template',cat:'IEP',status:'Ready'},
-{name:'FBA Data Collection Form',cat:'Behavior',status:'Ready'},
-{name:'BIP Template',cat:'Behavior',status:'Ready'},
-{name:'Parent Input Form',cat:'Communication',status:'Draft'},
-{name:'Consent for Evaluation',cat:'Compliance',status:'Ready'},
-{name:'Teacher Input Form',cat:'Assessment',status:'Ready'}
+const BUILTIN_FORMS=[
+{id:'iep-agenda',name:'IEP Meeting Agenda',cat:'IEP',status:'Ready',genType:'IEP Meeting Agenda',body:`IEP MEETING AGENDA
+
+Student: {{name}}
+Grade / Teacher: {{grade}} · {{teacher}}
+Case Manager: {{caseManager}}
+IEP Due: {{iepDue}}
+Date: {{date}}
+
+1. Introductions & parent rights
+2. Review purpose of meeting
+3. Present levels of academic achievement and functional performance
+4. Goals review / proposed goals
+   Current goals:
+{{goals}}
+5. Special education & related services
+6. Accommodations / modifications
+{{accommodations}}
+7. LRE / placement
+8. ESY determination (if applicable)
+9. Prior Written Notice
+10. Next steps & signatures
+`},
+{id:'nom',name:'NOM Template',cat:'Compliance',status:'Ready',genType:'NOM Letter',body:`NOTICE OF MEETING (NOM)
+
+Student: {{name}}
+Grade: {{grade}}
+Case Manager: {{caseManager}}
+Date of notice: {{date}}
+
+Dear Parent/Guardian,
+
+You are invited to an IEP team meeting for {{name}}.
+
+Purpose: Annual IEP review / educational planning
+Proposed date/time: ________________
+Location: ________________
+
+Required participants will include the case manager, general education teacher, and other service providers as appropriate.
+
+Parent rights are enclosed. Please contact {{caseManager}} if you need to reschedule or request an interpreter.
+
+Home language (if known): {{homeLanguage}}
+`},
+{id:'progress',name:'Progress Report Template',cat:'IEP',status:'Ready',genType:'Progress Report',body:`PROGRESS REPORT — {{date}}
+
+Student: {{name}} ({{grade}})
+Teacher: {{teacher}}
+Case Manager: {{caseManager}}
+Program: {{disability}}
+IEP Due: {{iepDue}}
+
+Goals:
+{{goals}}
+
+Progress summary:
+- Goal 1: ________________ (met / progressing / not progressing)
+- Goal 2: ________________ (met / progressing / not progressing)
+
+Accommodations in use:
+{{accommodations}}
+
+Next steps / recommendations:
+________________
+`},
+{id:'fba',name:'FBA Data Collection Form',cat:'Behavior',status:'Ready',jump:'tmpl-fba',body:`FBA DATA COLLECTION — {{name}}
+
+Target behavior (operational): ________________
+Setting events: ________________
+Antecedents: {{triggers}}
+Typical calming / replacement context: {{calming}}
+
+ABC log (add rows in FBA/BIP Engine tab):
+Date | Setting | Antecedent | Behavior | Consequence | Function
+`},
+{id:'bip',name:'BIP Template',cat:'Behavior',status:'Ready',genType:'BIP Draft',jump:'tmpl-fba',body:`BEHAVIOR INTERVENTION PLAN — {{name}}
+
+Target behavior: ________________
+Hypothesized function: ________________
+Triggers: {{triggers}}
+Calming strategies already known: {{calming}}
+
+Prevention strategies:
+________________
+
+Replacement behavior:
+________________
+
+Reinforcement plan:
+________________
+
+Crisis / safety plan:
+________________
+
+Data collection method: ________________
+`},
+{id:'parent-input',name:'Parent Input Form',cat:'Communication',status:'Ready',body:`PARENT INPUT FORM
+
+Student: {{name}}
+Grade: {{grade}}
+Date: {{date}}
+
+1. What are your child's strengths and interests?
+{{interests}}
+
+2. What concerns do you have about school?
+________________
+
+3. What strategies work well at home?
+{{calming}}
+
+4. Goals you would like the team to consider:
+________________
+
+5. Preferred contact method / language: {{homeLanguage}}
+`},
+{id:'consent-eval',name:'Consent for Evaluation',cat:'Compliance',status:'Ready',body:`CONSENT FOR INITIAL / REEVALUATION
+
+Student: {{name}}
+Grade: {{grade}}
+Date: {{date}}
+
+I give / do not give (circle one) consent for the district to conduct an evaluation of my child.
+
+Areas proposed: ________________
+Parent signature: ________________  Date: ________
+`},
+{id:'teacher-input',name:'Teacher Input Form',cat:'Assessment',status:'Ready',body:`TEACHER INPUT FORM
+
+Student: {{name}}
+Teacher: {{teacher}}
+Grade: {{grade}}
+Date: {{date}}
+
+Academic performance: ________________
+Classroom behavior: ________________
+Accommodations currently used:
+{{accommodations}}
+
+Concerns / referral reason: ________________
+`},
+{id:'504-notice',name:'504 Meeting / PWN Notice',cat:'504',status:'Ready',body:`SECTION 504 — MEETING / PRIOR WRITTEN NOTICE
+
+Student: {{name}}
+Grade / Teacher: {{grade}} · {{teacher}}
+Case Manager: {{caseManager}}
+504 Review Due: {{section504Due}}
+Impairment: {{section504Impairment}}
+Date: {{date}}
+
+Dear Parent/Guardian,
+
+This notice concerns {{name}}'s Section 504 plan.
+Please contact the case manager to confirm attendance or request an interpreter.
+
+Accommodations on file:
+{{accommodations}}
+`},
+{id:'504-plan',name:'504 Accommodation Plan',cat:'504',status:'Ready',body:`SECTION 504 ACCOMMODATION PLAN
+
+Student: {{name}}
+Grade: {{grade}}  Teacher: {{teacher}}
+Impairment: {{section504Impairment}}
+Annual review due: {{section504Due}}
+Date: {{date}}
+
+Major life activities affected: ________________
+
+Accommodations:
+{{accommodations}}
+
+Responsible staff: {{caseManager}}
+Parent acknowledgment: ________________
+`},
+{id:'mll-family',name:'MLL Family Communication',cat:'MLL',status:'Ready',body:`MLL / FAMILY COMMUNICATION
+
+Student: {{name}}
+Grade: {{grade}}
+Home language: {{homeLanguage}}
+ELD level: {{eldLevel}}
+Interpreter needed: {{interpreterNeeded}}
+Date: {{date}}
+
+Dear Family,
+
+This message concerns educational planning for {{name}}.
+Preferred language for notices: {{homeLanguage}}
+
+Please reply with questions or preferred meeting times.
+`},
+{id:'accommodation-sheet',name:'Accommodation One-Pager',cat:'IEP',status:'Ready',genType:'Accommodation Sheet',body:`TEACHER ONE-PAGER — ACCOMMODATIONS
+
+Student: {{name}} ({{grade}})
+Program flags: {{programs}}
+Disability / category: {{disability}}
+
+Must-use accommodations:
+{{accommodations}}
+
+Triggers to avoid: {{triggers}}
+Calming supports: {{calming}}
+Interests: {{interests}}
+`}
 ];
+
+const PRISM_DISTRICT_TEMPLATES_KEY='prism_district_templates_v1';
+const PRISM_TEMPLATE_INSTANCES_KEY='prism_template_instances_v1';
+function loadCustomTemplates(){
+try{const raw=localStorage.getItem(PRISM_DISTRICT_TEMPLATES_KEY);const p=JSON.parse(raw||'[]');return Array.isArray(p)?p:[]}catch(e){return[]}
+}
+function saveCustomTemplates(list){localStorage.setItem(PRISM_DISTRICT_TEMPLATES_KEY,JSON.stringify(list||[]))}
+function loadTemplateInstances(){
+try{const raw=localStorage.getItem(PRISM_TEMPLATE_INSTANCES_KEY);const p=JSON.parse(raw||'[]');return Array.isArray(p)?p:[]}catch(e){return[]}
+}
+function saveTemplateInstances(list){localStorage.setItem(PRISM_TEMPLATE_INSTANCES_KEY,JSON.stringify(list||[]))}
+let CUSTOM_TEMPLATES=loadCustomTemplates();
+let TEMPLATE_INSTANCES=loadTemplateInstances();
+let ACTIVE_TEMPLATE_ID=null;
+function allForms(){
+return BUILTIN_FORMS.concat(CUSTOM_TEMPLATES.map(t=>({...t,cat:t.cat||'Custom',status:t.status||'Custom',custom:true})));
+}
+function getFormById(id){return allForms().find(f=>f.id===id)}
+function suiteMode(){return (DISTRICT_SETTINGS&&DISTRICT_SETTINGS.suiteMode)||'companion'}
+function suiteModeNote(){
+return suiteMode()==='standalone'
+?'[Standalone] This draft can be saved as a PRISM district template instance.'
+:'[Companion] Copy into '+(DISTRICT_SETTINGS.iepSystem||'Enrich')+' / your district SoR — PRISM does not live-sync.';
+}
+function fillTemplateBody(tpl,student){
+const s=student||{};
+const map={
+name:s.name||'________________',
+grade:s.grade||'—',
+teacher:s.teacher||'—',
+caseManager:s.caseManager||s.provider||'—',
+disability:s.disability||'—',
+iepDue:s.iepDue||'—',
+section504Due:s.section504Due||'—',
+section504Impairment:s.section504Impairment||'—',
+homeLanguage:s.homeLanguage||'—',
+eldLevel:s.eldLevel||'—',
+interpreterNeeded:s.interpreterNeeded?'Yes':'No',
+interests:s.interests||'—',
+triggers:s.triggers||'—',
+calming:s.calming||'—',
+goals:(s.goals&&s.goals.length)?s.goals.map(g=>'- '+g).join('\n'):'- (goals not yet entered)',
+accommodations:(s.accommodations&&s.accommodations.length)?s.accommodations.map(a=>'- '+a).join('\n'):'- (none entered)',
+programs:[s.hasIEP?'IEP':null,s.has504?'504':null,s.hasMLL?'MLL':null].filter(Boolean).join(' · ')||'—',
+date:new Date().toLocaleDateString('en-US',{timeZone:'America/Denver'})
+};
+return String(tpl||'').replace(/\{\{(\w+)\}\}/g,(_,k)=>map[k]!=null?map[k]:'');
+}
 
 const RULES=[
 {rule:'Notice of Meeting (NOM)',req:'Must be sent 10 calendar days before meeting',source:'CCSD/IDEA',active:true},
@@ -1581,6 +1861,7 @@ footer.textContent=mode==='standalone'
 ?'💡 Standalone suite: PRISM can be the full platform. Turn off modules you do not need under Admin → Module toggles.'
 :'💡 Companion (CCSD default): PRISM is your brain; '+(DISTRICT_SETTINGS.iepSystem||'Enrich')+' is the official record.';
 }
+if(typeof updateTemplateSuiteUI==='function')updateTemplateSuiteUI();
 const enrichFeat=FEATURES.find(f=>f.id==='enrichReminders');
 if(enrichFeat&&mode==='standalone'&&enrichFeat.on===true){
 /* leave user choice; just hint via Help Assist later */
@@ -2603,9 +2884,191 @@ return`<div class="p-3 rounded-lg ${ok?'bg-green-50':'bg-red-50'} flex items-cen
 showToast('Validation complete — check results');
 });
 
-// === FORMS LIBRARY ===
-const formsGrid=document.getElementById('formsGrid');
-formsGrid.innerHTML=FORMS.map(f=>`<div class="card"><h4 class="font-bold text-sm">${f.name}</h4><div class="flex items-center gap-2 mt-1"><span class="badge badge-sky">${f.cat}</span><span class="badge ${f.status==='Ready'?'badge-green':'badge-amber'}">${f.status}</span></div><button class="btn-sm btn-outlined mt-2">Use Template</button></div>`).join('');
+// === TEMPLATE ENGINE (Forms Library + Creator + Drafts) ===
+function updateTemplateSuiteUI(){
+const mode=suiteMode();
+const banner=document.getElementById('tmplSuiteBanner');
+const hint=document.getElementById('tmplDraftHint');
+const saveBtn=document.getElementById('tmplDraftSaveBtn');
+const instHint=document.getElementById('tmplInstancesHint');
+if(banner){
+banner.innerHTML=mode==='standalone'
+?'<strong>Standalone suite:</strong> District templates live in PRISM. Fill a form, then <strong>Save as district draft</strong> (browser-only). You can still Copy/Print.'
+:'<strong>Companion mode:</strong> Use templates to prepare drafts, then <strong>Copy</strong> into '+(DISTRICT_SETTINGS.iepSystem||'Enrich')+' / your district SoR. PRISM does not live-sync.';
+}
+if(hint){
+hint.textContent=mode==='standalone'
+?'Select a template, pick a student, Fill, then Save as district draft (and/or Copy).'
+:'Select a template, pick a student, Fill, then Copy into your official system.';
+}
+if(saveBtn)saveBtn.style.display=mode==='standalone'?'inline-block':'none';
+if(instHint){
+instHint.textContent=mode==='standalone'
+?'Saved template instances for this browser (FERPA: local only).'
+:'Switch Admin → Suite Mode to Standalone to save district drafts here. In Companion, Copy is the primary action.';
+}
+const genSave=document.getElementById('genSaveBtn');
+if(genSave)genSave.textContent=mode==='standalone'?'Save as district draft':'Copy guidance (use Copy)';
+}
+function renderFormsLibrary(cat){
+const grid=document.getElementById('formsGrid');
+if(!grid)return;
+const filter=cat||(document.querySelector('.forms-filter-btn.active')||{}).dataset.formscat||'All';
+let list=allForms();
+if(filter==='Custom')list=list.filter(f=>f.custom);
+else if(filter!=='All')list=list.filter(f=>f.cat===filter);
+grid.innerHTML=list.map(f=>`<div class="card">
+<h4 class="font-bold text-sm">${f.name}</h4>
+<div class="flex flex-wrap items-center gap-2 mt-1"><span class="badge badge-sky">${f.cat}</span><span class="badge ${f.status==='Ready'?'badge-green':f.custom?'badge-lav':'badge-amber'}">${f.status}</span>${f.custom?'<span class="badge badge-lav">District</span>':''}</div>
+<button class="btn-sm btn-outlined mt-2 use-template-btn" data-formid="${f.id}">Use Template</button>
+${f.custom?`<button class="btn-sm btn-outlined mt-2 text-red-600 delete-template-btn" data-formid="${f.id}">Delete</button>`:''}
+</div>`).join('')||'<p class="text-sm text-subtext">No templates in this category.</p>';
+grid.querySelectorAll('.use-template-btn').forEach(b=>b.addEventListener('click',()=>useTemplate(b.dataset.formid)));
+grid.querySelectorAll('.delete-template-btn').forEach(b=>b.addEventListener('click',()=>{
+if(!confirm('Delete this custom district template?'))return;
+CUSTOM_TEMPLATES=CUSTOM_TEMPLATES.filter(t=>t.id!==b.dataset.formid);
+saveCustomTemplates(CUSTOM_TEMPLATES);
+renderFormsLibrary(filter);
+showToast('Custom template deleted');
+}));
+}
+function useTemplate(formId){
+const form=getFormById(formId);
+if(!form){showToast('Template not found');return}
+ACTIVE_TEMPLATE_ID=formId;
+const title=document.getElementById('tmplDraftTitle');
+const body=document.getElementById('tmplDraftBody');
+if(title)title.textContent=form.name;
+fillSelect(document.getElementById('tmplDraftStudent'),STUDENTS,'Select student…');
+if(body)body.value=form.body||''(form.name+'\n\n(No body skeleton — use Generation Studio.)');
+document.getElementById('tmplDraftPanel')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+if(form.jump){
+const pill=document.querySelector('[data-tmpl="'+form.jump+'"]');
+if(pill)pill.click();
+showToast('Opened '+form.name+' — also loaded in Draft panel');
+return;
+}
+showToast('Template loaded: '+form.name);
+}
+function fillActiveTemplateDraft(){
+const form=getFormById(ACTIVE_TEMPLATE_ID);
+const body=document.getElementById('tmplDraftBody');
+if(!form||!body){showToast('Select a template first');return}
+const sid=document.getElementById('tmplDraftStudent').value;
+const s=STUDENTS.find(x=>x.id===sid);
+let text=fillTemplateBody(form.body||'',s);
+text+='\n\n'+suiteModeNote()+'\nGenerated by PRISM · Reflect the Whole Human\n';
+body.value=text;
+showToast(s?'Filled for '+s.name:'Filled with placeholders');
+}
+function saveTemplateInstance(opts){
+const mode=suiteMode();
+if(mode!=='standalone'){
+showToast('Switch to Standalone suite to save district drafts — or use Copy');
+return null;
+}
+const body=(opts&&opts.body)||(document.getElementById('tmplDraftBody')&&document.getElementById('tmplDraftBody').value)||'';
+if(!String(body).trim()){showToast('Nothing to save');return null}
+const form=getFormById((opts&&opts.formId)||ACTIVE_TEMPLATE_ID);
+const sid=(opts&&opts.studentId)||(document.getElementById('tmplDraftStudent')&&document.getElementById('tmplDraftStudent').value)||'';
+const s=STUDENTS.find(x=>x.id===sid);
+const now=new Date().toISOString();
+const inst={
+id:'inst-'+Date.now(),
+formId:form?form.id:(opts&&opts.formId)||'custom',
+type:form?form.name:((opts&&opts.title)||'Draft'),
+studentId:sid||null,
+studentName:s?s.name:((opts&&opts.studentName)||''),
+title:(opts&&opts.title)||((form?form.name:'Draft')+(s?' — '+s.name:'')),
+body:String(body),
+status:'draft',
+createdAt:now,
+updatedAt:now
+};
+TEMPLATE_INSTANCES.unshift(inst);
+saveTemplateInstances(TEMPLATE_INSTANCES);
+renderTemplateInstances();
+showToast('Saved district draft');
+return inst;
+}
+function renderTemplateInstances(){
+const list=document.getElementById('tmplInstancesList');
+if(!list)return;
+if(!TEMPLATE_INSTANCES.length){
+list.innerHTML='<p class="text-xs text-subtext">No saved drafts yet.</p>';
+return;
+}
+list.innerHTML=TEMPLATE_INSTANCES.map(inst=>`<div class="p-3 rounded-lg border" style="border-color:var(--border)">
+<div class="flex flex-wrap items-start justify-between gap-2">
+<div>
+<p class="font-semibold text-sm">${inst.title}</p>
+<p class="text-xs text-subtext">${inst.studentName||'No student'} · ${new Date(inst.updatedAt).toLocaleString('en-US',{timeZone:'America/Denver'})} · <span class="badge badge-amber">${inst.status}</span></p>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="btn-sm btn-outlined tmpl-inst-open" data-id="${inst.id}">Open</button>
+<button class="btn-sm btn-outlined tmpl-inst-copy" data-id="${inst.id}">Copy</button>
+<button class="btn-sm btn-outlined text-red-600 tmpl-inst-del" data-id="${inst.id}">Delete</button>
+</div>
+</div>
+</div>`).join('');
+list.querySelectorAll('.tmpl-inst-open').forEach(b=>b.addEventListener('click',()=>{
+const inst=TEMPLATE_INSTANCES.find(x=>x.id===b.dataset.id);if(!inst)return;
+ACTIVE_TEMPLATE_ID=inst.formId;
+document.getElementById('tmplDraftTitle').textContent=inst.title;
+document.getElementById('tmplDraftBody').value=inst.body;
+fillSelect(document.getElementById('tmplDraftStudent'),STUDENTS,'Select student…');
+if(inst.studentId)document.getElementById('tmplDraftStudent').value=inst.studentId;
+document.querySelector('[data-tmpl="tmpl-forms"]')?.click();
+document.getElementById('tmplDraftPanel')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+}));
+list.querySelectorAll('.tmpl-inst-copy').forEach(b=>b.addEventListener('click',()=>{
+const inst=TEMPLATE_INSTANCES.find(x=>x.id===b.dataset.id);if(!inst)return;
+navigator.clipboard.writeText(inst.body).then(()=>showToast('Copied')).catch(()=>showToast('Copy failed'));
+}));
+list.querySelectorAll('.tmpl-inst-del').forEach(b=>b.addEventListener('click',()=>{
+if(!confirm('Delete this draft?'))return;
+TEMPLATE_INSTANCES=TEMPLATE_INSTANCES.filter(x=>x.id!==b.dataset.id);
+saveTemplateInstances(TEMPLATE_INSTANCES);
+renderTemplateInstances();
+showToast('Draft deleted');
+}));
+}
+document.querySelectorAll('.forms-filter-btn').forEach(b=>{
+b.addEventListener('click',()=>{
+document.querySelectorAll('.forms-filter-btn').forEach(x=>x.classList.remove('active'));
+b.classList.add('active');
+renderFormsLibrary(b.dataset.formscat);
+});
+});
+document.getElementById('tmplDraftFillBtn')?.addEventListener('click',fillActiveTemplateDraft);
+document.getElementById('tmplDraftCopyBtn')?.addEventListener('click',()=>{
+const t=document.getElementById('tmplDraftBody').value;
+navigator.clipboard.writeText(t).then(()=>showToast(suiteMode()==='companion'?'Copied — paste into '+(DISTRICT_SETTINGS.iepSystem||'Enrich'):'Copied')).catch(()=>showToast('Copy failed'));
+});
+document.getElementById('tmplDraftPrintBtn')?.addEventListener('click',()=>{
+const t=document.getElementById('tmplDraftBody').value;
+const w=window.open('','','width=800,height=600');
+w.document.write('<html><head><title>Print</title><style>body{font-family:serif;padding:40px;white-space:pre-wrap;font-size:14px;line-height:1.6}</style></head><body>'+t.replace(/</g,'&lt;')+'</body></html>');
+w.document.close();w.print();
+});
+document.getElementById('tmplDraftSaveBtn')?.addEventListener('click',()=>saveTemplateInstance({}));
+document.getElementById('tmplCreateSave')?.addEventListener('click',()=>{
+const name=(document.getElementById('tmplCreateName').value||'').trim();
+const cat=document.getElementById('tmplCreateCat').value||'Custom';
+const body=(document.getElementById('tmplCreateBody').value||'').trim();
+if(!name||!body){showToast('Name and body required');return}
+const id='custom-'+Date.now();
+CUSTOM_TEMPLATES.push({id,name,cat,status:'Custom',body,custom:true,createdAt:new Date().toISOString()});
+saveCustomTemplates(CUSTOM_TEMPLATES);
+document.getElementById('tmplCreateName').value='';
+document.getElementById('tmplCreateBody').value='';
+renderFormsLibrary();
+showToast('District template saved');
+document.querySelector('[data-tmpl="tmpl-forms"]')?.click();
+});
+updateTemplateSuiteUI();
+renderFormsLibrary();
+renderTemplateInstances();
 
 // === RULES TABLE ===
 const rulesBody=document.getElementById('rulesBody');
@@ -2764,7 +3227,7 @@ document.getElementById('trainModal').style.display='block';
 
 // === POPULATE STUDENT SELECTS ===
 function populateStudentSelects(){
-document.querySelectorAll('select.tmpl-student-sel, #fbaStudent, #socialStudent, #eligStudentSelect, #genStudent, #commStudent').forEach(sel=>{
+document.querySelectorAll('select.tmpl-student-sel, #fbaStudent, #socialStudent, #eligStudentSelect, #genStudent, #commStudent, #tmplDraftStudent').forEach(sel=>{
 const cur=sel.value;
 const keepFirst=sel.options.length&&sel.options[0].value==='';
 sel.innerHTML=keepFirst?'<option value="">Select student...</option>':'';
@@ -2944,7 +3407,16 @@ const w=window.open('','','width=800,height=600');
 w.document.write('<html><head><title>Print</title><style>body{font-family:serif;padding:40px;white-space:pre-wrap;font-size:14px;line-height:1.6}</style></head><body>'+t+'</body></html>');
 w.document.close();w.print();
 });
-document.getElementById('genSaveBtn').addEventListener('click',()=>showToast('Saved to student materials'));
+document.getElementById('genSaveBtn').addEventListener('click',()=>{
+const body=document.getElementById('genOutput').textContent||'';
+const sid=document.getElementById('genStudent').value;
+const type=document.getElementById('genType').value;
+if(suiteMode()==='standalone'){
+saveTemplateInstance({body,studentId:sid,title:type,formId:'gen-'+type.toLowerCase().replace(/\s+/g,'-')});
+}else{
+navigator.clipboard.writeText(body).then(()=>showToast('Copied — paste into '+(DISTRICT_SETTINGS.iepSystem||'Enrich'))).catch(()=>showToast('Use Copy button'));
+}
+});
 
 // === AI: FBA Summary ===
 document.getElementById('genFbaBtn').addEventListener('click',async()=>{
@@ -2978,6 +3450,21 @@ const res=await AppSDK.ai.chat({messages:[
 ]});
 out.textContent=res.content;
 }catch(e){out.textContent='Error generating BIP. Please try again.'}
+});
+document.getElementById('bipSaveBtn')?.addEventListener('click',()=>{
+const body=document.getElementById('bipOutput').textContent||'';
+const sid=document.getElementById('fbaStudent').value;
+if(suiteMode()==='standalone'){
+saveTemplateInstance({body,studentId:sid,title:'BIP Draft',formId:'bip'});
+}else{
+navigator.clipboard.writeText(body).then(()=>showToast('Copied — paste into district BIP / Enrich')).catch(()=>showToast('Copy failed'));
+}
+});
+document.getElementById('bipPrintBtn')?.addEventListener('click',()=>{
+const t=document.getElementById('bipOutput').textContent||'';
+const w=window.open('','','width=800,height=600');
+w.document.write('<html><head><title>BIP</title><style>body{font-family:serif;padding:40px;white-space:pre-wrap;font-size:14px;line-height:1.6}</style></head><body>'+t.replace(/</g,'&lt;')+'</body></html>');
+w.document.close();w.print();
 });
 
 // === AI: Social Story ===
