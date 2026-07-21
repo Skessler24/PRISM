@@ -48,6 +48,10 @@ npm run api:start   # http://localhost:7071 — Vite proxies /api
 
 GitHub Actions on push to `main` uploads the `deploy/` folder to Azure Static Web Apps (with `api/` as the Functions backend when Azure recovers).
 
+**Azure is currently struggling** (cannot add/configure the API in Portal yet). Track everything to finish when it recovers in:
+
+→ [`docs/ops/AZURE_RECOVERY_CHECKLIST.md`](docs/ops/AZURE_RECOVERY_CHECKLIST.md)
+
 ## Compliance
 
 - Demo/sample student data only in git — no real PHI
