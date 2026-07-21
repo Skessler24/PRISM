@@ -60,4 +60,5 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 - PRISM supports **Companion** (Enrich/IEP Writer as SoR) and **Standalone suite** (PRISM is the full platform).
 - District Profile lives in a **permission-gated Admin menu**, not the main tab bar.
 - Module toggles (504, MLL, MTSS, etc.) hide main tabs when a district uses another system for that work.
+- Student program flags: `hasIEP` / `has504` / `hasMLL` (504 + MLL workspaces filter the shared caseload; tabs default off for CCSD Companion).
 - No live Enrich sync in either mode.

@@ -21,11 +21,28 @@ The importer finds the first row whose first cell is `Name` and that also includ
 | Grade | `K`, `Gr1`–`Gr5` |
 | Teacher | `teacher` |
 | New Scheduled Meeting Date | `meetingDate` |
-| SLP, OT, PT, MH, NSS, ELA, Nurse, DHH, Vision | Related-service flags (`TRUE` → discipline list) |
+| SLP, OT, PT, MH, NSS, ELA, Nurse, DHH, Vision | Related-service flags (`TRUE` → discipline list). **`ELA=TRUE` also sets `hasMLL`** |
 | BIP | Adds `Behavior` when `TRUE` |
 | Fall 2026 Evals | `fallEval` boolean |
+| 504 / Section 504 / Has 504 *(optional)* | Sets `has504` when `TRUE` (does not break import if missing) |
+| 504 Only / No IEP *(optional)* | When `TRUE`, sets `hasIEP: false` (ARR SPED sheet defaults to `hasIEP: true`) |
+| 504 Review Date / 504 Date *(optional)* | `section504Due` |
+| 504 Impairment / Impairment *(optional)* | `section504Impairment` |
+| Home Language / Primary Language *(optional)* | `homeLanguage` |
+| ELD Level / ELD *(optional)* | `eldLevel` |
+| Interpreter / Interpreter Needed *(optional)* | `interpreterNeeded` |
 
-## Storage
+## Program flags
+
+Every student record may include:
+
+| Flag | Meaning |
+|------|---------|
+| `hasIEP` | IDEA IEP (default true for ARR SPED import) |
+| `has504` | Section 504 plan |
+| `hasMLL` | Multilingual / EL learner |
+
+Student Tiles filter chips: **IEP / 504 / MLL**. Enable the 504 Plans and Multilingual Learners tabs under **Admin → Module toggles**.
 
 - Key: `localStorage.prism_students_v1`
 - Meta: `localStorage.prism_caseload_meta_v1` (file name, import time, count)
