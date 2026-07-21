@@ -8,6 +8,7 @@ import {
   EVAL_STAGES,
   type EvalRecord,
 } from '../../data/evals.demo'
+import { FieldTip } from '../../lib/help-assist/FieldTip'
 
 const FILTERS = ['All', 'Initial', 'Annual', 'Reevaluation', 'Transfer'] as const
 
@@ -136,6 +137,7 @@ export function EvaluationsPage() {
 
       <section className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card">
         <h2 className="font-heading text-sm font-bold">Eval checklist</h2>
+        <FieldTip tipId="eval-checklist" className="mb-2 mt-2" />
         <select
           className="mt-2 w-full max-w-xs rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
           value={selected}

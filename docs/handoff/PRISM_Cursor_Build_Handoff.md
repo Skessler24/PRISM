@@ -62,5 +62,12 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 - Module toggles (504, MLL, MTSS, etc.) hide main tabs when a district uses another system for that work.
 - Student program flags: `hasIEP` / `has504` / `hasMLL` (504 + MLL workspaces filter the shared caseload; tabs default off for CCSD Companion).
 - Template engine: Forms Library fills student placeholders; **Companion = Copy** into SoR; **Standalone = Save as district draft** (`prism_template_instances_v1`) + custom templates (`prism_district_templates_v1`).
-- React Prompt 3: core tabs ported (Dashboard, Students, Caseload, MTSS, Eval, Templates, Accessibility, Resources, 504, MLL) with feature-gated nav; AI backend and Graph storage remain later prompts.
+- React Prompt 3: core tabs ported (Dashboard, Students, Caseload, MTSS, Eval, Templates, Accessibility, Resources, 504, MLL) with feature-gated nav.
 - No live Enrich sync in either mode.
+
+## Decisions locked (Prompts 4–6)
+
+- **AI:** Frontend calls only `/api/ai-chat` and `/api/ai-speak`. Vendor keys (`ANTHROPIC_API_KEY` / `OPENAI_API_KEY`) live in Azure SWA / Function settings — never in the browser. `deploy/index.html` AppSDK shim uses the same proxy. Generation Studio is feature-gated (`features.ai`).
+- **Help Assist:** Field tips on District timeline, Eval checklist, and Templates; gated by TopBar toggle + district `features.help`. Tip copy comes from district profile rules.
+- **Storage:** `StorageRepository` with Local default + Graph/OneDrive stub (`VITE_STORAGE_BACKEND=graph` delegates to Local until MSAL OAuth is wired). Students + template drafts go through this layer.
+- Next prompts: deeper phase modules; real Graph MSAL OAuth; TTS vendor for `/api/ai-speak`.

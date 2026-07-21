@@ -11,6 +11,7 @@ import { MtssPage } from './features/mtss/MtssPage'
 import { EvaluationsPage } from './features/evaluations/EvaluationsPage'
 import { AccessibilityPage } from './features/accessibility/AccessibilityPage'
 import { TemplatesPage } from './features/templates-forms/TemplatesPage'
+import { GenerationPage } from './features/generation/GenerationPage'
 import { ResourcesPage } from './features/resources/ResourcesPage'
 import { DistrictProfilePage } from './features/district-profile/DistrictProfilePage'
 import { Section504Page } from './features/section504/Section504Page'
@@ -34,6 +35,7 @@ export default function App() {
                   <Route path="mll" element={<MllPage />} />
                   <Route path="accessibility" element={<AccessibilityPage />} />
                   <Route path="templates" element={<TemplatesPage />} />
+                  <Route path="generation" element={<GenerationPage />} />
                   <Route path="resources" element={<ResourcesPage />} />
                   <Route path="district" element={<DistrictProfilePage />} />
                   <Route path="*" element={<Navigate to="/" replace />} />

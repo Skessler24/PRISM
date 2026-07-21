@@ -1410,6 +1410,37 @@ textarea{min-height:80px;resize:vertical}
 // === Guard Lucide ===
 if(typeof lucide!=="undefined"&&typeof lucide.createIcons==="function"){lucide.createIcons()}
 
+// === AI PROXY (Azure Functions /api/ai-*) ===
+// AppSDK was injected by Copilot preview; in Azure we proxy so keys never ship in the browser.
+(function(){
+  if(!window.AppSDK) window.AppSDK={};
+  if(!window.AppSDK.ai) window.AppSDK.ai={};
+  window.AppSDK.ai.chat=async function(payload){
+    var messages=(payload&&payload.messages)||[];
+    var res=await fetch('/api/ai-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:messages})});
+    var data={content:''};
+    try{data=await res.json()}catch(e){}
+    if(!res.ok){
+      var err=new Error((data&&data.error)||('AI chat failed ('+res.status+')'));
+      err.status=res.status;err.data=data;throw err;
+    }
+    return {content:(data&&data.content)||''};
+  };
+  window.AppSDK.ai.speak=async function(payload){
+    var text=(payload&&payload.text)||'';
+    var voice=payload&&payload.voice;
+    var res=await fetch('/api/ai-speak',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,voice:voice})});
+    var data={};
+    try{data=await res.json()}catch(e){}
+    if(!res.ok){
+      var err=new Error((data&&data.note)||('AI speak failed ('+res.status+')'));
+      err.status=res.status;err.data=data;throw err;
+    }
+    // Map Function shape → legacy AppSDK { audio, format }
+    return {audio:data.audioBase64||data.audio||null,format:data.format||'mp3',note:data.note};
+  };
+})();
+
 // === DATA ===
 const PRISM_STUDENTS_KEY='prism_students_v1';
 const PRISM_CASELOAD_META_KEY='prism_caseload_meta_v1';

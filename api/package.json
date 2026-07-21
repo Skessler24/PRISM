@@ -1,0 +1,17 @@
+{
+  "name": "prism-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PRISM Azure Functions — AI proxy only (keys stay server-side)",
+  "main": "src/functions/*.js",
+  "scripts": {
+    "start": "func start",
+    "build": "echo 'JS functions — no build step'"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.6.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

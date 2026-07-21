@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AI_PROVIDER": "anthropic",
+    "ANTHROPIC_API_KEY": "",
+    "ANTHROPIC_MODEL": "claude-sonnet-4-20250514",
+    "OPENAI_API_KEY": "",
+    "OPENAI_MODEL": "gpt-4o-mini",
+    "AI_MAX_TOKENS": "2048"
+  }
+}

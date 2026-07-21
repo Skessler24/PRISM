@@ -30,8 +30,8 @@ export function AppShell() {
       <main className="px-3 pb-10 pt-[148px] md:px-4">
         {enabled && isFeatureEnabled('help') && (
           <div className="help-assist-panel mb-3 block">
-            <strong>💡 Help Assist is ON</strong> for {profile.name}. Field-level guidance expands in
-            Prompt 5; timeline math already reads this district profile.
+            <strong>💡 Help Assist is ON</strong> for {profile.name}. Field tips appear on District
+            timeline, Eval checklist, and Templates when this toggle is on.
           </div>
         )}
         <Outlet />

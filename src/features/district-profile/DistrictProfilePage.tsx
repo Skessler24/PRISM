@@ -3,6 +3,7 @@ import { PageShell } from '../../components/PageShell'
 import { useDistrictProfile } from '../../lib/district-profiles/useDistrictProfile'
 import { FEATURE_LABELS, type FeatureName } from '../../lib/district-profiles/types'
 import type { TimelineEventType } from '../../lib/district-profiles/loadProfile'
+import { FieldTip } from '../../lib/help-assist/FieldTip'
 
 const EVENT_OPTIONS: TimelineEventType[] = [
   'Consent Received',
@@ -111,6 +112,7 @@ export function DistrictProfilePage() {
 
         <section className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card">
           <h2 className="font-heading text-sm font-bold">Timeline calculator</h2>
+          <FieldTip tipId="timeline-calculator" className="mb-2 mt-2" />
           <p className="mt-1 text-xs text-[var(--subtext)]">
             Uses this district&apos;s rule values — not hardcoded CCSD numbers in the UI.
           </p>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { PageShell } from '../../components/PageShell'
 import { useDistrictProfile } from '../../lib/district-profiles/useDistrictProfile'
 import { useStudents } from '../../lib/students/useStudents'
@@ -15,6 +15,9 @@ import {
   type SuiteMode,
   type TemplateInstance,
 } from '../../lib/templates/catalog'
+import { FieldTip } from '../../lib/help-assist/FieldTip'
+import { storage } from '../../lib/storage'
+import { chat } from '../../lib/ai/client'
 
 const CATS = ['All', 'IEP', '504', 'MLL', 'Compliance', 'Behavior', 'Communication', 'Assessment', 'Custom'] as const
 
@@ -33,6 +36,26 @@ export function TemplatesPage() {
   const [createCat, setCreateCat] = useState('IEP')
   const [createBody, setCreateBody] = useState('')
   const [tab, setTab] = useState<'library' | 'drafts' | 'creator'>('library')
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const [storedInstances, storedCustom] = await Promise.all([
+          storage.getTemplateInstances(),
+          storage.getCustomTemplates(),
+        ])
+        if (cancelled) return
+        if (storedInstances.length) setInstances(storedInstances)
+        if (storedCustom.length) setCustom(storedCustom)
+      } catch {
+        /* keep sync localStorage seed */
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const forms = useMemo(() => allForms(custom), [custom])
   const active = forms.find((f) => f.id === activeId) || null
@@ -100,6 +123,7 @@ export function TemplatesPage() {
     const next = [inst, ...instances]
     setInstances(next)
     saveTemplateInstances(next)
+    void storage.saveTemplateInstances(next)
     flash('Saved district draft')
     setTab('drafts')
   }
@@ -120,6 +144,7 @@ export function TemplatesPage() {
     const next = [...custom, t]
     setCustom(next)
     saveCustomTemplates(next)
+    void storage.saveCustomTemplates(next)
     setCreateName('')
     setCreateBody('')
     flash('District template saved')
@@ -127,25 +152,50 @@ export function TemplatesPage() {
     setCat('Custom')
   }
 
+  async function aiPolish() {
+    if (!body.trim()) {
+      flash('Fill or paste a draft first')
+      return
+    }
+    flash('Generating with /api/ai-chat…')
+    const s = students.find((x) => x.id === studentId)
+    const res = await chat([
+      {
+        role: 'system',
+        content: `You are a special education document assistant for ${profile.name}. Improve clarity while keeping IDEA-compliant language. Return only the revised document text.`,
+      },
+      {
+        role: 'user',
+        content: `Revise this ${active?.name || 'draft'} for ${s ? s.name : 'the student'}:\n\n${body}`,
+      },
+    ])
+    if (res.error && !res.content) {
+      flash(res.error)
+      return
+    }
+    if (res.content) setBody(res.content)
+    flash(res.error ? `AI returned with note: ${res.error}` : 'AI draft ready')
+  }
+
   return (
     <PageShell
       title="🎨 Templates & Forms"
       description="Forms Library with student placeholder fill. Companion = Copy into SoR; Standalone = save district drafts (same localStorage keys as deploy/)."
     >
-      <div className="help-assist-panel mb-3 block">
+      <p className="mb-2 text-xs text-[var(--subtext)]">
         {mode === 'standalone' ? (
           <>
-            <strong>Standalone suite:</strong> Fill a form, then <strong>Save as district draft</strong>{' '}
-            (browser-only). Copy/Print still available.
+            Standalone suite: fill a form, then <strong>Save as district draft</strong> (browser /
+            Graph when configured). Copy/Print still available.
           </>
         ) : (
           <>
-            <strong>Companion mode:</strong> Prepare drafts here, then <strong>Copy</strong> into{' '}
-            {profile.iepSystem}. PRISM does not live-sync. (Suite mode is set in the live{' '}
-            <code>deploy/</code> Admin panel.)
+            Companion mode: prepare drafts here, then <strong>Copy</strong> into {profile.iepSystem}.
+            PRISM does not live-sync.
           </>
         )}
-      </div>
+      </p>
+      <FieldTip tipId="templates-suite" className="mb-3" />
 
       {toast && (
         <div className="mb-3 rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white">
@@ -269,6 +319,13 @@ export function TemplatesPage() {
                 onClick={() => copyBody()}
               >
                 Copy
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-[var(--accent)] px-3 py-2 text-xs font-semibold text-[var(--accent)]"
+                onClick={() => void aiPolish()}
+              >
+                AI polish draft
               </button>
               {mode === 'standalone' && (
                 <button
