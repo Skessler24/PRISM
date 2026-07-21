@@ -40,6 +40,8 @@ GitHub Actions on push to `main` uploads the `deploy/` folder to Azure Static We
 
 ## Compliance
 
-- Demo/sample student data only — no real PHI
+- Demo/sample student data only in git — no real PHI
+- Import your ARR Special Pops CSV from **Student Tiles → Import CSV**; it stays in browser `localStorage` only (see `docs/ccsd/caseload-import-schema.md`)
+- Real caseload CSV exports are gitignored — never commit them
 - No direct Enrich automation or API sync
 - AI is assistive; human review required before use
