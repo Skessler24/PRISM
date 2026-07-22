@@ -1,4 +1,4 @@
-import { useMemo, useState, type MouseEvent, type ReactNode } from 'react'
+import { useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react'
 import {
   PRESET_COLORS,
   TEAM_DAYS,
@@ -31,6 +31,11 @@ import {
   type TeamSession,
   type TeamSettings,
 } from '../../lib/scheduling/teamStore'
+import {
+  downloadSampleSchoolSchedule,
+  parseCSV,
+  parseMasterScheduleRows,
+} from '../../lib/scheduling/csv'
 
 type Props = {
   onFlash: (msg: string) => void
@@ -1198,16 +1203,102 @@ export function TeamParametersPanel({ onFlash }: Props) {
   const [settings, setSettings] = useState<TeamSettings>(state.settings)
   const [constraintModal, setConstraintModal] = useState(false)
   const [iepModal, setIepModal] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
   const slots = useMemo(() => getTimeSlots(settings), [settings])
+
+  function ingestMasterCsv(file: File, mode: 'append' | 'replace') {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const rows = parseCSV(String(reader.result || ''))
+      const { constraints, skipped } = parseMasterScheduleRows(rows)
+      if (!constraints.length) {
+        onFlash('No valid rows in school schedule CSV')
+        return
+      }
+      patch(
+        {
+          masterConstraints:
+            mode === 'replace'
+              ? constraints
+              : [...state.masterConstraints, ...constraints],
+        },
+        mode === 'replace'
+          ? `Replaced with ${constraints.length} constraints${skipped ? ` (${skipped} skipped)` : ''}`
+          : `Imported ${constraints.length} constraints${skipped ? ` (${skipped} skipped)` : ''}`,
+      )
+    }
+    reader.readAsText(file)
+  }
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <section>
         <h2 className="font-heading text-lg font-bold">Master School Schedule</h2>
         <p className="mb-3 text-xs text-[var(--subtext)]">
-          Global protected times for all providers (lunch, specials, testing).
+          Upload your school&apos;s master schedule CSV to set global protected times for all
+          providers. Format: Day, StartTime, EndTime, Type, Label.
         </p>
-        <div className="mb-2 flex justify-end">
+        <div
+          className={`mb-3 cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition ${
+            dragOver
+              ? 'border-[var(--accent)] bg-sky-50'
+              : 'border-[var(--border)] bg-[var(--slate)]'
+          }`}
+          onDragOver={(e) => {
+            e.preventDefault()
+            setDragOver(true)
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault()
+            setDragOver(false)
+            const f = e.dataTransfer.files?.[0]
+            if (f) ingestMasterCsv(f, 'append')
+          }}
+          onClick={() => fileRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') fileRef.current?.click()
+          }}
+        >
+          <p className="text-sm text-[var(--subtext)]">Drop a CSV here or click to upload</p>
+          <p className="mt-1 text-[10px] text-[var(--subtext)]">
+            Expected: Day, StartTime, EndTime, Type, Label
+          </p>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".csv,text/csv"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0]
+              if (f) ingestMasterCsv(f, 'append')
+              e.target.value = ''
+            }}
+          />
+        </div>
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="text-xs font-semibold text-[var(--accent)]"
+              onClick={downloadSampleSchoolSchedule}
+            >
+              Download sample CSV
+            </button>
+            <button
+              type="button"
+              className="text-xs font-semibold text-red-600"
+              onClick={() => {
+                if (!confirm('Clear all master constraints?')) return
+                patch({ masterConstraints: [] }, 'Constraints cleared')
+              }}
+            >
+              Clear all
+            </button>
+          </div>
           <button
             type="button"
             className="text-xs font-semibold text-[var(--accent)]"
