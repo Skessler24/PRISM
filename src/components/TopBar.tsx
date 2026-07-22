@@ -26,34 +26,36 @@ export function TopBar() {
 
   return (
     <header
-      className="fixed inset-x-0 top-0 z-[1000] flex h-16 items-center justify-between px-3 md:px-4"
+      className="shell-topbar fixed inset-x-0 top-0 z-[1000] flex items-center justify-between px-3 md:px-4"
       style={{ background: 'var(--header-bg)', color: 'var(--header-txt)' }}
     >
       <NavLink to="/" className="flex min-w-0 items-center gap-2" aria-label="PRISM home">
         <img
           src="/prism-wordmark.png"
           alt="PRISM — Reflect the Whole Human"
-          className="h-[56px] w-auto max-w-[min(72vw,380px)] object-contain object-left"
+          className="h-11 w-auto max-w-[min(58vw,320px)] object-contain object-left sm:h-[56px] sm:max-w-[min(72vw,380px)]"
         />
       </NavLink>
 
-      <div className="flex shrink-0 items-center gap-2 md:gap-3">
+      <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 md:gap-3">
         <button
           type="button"
           onClick={toggle}
-          className={`rounded-full border-2 px-3 py-1 text-xs font-semibold transition ${
+          className={`touch-manipulation rounded-full border-2 px-2.5 py-2 text-[11px] font-semibold transition sm:px-3 sm:py-1 sm:text-xs ${
             enabled
               ? 'border-green-500 bg-green-950 text-green-400'
               : 'border-gray-500 bg-transparent text-gray-300'
           }`}
           aria-pressed={enabled}
+          aria-label={`Help Assist ${enabled ? 'on' : 'off'}`}
         >
-          💡 Help Assist: {enabled ? 'ON' : 'OFF'}
+          <span className="sm:hidden">💡 {enabled ? 'ON' : 'OFF'}</span>
+          <span className="hidden sm:inline">💡 Help Assist: {enabled ? 'ON' : 'OFF'}</span>
         </button>
         <button
           type="button"
           onClick={() => setThemeStudioOpen(true)}
-          className="rounded-lg border border-white/30 bg-white/10 px-3 py-1 text-xs font-semibold text-white transition hover:bg-white/20"
+          className="touch-manipulation rounded-lg border border-white/30 bg-white/10 px-2.5 py-2 text-[11px] font-semibold text-white transition hover:bg-white/20 sm:px-3 sm:py-1 sm:text-xs"
         >
           Theme
         </button>
@@ -61,7 +63,7 @@ export function TopBar() {
         <div className="relative">
           <button
             type="button"
-            className="flex h-9 items-center gap-1 rounded-full bg-gradient-to-br from-violet-600 to-blue-600 px-2 text-sm font-bold text-white"
+            className="flex h-11 min-w-11 touch-manipulation items-center justify-center gap-1 rounded-full bg-gradient-to-br from-violet-600 to-blue-600 px-2 text-sm font-bold text-white sm:h-9 sm:min-w-0"
             title="Account / Admin"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((v) => !v)}
@@ -87,7 +89,7 @@ export function TopBar() {
                   <>
                     <button
                       type="button"
-                      className="block w-full rounded-lg px-2 py-2 text-left text-xs font-semibold hover:bg-[var(--slate)]"
+                      className="block w-full rounded-lg px-2 py-2.5 text-left text-xs font-semibold hover:bg-[var(--slate)]"
                       onClick={() => {
                         setMenuOpen(false)
                         navigate('/district')
@@ -97,7 +99,7 @@ export function TopBar() {
                     </button>
                     <button
                       type="button"
-                      className="block w-full rounded-lg px-2 py-2 text-left text-xs font-semibold hover:bg-[var(--slate)]"
+                      className="block w-full rounded-lg px-2 py-2.5 text-left text-xs font-semibold hover:bg-[var(--slate)]"
                       onClick={() => {
                         setStaff()
                         setMenuOpen(false)
@@ -109,7 +111,7 @@ export function TopBar() {
                 ) : (
                   <button
                     type="button"
-                    className="block w-full rounded-lg px-2 py-2 text-left text-xs font-semibold hover:bg-[var(--slate)]"
+                    className="block w-full rounded-lg px-2 py-2.5 text-left text-xs font-semibold hover:bg-[var(--slate)]"
                     onClick={requestAdmin}
                   >
                     Admin access…

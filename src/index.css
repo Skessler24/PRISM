@@ -42,6 +42,44 @@ body {
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Shell layout: safe areas + compact mobile chrome (ticker hidden < md) */
+.shell-topbar {
+  height: calc(4rem + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.shell-tabnav {
+  top: calc(4rem + env(safe-area-inset-top, 0px));
+  height: 3.25rem;
+}
+
+.shell-ticker {
+  top: calc(4rem + 3.25rem + env(safe-area-inset-top, 0px));
+}
+
+.shell-main {
+  padding-top: calc(4rem + 3.25rem + 0.75rem + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(2.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 768px) {
+  .shell-main {
+    padding-top: calc(4rem + 3.25rem + 1.75rem + 0.75rem + env(safe-area-inset-top, 0px));
+  }
+}
+
+.shell-footer {
+  padding-top: 0.375rem;
+  padding-bottom: calc(0.375rem + env(safe-area-inset-bottom, 0px));
+}
+
+.shell-drawer {
+  top: calc(4rem + 3.25rem + env(safe-area-inset-top, 0px));
+  height: calc(100dvh - 4rem - 3.25rem - env(safe-area-inset-top, 0px));
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
 }
 
 h1,

@@ -51,7 +51,7 @@ In SWA / linked Function App → Configuration / Application settings:
 - [ ] **Graph / OneDrive:** wire MSAL + app registration when ready (`VITE_STORAGE_BACKEND=graph` is stubbed to localStorage today)
 - [ ] **TTS:** choose vendor and replace `/api/ai-speak` 501 stub
 - [ ] **Team Chat durability:** move in-memory rooms to Azure Table/Blob / SignalR for multi-instance
-- [ ] **Publish React `dist/` instead of `deploy/`** when migration is complete (separate cutover decision)
+- [ ] **Publish React `dist/` instead of `deploy/`** when ready — follow [`REACT_DIST_CUTOVER.md`](./REACT_DIST_CUTOVER.md) (workflow flip prepared; not enabled yet)
 - [ ] Re-try any failed empty/retry deploys from the outage window if the live site looks stale
 
 ---
@@ -79,4 +79,4 @@ In SWA / linked Function App → Configuration / Application settings:
 
 ---
 
-*Last updated: 2026-07-21 — Planner / Meeting Prep / team-chat API / icon catalog on React track. Azure attach still pending. Offline features do **not** require Azure.*
+*Last updated: 2026-07-22 — React `dist/` cutover recipe in REACT_DIST_CUTOVER.md. Azure attach still pending. Offline features do **not** require Azure.*
