@@ -14,6 +14,7 @@ export function TabNavigation() {
   const visibleTabs = useMemo(
     () =>
       APP_TABS.filter((t) => {
+        if (t.hideInNav) return false
         if (t.adminOnly && !isAdmin) return false
         if (!t.featureId) return true
         return isFeatureEnabled(t.featureId)
@@ -78,7 +79,7 @@ export function TabNavigation() {
           />
           <aside className="shell-drawer fixed right-0 z-[999] flex w-72 max-w-[90vw] flex-col gap-1 overflow-y-auto border-l border-[var(--border)] bg-[var(--card-bg)] p-3 shadow-xl">
             <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-[var(--subtext)]">
-              More modules
+              More apps & tabs
             </p>
             {drawerTabs.map((tab) => (
               <NavLink

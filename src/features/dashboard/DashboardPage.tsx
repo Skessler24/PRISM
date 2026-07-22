@@ -11,13 +11,15 @@ import { loadSoapNotes } from '../../lib/session-notes/store'
 import { loadTodos, saveTodos, type TodoItem } from '../../lib/dashboard/todoStore'
 import { materialsDueOn } from '../../lib/classroom-materials/store'
 import { openFbaSessions } from '../../lib/fba/store'
-import { loadPlanner, todaysSchedule } from '../../lib/weekly-planner/store'
+import { loadPlanner } from '../../lib/weekly-planner/store'
 import { loadPrepPackets } from '../../lib/meeting-prep/store'
 import {
   buildWeekDues,
   buildWeekMeetings,
   weekRangeLabel,
 } from '../../lib/dashboard/weekAtAGlance'
+import { loadSchedule, todaysGroups } from '../../lib/scheduling/store'
+import { QuickLinksBar } from '../../components/QuickLinksBar'
 import { TeamChatDock } from './TeamChatPanel'
 
 const STAT_TINTS = [
@@ -48,7 +50,7 @@ export function DashboardPage() {
     [],
   )
 
-  const todaySlots = todaysSchedule(loadPlanner())
+  const todayGroups = todaysGroups(loadSchedule())
   const weekMeetings = useMemo(
     () =>
       buildWeekMeetings({
@@ -121,38 +123,86 @@ export function DashboardPage() {
     >
       <p className="mb-3 text-sm font-semibold text-[var(--text)]">{today}</p>
 
-      {todaySlots.length > 0 && (
-        <section
-          className="mb-3 rounded-2xl border border-[var(--border)] p-3 shadow-card tint-mint"
-          style={{ borderTop: '4px solid var(--accent)' }}
-        >
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="font-heading text-sm font-bold">Who am I seeing today?</h2>
-            <Link to="/planner" className="text-xs font-semibold text-[var(--accent)]">
-              Full planner →
-            </Link>
-          </div>
-          <ul className="mt-2 flex flex-wrap gap-2">
-            {todaySlots.map((s) => {
-              const st = students.find((x) => x.id === s.studentId)
-              return (
-                <li
-                  key={s.id}
-                  className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card-bg)] px-2.5 py-2 text-xs"
+      <section
+        className="mb-3 rounded-2xl border border-[var(--border)] p-4 shadow-card tint-mint"
+        style={{ borderTop: '4px solid var(--accent)' }}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-heading text-sm font-bold">Who am I seeing today?</h2>
+          <Link to="/scheduling" className="text-xs font-semibold text-[var(--accent)]">
+            Open Scheduling →
+          </Link>
+        </div>
+        {todayGroups.length === 0 ? (
+          <p className="mt-2 text-xs text-[var(--subtext)]">
+            No groups on today&apos;s schedule yet — add them in Scheduling (seeded demo groups load on
+            first visit).
+          </p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {todayGroups.map((g) => (
+              <li key={g.id}>
+                <Link
+                  to="/scheduling"
+                  className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--card-bg)] px-3 py-2.5 text-xs hover:border-[var(--accent)]"
                 >
-                  <StudentInitials name={s.studentName} color={st?.color || '#AEE4FF'} />
-                  <span>
-                    <strong className="font-mono">
-                      {s.startTime}–{s.endTime}
-                    </strong>{' '}
-                    {s.studentName} · {s.focus}
+                  <span className="font-mono text-sm font-bold text-[var(--accent)]">
+                    {g.startTime}–{g.endTime}
                   </span>
-                </li>
-              )
-            })}
+                  <span className="min-w-0 flex-1">
+                    <strong className="block">{g.name}</strong>
+                    <span className="text-[10px] text-[var(--subtext)]">
+                      {g.goalFocus.slice(0, 2).join(' · ') || g.location || 'Session'}
+                    </span>
+                  </span>
+                  <span className="flex flex-wrap gap-1">
+                    {g.studentIds.map((id) => {
+                      const st = students.find((x) => x.id === id)
+                      return st ? (
+                        <StudentInitials key={id} name={st.name} color={st.color} title={st.name} />
+                      ) : null
+                    })}
+                  </span>
+                </Link>
+              </li>
+            ))}
           </ul>
-        </section>
-      )}
+        )}
+      </section>
+
+      <QuickLinksBar />
+
+      <section
+        className="mb-3 rounded-2xl border border-[var(--border)] p-4 shadow-card tint-lav"
+        style={{ borderTop: '4px solid #7C3AED' }}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-heading text-sm font-bold">✨ Generation Studio — Quick Access</h2>
+          <Link to="/creation?panel=generate" className="text-xs font-semibold text-[var(--accent)]">
+            Creation Station →
+          </Link>
+        </div>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {[
+            'BIP Draft',
+            'FBA Summary',
+            'Progress Report',
+            'Social Story',
+            'NOM Letter',
+            'Eligibility Packet',
+            'Present Levels',
+            'Parent Summary',
+          ].map((t) => (
+            <Link
+              key={t}
+              to="/creation?panel=generate"
+              className="rounded-full border border-[var(--border)] bg-[var(--card-bg)] px-3 py-1.5 text-[10px] font-bold hover:border-[var(--accent)]"
+            >
+              {t}
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-7">
         {[
@@ -262,25 +312,20 @@ export function DashboardPage() {
           className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
           style={{ borderTop: '4px solid var(--accent-h)' }}
         >
-          <h2 className="font-heading text-sm font-bold">Quick actions</h2>
+          <h2 className="font-heading text-sm font-bold">Jump in</h2>
+          <p className="mt-0.5 text-[10px] text-[var(--subtext)]">
+            Core modules — external tools live in Quick Links above.
+          </p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {[
-              { to: '/planner', label: '📅 Weekly Planner', tint: 'tint-mint' },
-              { to: '/meeting-prep', label: '📋 Meeting Prep', tint: 'tint-lav' },
-              { to: '/reminders', label: '📨 Enrich Reminders', tint: 'tint-sky' },
-              { to: '/contacts', label: '📞 Parent Contact Log', tint: 'tint-pink' },
-              { to: '/progress', label: '📈 Progress Monitoring', tint: 'tint-sun' },
-              { to: '/caseload', label: '👤 Caseload / SOAP', tint: 'tint-softorange' },
-              { to: '/binder', label: '📁 Print Center / Binder', tint: 'tint-sky' },
-              { to: '/game', label: '🎲 Motivation Game', tint: 'tint-mint' },
-              { to: '/generation', label: '✨ Generation Studio', tint: 'tint-lav' },
-              { to: '/tools', label: '🧮 LRE / Age Tools', tint: 'tint-sky' },
-              { to: '/fba', label: '🔍 FBA / BIP', tint: 'tint-coral' },
-              { to: '/evaluations', label: '📊 Eval Tracker', tint: 'tint-sun' },
-              { to: '/templates', label: '🎨 Templates / Materials', tint: 'tint-pink' },
-              { to: '/mtss', label: '📋 MTSS / DAT', tint: 'tint-softorange' },
+              { to: '/scheduling', label: '📅 Scheduling', tint: 'tint-mint' },
+              { to: '/creation', label: '🎨 Creation Station', tint: 'tint-lav' },
+              { to: '/resources', label: '📚 Resource Hub', tint: 'tint-sky' },
+              { to: '/meeting-prep', label: '📋 Meeting Prep', tint: 'tint-sun' },
+              { to: '/progress', label: '📈 Progress', tint: 'tint-softorange' },
+              { to: '/caseload', label: '👤 Caseload', tint: 'tint-pink' },
+              { to: '/binder', label: '📁 Print Center', tint: 'tint-sky' },
               { to: '/students', label: '🧩 Student Tiles', tint: 'tint-mint' },
-              { to: '/district', label: '🏛️ District Profile', tint: 'tint-lav' },
             ].map((l) => (
               <Link
                 key={l.to}

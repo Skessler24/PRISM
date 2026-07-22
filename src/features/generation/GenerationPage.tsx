@@ -17,9 +17,16 @@ const DOC_TYPES = [
   'Parent Summary',
   'Accommodation Sheet',
   'Social Story',
+  'Teacher One-Pager',
+  'Monthly Newsletter',
+  'Eligibility Packet',
 ]
 
-export function GenerationPage() {
+const SAVE_KEY = 'prism_gen_saved_v1'
+
+type Props = { embedded?: boolean }
+
+export function GenerationPage({ embedded }: Props = {}) {
   const { students } = useStudents()
   const { profile } = useDistrictProfile()
   const [studentId, setStudentId] = useState('')
@@ -28,6 +35,12 @@ export function GenerationPage() {
   const [output, setOutput] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [toast, setToast] = useState('')
+
+  function flash(msg: string) {
+    setToast(msg)
+    window.setTimeout(() => setToast(''), 2000)
+  }
 
   async function generate() {
     setBusy(true)
@@ -40,7 +53,7 @@ export function GenerationPage() {
     const res = await chat([
       {
         role: 'system',
-        content: `You are a special education document assistant for ${profile.name} (${profile.state}). Generate professional, IDEA-compliant SPED documents. Use measurable language. Follow this district's IEP system context (${profile.iepSystem}) but do not invent live sync. NOM lead time: ${profile.rules.nomLeadTimeDays} days. Evaluation window: ${profile.rules.evaluationWindowDays} days.`,
+        content: `You are a special education document assistant for ${profile.name} (${profile.state}). Generate professional, IDEA-compliant SPED documents. Use measurable language. Follow this district's IEP system context (${profile.iepSystem}) but do not invent live sync. NOM lead time: ${profile.rules.nomLeadTimeDays} days. Evaluation window: ${profile.rules.evaluationWindowDays} days. Human review required before use.`,
       },
       {
         role: 'user',
@@ -57,19 +70,61 @@ export function GenerationPage() {
     if (res.error) setError(res.error)
   }
 
+  function saveToStudent() {
+    if (!output || !studentId) {
+      flash('Select a student and generate first')
+      return
+    }
+    try {
+      const raw = localStorage.getItem(SAVE_KEY)
+      const list = raw ? (JSON.parse(raw) as { id: string; studentId: string; docType: string; body: string; at: string }[]) : []
+      list.unshift({
+        id: `gen-${Date.now()}`,
+        studentId,
+        docType,
+        body: output,
+        at: new Date().toISOString(),
+      })
+      localStorage.setItem(SAVE_KEY, JSON.stringify(list.slice(0, 40)))
+      flash('Saved to student drafts (local)')
+    } catch {
+      flash('Could not save')
+    }
+  }
+
   return (
     <PageShell
+      embedded={embedded}
       title="✨ Generation Studio"
-      description={`AI drafts via /api/ai-chat (keys stay on the server). Provider is configured with AI_PROVIDER — never call Anthropic/OpenAI from the browser.`}
+      description="AI drafts for PLAAFP, goals, BIP, NOM, social stories, teacher one-pagers, newsletters, and more — keys stay server-side."
     >
+      {toast && (
+        <div className="mb-3 rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white">
+          {toast}
+        </div>
+      )}
       <p className="mb-3 text-xs text-[var(--subtext)]">
-        For exact LRE % math from service minutes, use{' '}
+        LRE math:{' '}
         <Link to="/tools" className="font-semibold text-[var(--accent)]">
           Quick Tools → LRE Calculator
         </Link>
-        , then paste results into Extra context below (or choose &quot;LRE / Placement Summary&quot;).
       </p>
       <FieldTip tipId="templates-suite" className="mb-3" />
+
+      <div className="mb-3 flex flex-wrap gap-1.5">
+        {DOC_TYPES.slice(0, 8).map((t) => (
+          <button
+            key={t}
+            type="button"
+            className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${
+              docType === t ? 'bg-[var(--accent)] text-white' : 'border border-[var(--border)] tint-lav'
+            }`}
+            onClick={() => setDocType(t)}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
 
       <div className="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card md:grid-cols-2">
         <label className="text-xs font-semibold">
@@ -123,17 +178,35 @@ export function GenerationPage() {
         <button
           type="button"
           className="rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-semibold"
-          onClick={() => navigator.clipboard.writeText(output)}
+          onClick={() => {
+            void navigator.clipboard.writeText(output)
+            flash('Copied')
+          }}
           disabled={!output}
         >
           Copy
+        </button>
+        <button
+          type="button"
+          className="rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-semibold"
+          disabled={!output}
+          onClick={() => window.print()}
+        >
+          Print
+        </button>
+        <button
+          type="button"
+          className="rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-semibold"
+          disabled={!output}
+          onClick={saveToStudent}
+        >
+          Save to student
         </button>
       </div>
 
       {error && (
         <p className="mt-3 rounded-lg bg-[var(--coral)] px-3 py-2 text-xs text-red-800">
-          {error} — set <code>ANTHROPIC_API_KEY</code> (or OpenAI) in Azure SWA /{' '}
-          <code>api/local.settings.json</code> for local Functions.
+          {error} — set <code>ANTHROPIC_API_KEY</code> in Azure / local Functions.
         </p>
       )}
 

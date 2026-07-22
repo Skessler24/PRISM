@@ -4,6 +4,7 @@ import { DAY_LABELS } from '../weekly-planner/store'
 import type { MeetingPrepPacket } from '../meeting-prep/store'
 import { daysUntil } from '../students/normalizeStudent'
 import { buildProgressAlerts, type ProbeSession } from '../progress-monitoring/store'
+import { loadSchedule } from '../scheduling/store'
 
 export type WeekMeetingItem = {
   id: string
@@ -89,6 +90,23 @@ export function buildWeekMeetings(opts: {
       color: studentColor(students, slot.studentId),
       detail: slot.focus || 'Session',
     })
+  }
+
+  for (const g of loadSchedule().groups) {
+    for (const sid of g.studentIds) {
+      const s = students.find((x) => x.id === sid)
+      items.push({
+        id: `grp-${g.id}-${sid}`,
+        kind: 'session',
+        dayLabel: DAY_LABELS[g.day],
+        dayIndex: g.day,
+        when: g.startTime,
+        studentId: sid,
+        studentName: s?.name || sid,
+        color: s?.color || '#AEE4FF',
+        detail: g.name,
+      })
+    }
   }
 
   const seenIep = new Set<string>()
