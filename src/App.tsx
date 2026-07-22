@@ -29,6 +29,8 @@ import { FbaTallyPopoutPage } from './features/fba-bip/FbaTallyPopoutPage'
 import { WeeklyPlannerPage } from './features/weekly-planner/WeeklyPlannerPage'
 import { MeetingPrepPage } from './features/meeting-prep/MeetingPrepPage'
 import { PrivateSchoolPage } from './features/private-school/PrivateSchoolPage'
+import { SchedulingPage } from './features/scheduling/SchedulingPage'
+import { CreationStationPage } from './features/creation-station/CreationStationPage'
 
 export default function App() {
   return (
@@ -46,6 +48,8 @@ export default function App() {
                     <Route index element={<DashboardPage />} />
                     <Route path="students" element={<StudentTilesPage />} />
                     <Route path="caseload" element={<CaseloadPage />} />
+                    <Route path="scheduling" element={<SchedulingPage />} />
+                    <Route path="creation" element={<CreationStationPage />} />
                     <Route path="progress" element={<ProgressMonitoringPage />} />
                     <Route path="binder" element={<CaseloadBinderPage />} />
                     <Route path="game" element={<MotivationGamePage />} />

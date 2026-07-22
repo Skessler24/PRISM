@@ -21,7 +21,9 @@ import { ClassroomMaterialsPanel } from './ClassroomMaterialsPanel'
 
 const CATS = ['All', 'IEP', '504', 'MLL', 'Compliance', 'Behavior', 'Communication', 'Assessment', 'Custom'] as const
 
-export function TemplatesPage() {
+type Props = { embedded?: boolean }
+
+export function TemplatesPage({ embedded }: Props = {}) {
   const { students } = useStudents()
   const { profile } = useDistrictProfile()
   const mode = readSuiteMode()
@@ -179,6 +181,7 @@ export function TemplatesPage() {
 
   return (
     <PageShell
+      embedded={embedded}
       title="🎨 Templates & Forms"
       description="Forms Library with student placeholder fill. Companion = Copy into SoR; Standalone = save district drafts (same localStorage keys as deploy/)."
     >

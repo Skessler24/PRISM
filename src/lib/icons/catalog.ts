@@ -1,11 +1,27 @@
 /**
- * PRISM icon catalog — plug-in point for Claude / custom AAC symbol packs.
+ * PRISM icon catalog — heart of Creation Station (Master Plan Phase 8 / Million Dollar Idea).
  *
- * Drop SVG files in /public/icons/aac/ named by id (e.g. want.svg),
- * or replace `svg` strings below. Materials boards resolve via `resolveIcon()`.
+ * Seed includes Phase 2 emoji library + AAC core glyphs.
+ * Drop SVG packs in /public/icons/aac/ named by id; catalog resolves via `file` or `svg`.
  */
 
-export type IconCategory = 'core' | 'actions' | 'people' | 'school' | 'feelings' | 'food' | 'custom'
+export type IconCategory =
+  | 'core'
+  | 'communication'
+  | 'activities'
+  | 'emotions'
+  | 'school'
+  | 'home'
+  | 'food'
+  | 'transport'
+  | 'animals'
+  | 'sports'
+  | 'toys'
+  | 'needs'
+  | 'actions'
+  | 'people'
+  | 'feelings'
+  | 'custom'
 
 export type PrismIcon = {
   id: string
@@ -18,19 +34,39 @@ export type PrismIcon = {
   emojiFallback: string
 }
 
-function glyph(paths: string, color = '#1e3a5f'): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><rect width="64" height="64" rx="12" fill="#e8f4fc"/><g fill="${color}" stroke="${color}" stroke-width="0">${paths}</g></svg>`
+function glyph(paths: string, color = '#1e3a5f', bg = '#e8f4fc'): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><rect width="64" height="64" rx="12" fill="${bg}"/><g fill="${color}" stroke="${color}" stroke-width="0">${paths}</g></svg>`
 }
 
-/** Seed catalog — replace/extend when Claude's library lands. */
-export const ICON_CATALOG: PrismIcon[] = [
+/** Emoji tile — used until custom SVG pack lands for that id. */
+function emojiTile(emoji: string, bg = '#f0f9ff'): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><rect width="64" height="64" rx="12" fill="${bg}"/><text x="32" y="42" text-anchor="middle" font-size="28">${emoji}</text></svg>`
+}
+
+function pack(
+  category: IconCategory,
+  items: [string, string, string][],
+  bg = '#f0f9ff',
+): PrismIcon[] {
+  return items.map(([label, emoji, id]) => ({
+    id,
+    label,
+    category,
+    emojiFallback: emoji,
+    svg: emojiTile(emoji, bg),
+  }))
+}
+
+const AAC_CORE: PrismIcon[] = [
   {
     id: 'want',
     label: 'I want',
     category: 'core',
     emojiFallback: '🙋',
     file: '/icons/aac/want.svg',
-    svg: glyph('<circle cx="32" cy="22" r="10"/><path d="M16 54c0-10 8-16 16-16s16 6 16 16" fill="none" stroke-width="6" stroke-linecap="round"/>'),
+    svg: glyph(
+      '<circle cx="32" cy="22" r="10"/><path d="M16 54c0-10 8-16 16-16s16 6 16 16" fill="none" stroke-width="6" stroke-linecap="round"/>',
+    ),
   },
   {
     id: 'more',
@@ -54,7 +90,9 @@ export const ICON_CATALOG: PrismIcon[] = [
     category: 'core',
     emojiFallback: '🆘',
     file: '/icons/aac/help.svg',
-    svg: glyph('<text x="32" y="42" text-anchor="middle" font-size="28" font-family="Arial,sans-serif" font-weight="700">?</text>'),
+    svg: glyph(
+      '<text x="32" y="42" text-anchor="middle" font-size="28" font-family="Arial,sans-serif" font-weight="700">?</text>',
+    ),
   },
   {
     id: 'go',
@@ -67,7 +105,7 @@ export const ICON_CATALOG: PrismIcon[] = [
   {
     id: 'bathroom',
     label: 'bathroom',
-    category: 'school',
+    category: 'needs',
     emojiFallback: '🚽',
     file: '/icons/aac/bathroom.svg',
     svg: glyph('<rect x="20" y="24" width="24" height="28" rx="4"/><circle cx="32" cy="16" r="8"/>'),
@@ -102,8 +140,132 @@ export const ICON_CATALOG: PrismIcon[] = [
     category: 'core',
     emojiFallback: '✅',
     file: '/icons/aac/all-done.svg',
-    svg: glyph('<path d="M14 34l12 12 24-28" fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>', '#1a6b3c'),
+    svg: glyph(
+      '<path d="M14 34l12 12 24-28" fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>',
+      '#1a6b3c',
+    ),
   },
+]
+
+/** Phase 2 ICON_DATA restored — the soul of boards / schedules / tokens. */
+const PHASE2_LIBRARY: PrismIcon[] = [
+  ...pack('communication', [
+    ['Speaking', '🗣️', 'speaking'],
+    ['Listening', '👂', 'listening'],
+    ['Yes', '✅', 'yes'],
+    ['No', '❌', 'no'],
+    ['Help me', '🙋', 'help-me'],
+    ['Wait', '⏳', 'wait'],
+    ['Please', '🙏', 'please'],
+    ['Thank you', '💛', 'thank-you'],
+  ], '#ede9fe'),
+  ...pack('activities', [
+    ['Reading', '📖', 'reading'],
+    ['Writing', '✏️', 'writing'],
+    ['Math', '🔢', 'math'],
+    ['Art', '🎨', 'art'],
+    ['Music', '🎵', 'music'],
+    ['PE', '⚽', 'pe'],
+    ['Lunch', '🍽️', 'lunch'],
+    ['Recess', '🎠', 'recess'],
+    ['Computer', '💻', 'computer'],
+    ['Speech', '🗣️', 'speech'],
+    ['OT', '🤲', 'ot'],
+    ['Game', '🎲', 'game'],
+  ], '#d1fae5'),
+  ...pack('emotions', [
+    ['Happy', '😊', 'happy'],
+    ['Sad', '😢', 'sad'],
+    ['Angry', '😠', 'angry'],
+    ['Scared', '😨', 'scared'],
+    ['Calm', '😌', 'calm'],
+    ['Excited', '🤩', 'excited'],
+    ['Confused', '😕', 'confused'],
+    ['Tired', '😴', 'tired'],
+    ['Frustrated', '😤', 'frustrated'],
+    ['Worried', '🥺', 'worried'],
+  ], '#fce7f3'),
+  ...pack('school', [
+    ['Books', '📚', 'books'],
+    ['Backpack', '🎒', 'backpack'],
+    ['School', '🏫', 'school-bldg'],
+    ['Teacher', '👩‍🏫', 'teacher'],
+    ['Friends', '👫', 'friends'],
+    ['Test', '📝', 'test'],
+    ['Bell', '🔔', 'bell'],
+  ], '#dbeafe'),
+  ...pack('home', [
+    ['Home', '🏠', 'home'],
+    ['Bed', '🛏️', 'bed'],
+    ['TV', '📺', 'tv'],
+    ['Toys', '🧸', 'toys-home'],
+    ['Pet', '🐕', 'pet'],
+  ], '#ffedd5'),
+  ...pack('food', [
+    ['Apple', '🍎', 'apple'],
+    ['Banana', '🍌', 'banana'],
+    ['Sandwich', '🥪', 'sandwich'],
+    ['Milk', '🥛', 'milk'],
+    ['Water', '💧', 'water'],
+    ['Cookie', '🍪', 'cookie'],
+    ['Snack', '🥜', 'snack'],
+  ], '#fef3c7'),
+  ...pack('transport', [
+    ['Bus', '🚌', 'bus'],
+    ['Car', '🚗', 'car'],
+    ['Walk', '🚶', 'walk'],
+    ['Bike', '🚲', 'bike'],
+  ], '#e0f2fe'),
+  ...pack('animals', [
+    ['Dog', '🐕', 'dog'],
+    ['Cat', '🐈', 'cat'],
+    ['Unicorn', '🦄', 'unicorn'],
+    ['Horse', '🐴', 'horse'],
+    ['Fish', '🐟', 'fish'],
+    ['Bird', '🦜', 'bird'],
+  ], '#ecfdf5'),
+  ...pack('sports', [
+    ['Soccer', '⚽', 'soccer'],
+    ['Football', '🏈', 'football'],
+    ['Baseball', '⚾', 'baseball'],
+    ['Basketball', '🏀', 'basketball'],
+    ['Tennis', '🎾', 'tennis'],
+  ], '#fee2e2'),
+  ...pack('toys', [
+    ['Blocks', '🧱', 'blocks'],
+    ['Puzzle', '🧩', 'puzzle'],
+    ['Doll', '🪆', 'doll'],
+    ['Car toy', '🚙', 'toy-car'],
+  ], '#f3e8ff'),
+  ...pack('needs', [
+    ['Yes need', '👍', 'need-yes'],
+    ['No need', '👎', 'need-no'],
+    ['Help need', '🆘', 'need-help'],
+    ['Water need', '💧', 'need-water'],
+    ['Bathroom need', '🚻', 'need-bathroom'],
+  ], '#fef9c3'),
+]
+
+/** Full catalog — AAC core first, then Phase 2 soul library. */
+export const ICON_CATALOG: PrismIcon[] = [...AAC_CORE, ...PHASE2_LIBRARY]
+
+export const ICON_CATEGORY_ORDER: IconCategory[] = [
+  'core',
+  'communication',
+  'needs',
+  'emotions',
+  'activities',
+  'school',
+  'home',
+  'food',
+  'transport',
+  'animals',
+  'sports',
+  'toys',
+  'actions',
+  'people',
+  'feelings',
+  'custom',
 ]
 
 const byId = new Map(ICON_CATALOG.map((i) => [i.id, i]))
@@ -113,14 +275,22 @@ export function resolveIcon(word: string): PrismIcon | undefined {
   const key = word.trim().toLowerCase()
   if (!key) return undefined
   const slug = key.replace(/[^a-z0-9]+/g, '-')
-  return byId.get(slug) || byId.get(key) || byLabel.get(key) || byLabel.get(word.trim().toLowerCase())
+  return byId.get(slug) || byId.get(key) || byLabel.get(key)
 }
 
 export function iconDataUri(icon: PrismIcon): string {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(icon.svg)}`
 }
 
-/** Match vocab lines to catalog; unmatched keep emoji/text only. */
 export function iconsForVocab(words: string[]): Array<{ word: string; icon?: PrismIcon }> {
   return words.map((word) => ({ word, icon: resolveIcon(word) }))
+}
+
+export function downloadIconPngStub(icon: PrismIcon) {
+  // SVG download (transparent-friendly staging until raster pack lands)
+  const blob = new Blob([icon.svg], { type: 'image/svg+xml' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `prism-icon-${icon.id}.svg`
+  a.click()
 }

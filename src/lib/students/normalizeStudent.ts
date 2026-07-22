@@ -58,8 +58,8 @@ export function daysUntil(dateStr?: string): number | null {
 }
 
 export function statusBadgeClass(status: string): string {
-  if (status === 'Overdue') return 'bg-red-100 text-red-700'
-  if (status === 'Upcoming' || status === 'At Risk') return 'bg-amber-100 text-amber-800'
-  if (status === 'On Track') return 'bg-green-100 text-green-700'
-  return 'bg-sky-100 text-sky-800'
+  if (status === 'Overdue') return 'tint-coral text-red-800'
+  if (status === 'Upcoming' || status === 'At Risk') return 'tint-sun text-amber-900'
+  if (status === 'On Track') return 'tint-mint text-emerald-900'
+  return 'tint-sky text-sky-900'
 }
