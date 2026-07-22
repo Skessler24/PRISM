@@ -1,11 +1,8 @@
-/* PRISM PWA shell — offline-friendly cache for app shell assets only (never PHI). */
-const CACHE = 'prism-shell-v1'
-const PRECACHE = ['/', '/index.html', '/manifest.webmanifest', '/favicon.svg', '/prism-logo.svg']
+/* PRISM PWA shell — network-first for HTML so deploys show up; cache assets only. */
+const CACHE = 'prism-shell-v2'
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting()),
-  )
+  event.waitUntil(self.skipWaiting())
 })
 
 self.addEventListener('activate', (event) => {
@@ -21,21 +18,43 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return
   const url = new URL(req.url)
   if (url.origin !== self.location.origin) return
-  // Do not cache API — cloud chat / AI must be network
+  // Never cache API
   if (url.pathname.startsWith('/api/')) return
 
-  event.respondWith(
-    caches.match(req).then((cached) => {
-      const network = fetch(req)
+  // HTML / navigations: always try network first so Azure deploys appear
+  const isHtml =
+    req.mode === 'navigate' ||
+    url.pathname === '/' ||
+    url.pathname.endsWith('.html') ||
+    (req.headers.get('accept') || '').includes('text/html')
+
+  if (isHtml) {
+    event.respondWith(
+      fetch(req)
         .then((res) => {
-          if (res.ok && (url.pathname.startsWith('/assets/') || PRECACHE.includes(url.pathname))) {
-            const clone = res.clone()
-            void caches.open(CACHE).then((cache) => cache.put(req, clone))
-          }
+          const clone = res.clone()
+          void caches.open(CACHE).then((cache) => cache.put(req, clone))
           return res
         })
-        .catch(() => cached)
-      return cached || network
-    }),
-  )
+        .catch(() => caches.match(req)),
+    )
+    return
+  }
+
+  // Hashed /assets/* : cache-first is fine (new deploy = new filename)
+  if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(
+      caches.match(req).then(
+        (cached) =>
+          cached ||
+          fetch(req).then((res) => {
+            if (res.ok) {
+              const clone = res.clone()
+              void caches.open(CACHE).then((cache) => cache.put(req, clone))
+            }
+            return res
+          }),
+      ),
+    )
+  }
 })
