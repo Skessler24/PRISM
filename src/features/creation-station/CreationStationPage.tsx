@@ -28,7 +28,7 @@ export function CreationStationPage() {
     <div>
       <PageShell
         title="🎨 Creation Station"
-        description="The creative wing from your Master Plan: Accessibility · Generator · Templates & boards · Icon Library — combined so the heart of PRISM stays in one place."
+        description="The creative wing: Accessibility · Generator · Templates & boards · Icon Library — classroom materials follow the PRISM Templates pack (Nunito, Fitzgerald AAC colors, Color + B&W laminate)."
       >
         <div className="mb-4 flex flex-wrap gap-2">
           {HUB_TABS.map((t) => (

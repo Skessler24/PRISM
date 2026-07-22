@@ -1,0 +1,291 @@
+{
+  "core": [
+    {
+      "word": "I",
+      "category": "p",
+      "color": "#FFC93C",
+      "file": "core/i.svg"
+    },
+    {
+      "word": "You",
+      "category": "p",
+      "color": "#FFC93C",
+      "file": "core/you.svg"
+    },
+    {
+      "word": "We",
+      "category": "p",
+      "color": "#FFC93C",
+      "file": "core/we.svg"
+    },
+    {
+      "word": "It",
+      "category": "p",
+      "color": "#FFC93C",
+      "file": "core/it.svg"
+    },
+    {
+      "word": "Want",
+      "category": "v",
+      "color": "#3DAA5B",
+      "file": "core/want.svg"
+    },
+    {
+      "word": "Go",
+      "category": "v",
+      "color": "#3DAA5B",
+      "file": "core/go.svg"
+    },
+    {
+      "word": "Eat",
+      "category": "v",
+      "color": "#3DAA5B",
+      "file": "core/eat.svg"
+    },
+    {
+      "word": "Drink",
+      "category": "v",
+      "color": "#3DAA5B",
+      "file": "core/drink.svg"
+    },
+    {
+      "word": "Help",
+      "category": "v",
+      "color": "#3DAA5B",
+      "file": "core/help.svg"
+    },
+    {
+      "word": "Play",
+      "category": "v",
+      "color": "#3DAA5B",
+      "file": "core/play.svg"
+    },
+    {
+      "word": "Look",
+      "category": "v",
+      "color": "#3DAA5B",
+      "file": "core/look.svg"
+    },
+    {
+      "word": "Like",
+      "category": "v",
+      "color": "#3DAA5B",
+      "file": "core/like.svg"
+    },
+    {
+      "word": "Big",
+      "category": "d",
+      "color": "#4A90D9",
+      "file": "core/big.svg"
+    },
+    {
+      "word": "Small",
+      "category": "d",
+      "color": "#4A90D9",
+      "file": "core/small.svg"
+    },
+    {
+      "word": "Happy",
+      "category": "d",
+      "color": "#4A90D9",
+      "file": "core/happy.svg"
+    },
+    {
+      "word": "Sad",
+      "category": "d",
+      "color": "#4A90D9",
+      "file": "core/sad.svg"
+    },
+    {
+      "word": "Food",
+      "category": "n",
+      "color": "#F2924B",
+      "file": "core/food.svg"
+    },
+    {
+      "word": "Water",
+      "category": "n",
+      "color": "#F2924B",
+      "file": "core/water.svg"
+    },
+    {
+      "word": "Bathroom",
+      "category": "n",
+      "color": "#F2924B",
+      "file": "core/bathroom.svg"
+    },
+    {
+      "word": "Home",
+      "category": "n",
+      "color": "#F2924B",
+      "file": "core/home.svg"
+    },
+    {
+      "word": "Book",
+      "category": "n",
+      "color": "#F2924B",
+      "file": "core/book.svg"
+    },
+    {
+      "word": "Ball",
+      "category": "n",
+      "color": "#F2924B",
+      "file": "core/ball.svg"
+    },
+    {
+      "word": "School",
+      "category": "n",
+      "color": "#F2924B",
+      "file": "core/school.svg"
+    },
+    {
+      "word": "Family",
+      "category": "n",
+      "color": "#F2924B",
+      "file": "core/family.svg"
+    },
+    {
+      "word": "What",
+      "category": "q",
+      "color": "#9B6BC9",
+      "file": "core/what.svg"
+    },
+    {
+      "word": "Where",
+      "category": "q",
+      "color": "#9B6BC9",
+      "file": "core/where.svg"
+    },
+    {
+      "word": "Who",
+      "category": "q",
+      "color": "#9B6BC9",
+      "file": "core/who.svg"
+    },
+    {
+      "word": "When",
+      "category": "q",
+      "color": "#9B6BC9",
+      "file": "core/when.svg"
+    },
+    {
+      "word": "Please",
+      "category": "s",
+      "color": "#E86A9A",
+      "file": "core/please.svg"
+    },
+    {
+      "word": "Thank You",
+      "category": "s",
+      "color": "#E86A9A",
+      "file": "core/thank-you.svg"
+    },
+    {
+      "word": "No",
+      "category": "x",
+      "color": "#E5484D",
+      "file": "core/no.svg"
+    },
+    {
+      "word": "Stop",
+      "category": "x",
+      "color": "#E5484D",
+      "file": "core/stop.svg"
+    }
+  ],
+  "emotions": [
+    {
+      "word": "Happy",
+      "category": "d",
+      "color": "#4A90D9",
+      "line": "emotions/line/happy.svg",
+      "emoji": "emotions/emoji/happy.svg"
+    },
+    {
+      "word": "Sad",
+      "category": "d",
+      "color": "#4A90D9",
+      "line": "emotions/line/sad.svg",
+      "emoji": "emotions/emoji/sad.svg"
+    },
+    {
+      "word": "Angry",
+      "category": "d",
+      "color": "#4A90D9",
+      "line": "emotions/line/angry.svg",
+      "emoji": "emotions/emoji/angry.svg"
+    },
+    {
+      "word": "Scared",
+      "category": "d",
+      "color": "#4A90D9",
+      "line": "emotions/line/scared.svg",
+      "emoji": "emotions/emoji/scared.svg"
+    },
+    {
+      "word": "Surprised",
+      "category": "d",
+      "color": "#4A90D9",
+      "line": "emotions/line/surprised.svg",
+      "emoji": "emotions/emoji/surprised.svg"
+    },
+    {
+      "word": "Silly",
+      "category": "d",
+      "color": "#4A90D9",
+      "line": "emotions/line/silly.svg",
+      "emoji": "emotions/emoji/silly.svg"
+    },
+    {
+      "word": "Tired",
+      "category": "d",
+      "color": "#4A90D9",
+      "line": "emotions/line/tired.svg",
+      "emoji": "emotions/emoji/tired.svg"
+    },
+    {
+      "word": "Excited",
+      "category": "d",
+      "color": "#4A90D9",
+      "line": "emotions/line/excited.svg",
+      "emoji": "emotions/emoji/excited.svg"
+    },
+    {
+      "word": "Calm",
+      "category": "d",
+      "color": "#4A90D9",
+      "line": "emotions/line/calm.svg",
+      "emoji": "emotions/emoji/calm.svg"
+    },
+    {
+      "word": "Sick",
+      "category": "d",
+      "color": "#4A90D9",
+      "line": "emotions/line/sick.svg",
+      "emoji": "emotions/emoji/sick.svg"
+    },
+    {
+      "word": "Proud",
+      "category": "d",
+      "color": "#4A90D9",
+      "line": "emotions/line/proud.svg",
+      "emoji": "emotions/emoji/proud.svg"
+    },
+    {
+      "word": "Shy",
+      "category": "d",
+      "color": "#4A90D9",
+      "line": "emotions/line/shy.svg",
+      "emoji": "emotions/emoji/shy.svg"
+    }
+  ],
+  "fitzgerald": {
+    "p": "#FFC93C",
+    "v": "#3DAA5B",
+    "d": "#4A90D9",
+    "n": "#F2924B",
+    "q": "#9B6BC9",
+    "s": "#E86A9A",
+    "x": "#E5484D"
+  }
+}
