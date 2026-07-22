@@ -21,6 +21,7 @@ That file came from your latest complete build (`archive/index.prototype.html` /
 | `district-profiles/` | CCSD Enrich + DAT rules (used by React District Profile) |
 | `docs/` | Enrich guide, handoff, design refs, intake catalogs |
 | `docs/ops/AZURE_RECOVERY_CHECKLIST.md` | **When Azure is healthy** — API attach, secrets, smoke tests |
+| `docs/ops/REACT_DIST_CUTOVER.md` | Flip Azure from `deploy/` HTML → React `dist/` (prepared, not flipped) |
 
 ## Run locally
 
@@ -51,6 +52,10 @@ GitHub Actions on push to `main` uploads the `deploy/` folder to Azure Static We
 **Azure is currently struggling** (cannot add/configure the API in Portal yet). Track everything to finish when it recovers in:
 
 → [`docs/ops/AZURE_RECOVERY_CHECKLIST.md`](docs/ops/AZURE_RECOVERY_CHECKLIST.md)
+
+When you are ready to publish React instead of `deploy/`:
+
+→ [`docs/ops/REACT_DIST_CUTOVER.md`](docs/ops/REACT_DIST_CUTOVER.md)
 
 ## Compliance
 

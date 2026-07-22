@@ -29,7 +29,7 @@ export function TabNavigation() {
   const closeDrawer = () => setDrawerOpen(false)
 
   const pillClass = (isActive: boolean) =>
-    `whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-semibold transition min-h-9 ${
+    `inline-flex min-h-11 min-w-11 touch-manipulation items-center justify-center whitespace-nowrap rounded-full px-3 py-2.5 text-sm font-semibold transition sm:min-h-9 sm:min-w-0 sm:px-3.5 sm:py-2 ${
       isActive
         ? 'bg-[var(--nav-active)] text-[var(--nav-active-txt)]'
         : 'bg-[var(--nav-inactive)] text-[var(--nav-inactive-txt)] hover:brightness-95'
@@ -37,8 +37,8 @@ export function TabNavigation() {
 
   return (
     <>
-      <nav className="fixed inset-x-0 top-16 z-[999] flex h-[52px] items-center gap-1 border-b border-[var(--border)] bg-[var(--card-bg)] px-2 md:px-3">
-        <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
+      <nav className="shell-tabnav fixed inset-x-0 z-[999] flex items-center gap-1 border-b border-[var(--border)] bg-[var(--card-bg)] px-2 md:px-3">
+        <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
           {primaryTabs.map((tab) => (
             <NavLink
               key={tab.id}
@@ -47,7 +47,7 @@ export function TabNavigation() {
               onClick={closeDrawer}
               className={({ isActive }) => pillClass(isActive)}
             >
-              <span className="mr-1">{tab.icon}</span>
+              <span className="mr-0 sm:mr-1">{tab.icon}</span>
               <span className="hidden sm:inline">{tab.shortLabel}</span>
             </NavLink>
           ))}
@@ -58,7 +58,7 @@ export function TabNavigation() {
           aria-label="More tabs"
           aria-expanded={drawerOpen}
           onClick={() => setDrawerOpen((v) => !v)}
-          className={`ml-auto shrink-0 rounded-lg border border-[var(--border)] px-3 py-2 text-sm font-bold ${
+          className={`ml-auto inline-flex h-11 min-w-11 shrink-0 touch-manipulation items-center justify-center rounded-lg border border-[var(--border)] px-3 text-sm font-bold sm:h-9 sm:min-w-0 ${
             drawerTabs.some((t) => t.id === active.id)
               ? 'bg-[var(--nav-active)] text-[var(--nav-active-txt)]'
               : 'bg-[var(--card-bg)] text-[var(--text)]'
@@ -76,7 +76,7 @@ export function TabNavigation() {
             aria-label="Close menu"
             onClick={closeDrawer}
           />
-          <aside className="fixed right-0 top-[140px] z-[999] flex h-[calc(100vh-140px)] w-72 max-w-[90vw] flex-col gap-1 border-l border-[var(--border)] bg-[var(--card-bg)] p-3 shadow-xl">
+          <aside className="shell-drawer fixed right-0 z-[999] flex w-72 max-w-[90vw] flex-col gap-1 overflow-y-auto border-l border-[var(--border)] bg-[var(--card-bg)] p-3 shadow-xl">
             <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-[var(--subtext)]">
               More modules
             </p>
@@ -86,7 +86,7 @@ export function TabNavigation() {
                 to={tab.path}
                 onClick={closeDrawer}
                 className={({ isActive }) =>
-                  `rounded-xl px-3 py-3 text-sm font-semibold transition ${
+                  `touch-manipulation rounded-xl px-3 py-3.5 text-sm font-semibold transition ${
                     isActive
                       ? 'bg-[var(--nav-active)] text-[var(--nav-active-txt)]'
                       : 'text-[var(--text)] hover:bg-[var(--slate)]'

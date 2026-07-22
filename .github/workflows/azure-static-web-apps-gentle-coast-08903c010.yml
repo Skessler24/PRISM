@@ -27,10 +27,19 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           # Live site serves the FULL working Phase 3 HTML app (all tabs/tiles).
-          # React/Vite scaffold remains in repo for migration — not what Azure publishes yet.
+          # React/Vite lives in src/ — cutover steps: docs/ops/REACT_DIST_CUTOVER.md
           app_location: "deploy"
           api_location: "api"
           skip_app_build: true
+
+          # --- REACT CUTOVER (do not enable until preflight in REACT_DIST_CUTOVER.md) ---
+          # Replace the three lines above (app_location / api_location / skip_app_build) with:
+          #   app_location: "/"
+          #   api_location: "api"
+          #   output_location: "dist"
+          #   app_build_command: "npm ci && npm run build"
+          #   skip_app_build: false
+          # Or omit skip_app_build. Keep deploy/ in git for rollback.
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'

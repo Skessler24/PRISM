@@ -16,11 +16,11 @@ export function AppShell() {
   const doubled = [...ticker, ...ticker]
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
+    <div className="shell-root min-h-screen bg-[var(--bg)] text-[var(--text)]">
       <TopBar />
       <TabNavigation />
       <div
-        className="fixed inset-x-0 top-[116px] z-[997] overflow-hidden py-1.5 font-mono text-[11px]"
+        className="shell-ticker fixed inset-x-0 z-[997] hidden overflow-hidden py-1.5 font-mono text-[11px] md:block"
         style={{ background: 'var(--header-bg)', color: 'var(--header-txt)', opacity: 0.95 }}
       >
         <div className="animate-marquee whitespace-nowrap">
@@ -31,7 +31,7 @@ export function AppShell() {
           ))}
         </div>
       </div>
-      <main className="px-3 pb-10 pt-[148px] md:px-4">
+      <main className="shell-main px-3 md:px-4">
         {enabled && isFeatureEnabled('help') && (
           <div className="help-assist-panel mb-3 block">
             <strong>💡 Help Assist is ON</strong> for {profile.name}. Field tips appear on District
@@ -41,7 +41,7 @@ export function AppShell() {
         <Outlet />
       </main>
       <ThemeStudioModal />
-      <footer className="fixed inset-x-0 bottom-0 z-[900] border-t border-[var(--border)] bg-[var(--card-bg)] px-3 py-1.5 text-center text-[10px] text-[var(--subtext)]">
+      <footer className="shell-footer fixed inset-x-0 bottom-0 z-[900] border-t border-[var(--border)] bg-[var(--card-bg)] px-3 text-center text-[10px] text-[var(--subtext)]">
         PRISM · Reflect the Whole Human · {profile.name} ·{' '}
         {suite === 'standalone' ? 'Standalone' : 'Companion'} · {isAdmin ? 'Admin' : 'Staff'} · No
         live Enrich sync · Demo data only

@@ -1,9 +1,20 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/*.{css,js,svg,png,ico,txt,map,json,webp}"]
+    "exclude": [
+      "/assets/*",
+      "/icons/*",
+      "/api/*",
+      "/sw.js",
+      "/manifest.webmanifest",
+      "/favicon.svg",
+      "/prism-logo.svg",
+      "/prism-wordmark.png",
+      "/*.{css,js,mjs,svg,png,ico,txt,map,json,webp,webmanifest,woff,woff2}"
+    ]
   },
   "mimeTypes": {
-    ".json": "application/json"
+    ".json": "application/json",
+    ".webmanifest": "application/manifest+json"
   }
 }
