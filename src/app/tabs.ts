@@ -28,8 +28,8 @@ export const APP_TABS: AppTab[] = [
   {
     id: 'binder',
     path: '/binder',
-    label: 'Caseload Binder',
-    shortLabel: 'Binder',
+    label: 'Print Center',
+    shortLabel: 'Print',
     icon: '📁',
     featureId: 'print',
   },
