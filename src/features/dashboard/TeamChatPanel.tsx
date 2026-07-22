@@ -7,6 +7,7 @@ import {
   openDistrictMessenger,
   postMessage,
   redeemInvite,
+  saveTeamChat,
   setActiveChannel,
   setChatMode,
   setDisplayName,
@@ -14,12 +15,15 @@ import {
   subscribeTeamChat,
   type TeamChatState,
 } from '../../lib/team-chat/store'
+import { joinCloudRoom, listCloudRoom, postCloudMessage } from '../../lib/team-chat/cloud'
 
 export function TeamChatPanel() {
   const [state, setState] = useState<TeamChatState>(() => loadTeamChat())
   const [draft, setDraft] = useState('')
   const [channelName, setChannelName] = useState('')
   const [inviteInput, setInviteInput] = useState('')
+  const [roomCode, setRoomCode] = useState(() => state.invites[0]?.code || '')
+  const [cloudStatus, setCloudStatus] = useState<'off' | 'live' | 'offline'>('off')
   const [toast, setToast] = useState('')
   const bottomRef = useRef<HTMLDivElement | null>(null)
 
@@ -30,6 +34,45 @@ export function TeamChatPanel() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [state.messages, state.activeChannelId])
+
+  // Poll cloud room when a room code is set and mode is prism
+  useEffect(() => {
+    if (state.mode !== 'prism' || !roomCode.trim()) return
+    let cancelled = false
+    async function tick() {
+      const res = await listCloudRoom(roomCode.trim().toUpperCase())
+      if (cancelled) return
+      if (!res.ok) {
+        setCloudStatus('offline')
+        return
+      }
+      setCloudStatus('live')
+      const local = loadTeamChat()
+      const byId = new Map(local.messages.map((m) => [m.id, m]))
+      for (const m of res.room.messages) byId.set(m.id, m)
+      const merged = {
+        ...local,
+        messages: [...byId.values()].sort((a, b) => a.createdAt.localeCompare(b.createdAt)).slice(-500),
+        channels: res.room.channels.length ? res.room.channels : local.channels,
+        members: res.room.members.length
+          ? res.room.members.map((m) => ({
+              id: m.id,
+              displayName: m.displayName,
+              role: (m.role === 'owner' ? 'owner' : 'member') as 'owner' | 'member',
+              joinedAt: m.joinedAt,
+            }))
+          : local.members,
+      }
+      saveTeamChat(merged)
+      setState(merged)
+    }
+    void tick()
+    const id = window.setInterval(() => void tick(), 8000)
+    return () => {
+      cancelled = true
+      window.clearInterval(id)
+    }
+  }, [state.mode, roomCode])
 
   function flash(msg: string) {
     setToast(msg)
@@ -43,10 +86,33 @@ export function TeamChatPanel() {
   const messages = messagesForChannel(state, state.activeChannelId)
   const active = state.channels.find((c) => c.id === state.activeChannelId)
 
-  function send() {
+  async function send() {
     if (!draft.trim()) return
-    refresh(postMessage(state, draft))
+    const next = postMessage(state, draft)
+    refresh(next)
+    const msg = next.messages[next.messages.length - 1]
     setDraft('')
+    if (roomCode.trim() && msg) {
+      const res = await postCloudMessage(roomCode.trim().toUpperCase(), state.me.id, state.me.displayName, msg)
+      setCloudStatus(res.ok ? 'live' : 'offline')
+    }
+  }
+
+  async function connectCloud() {
+    const code = (roomCode || state.invites[0]?.code || '').trim().toUpperCase()
+    if (!code) {
+      flash('Create an invite code first (used as room code)')
+      return
+    }
+    setRoomCode(code)
+    const res = await joinCloudRoom(code, state.me.id, state.me.displayName)
+    if (!res.ok) {
+      setCloudStatus('offline')
+      flash(res.error)
+      return
+    }
+    setCloudStatus('live')
+    flash(`Cloud room ${code} connected`)
   }
 
   return (
@@ -199,14 +265,14 @@ export function TeamChatPanel() {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault()
-                    send()
+                    void send()
                   }
                 }}
               />
               <button
                 type="button"
                 className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white"
-                onClick={send}
+                onClick={() => void send()}
               >
                 Send
               </button>
@@ -224,8 +290,16 @@ export function TeamChatPanel() {
             onChange={(e) => refresh(setDisplayName(state, e.target.value))}
           />
         </label>
-        <div className="text-xs">
-          <p className="font-semibold">Invites</p>
+          <div className="text-xs">
+          <p className="font-semibold">Invites & cloud room</p>
+          <p className="mt-0.5 text-[10px] text-[var(--subtext)]">
+            Cloud:{' '}
+            {cloudStatus === 'live'
+              ? 'live sync'
+              : cloudStatus === 'offline'
+                ? 'offline (local only)'
+                : 'not connected'}
+          </p>
           <div className="mt-1 flex flex-wrap gap-2">
             <button
               type="button"
@@ -235,12 +309,20 @@ export function TeamChatPanel() {
                 refresh(next)
                 const code = next.invites[0]?.code
                 if (code) {
+                  setRoomCode(code)
                   void navigator.clipboard.writeText(code)
                   flash(`Invite ${code} copied`)
                 }
               }}
             >
               Create + copy invite code
+            </button>
+            <button
+              type="button"
+              className="rounded-lg border border-[var(--border)] px-2 py-1.5 text-[10px] font-semibold"
+              onClick={() => void connectCloud()}
+            >
+              Connect cloud room
             </button>
           </div>
           {state.invites[0] && (
@@ -249,10 +331,19 @@ export function TeamChatPanel() {
               {state.invites[0].maxUses}
             </p>
           )}
+          <label className="mt-2 block text-[10px] font-semibold">
+            Room / invite code
+            <input
+              className="mt-0.5 w-full rounded border border-[var(--border)] px-2 py-1 font-mono"
+              value={roomCode}
+              onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+              placeholder="ABCD-EFGH"
+            />
+          </label>
           <div className="mt-2 flex gap-1">
             <input
               className="min-w-0 flex-1 rounded border border-[var(--border)] px-2 py-1 text-[10px] font-mono"
-              placeholder="ABCD-EFGH"
+              placeholder="Join local invite…"
               value={inviteInput}
               onChange={(e) => setInviteInput(e.target.value)}
             />

@@ -19,6 +19,8 @@ import {
   type PrintSizeId,
 } from '../../lib/classroom-materials/generateMaterialPdf'
 import { loadFbaSessions } from '../../lib/fba/store'
+import { resolveIcon } from '../../lib/icons/catalog'
+import { IconGlyph } from '../../lib/icons/IconGlyph'
 
 type Props = {
   onFlash: (msg: string) => void
@@ -121,7 +123,7 @@ export function ClassroomMaterialsPanel({ onFlash }: Props) {
   // Comm board
   const [commStudent, setCommStudent] = useState('')
   const [commWords, setCommWords] = useState(
-    'I want\nmore\nstop\nhelp\ngo\nbathroom\ndrink\neat',
+    'I want\nmore\nstop\nhelp\ngo\nbathroom\ndrink\neat\nbreak\nall done',
   )
   const [commPrompt, setCommPrompt] = useState(
     "Make a communication board with this month's vocabulary for today's ILC group",
@@ -763,8 +765,9 @@ Reward: ${reward}`
               .map((w, i) => (
                 <div
                   key={`${w}-${i}`}
-                  className="rounded-xl border border-[var(--border)] bg-[var(--sky)] px-2 py-4 text-center text-xs font-bold"
+                  className="flex flex-col items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--sky)] px-2 py-3 text-center text-xs font-bold"
                 >
+                  <IconGlyph icon={resolveIcon(w)} label={w} size={36} />
                   {w}
                 </div>
               ))}
