@@ -1,6 +1,6 @@
 # PRISM AAC / Materials Icon Library
 
-Plug-in point for Claude (or designers) to ship a full symbol pack.
+Heart of **Creation Station → Icon Library** (Master Plan Phase 8 / Million Dollar Idea).
 
 ## How to add icons
 
@@ -8,10 +8,16 @@ Plug-in point for Claude (or designers) to ship a full symbol pack.
 2. Register (or update) entries in `src/lib/icons/catalog.ts`:
    - `id` — slug used by boards
    - `label` — spoken / cell text
-   - `category` — core | actions | people | school | feelings | food | custom
+   - `category` — communication | emotions | school | animals | sports | needs | …
    - `svg` — inline fallback (keeps boards offline)
    - `file` — optional `/icons/aac/{id}.svg`
    - `emojiFallback` — last resort
+
+## UI features
+
+- Search, category filters, ★ favorites, recently used
+- Horizontal ribbon (drag `text/prism-icon` for future board drop targets)
+- Download SVG, custom label copy
 
 ## Contract
 
@@ -20,4 +26,4 @@ Plug-in point for Claude (or designers) to ship a full symbol pack.
 - Do **not** put student PHI in filenames or labels.
 - Materials resolve words → icons via `resolveIcon()` / `iconsForVocab()`.
 
-Until the full pack lands, the seed catalog in `catalog.ts` powers communication boards.
+Until Claude’s full pack lands, Phase 2 emoji categories + AAC core seed the library.
