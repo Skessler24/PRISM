@@ -37,8 +37,11 @@ local-data/
 **/*student.export*
 **/*Gifted*ALP*
 **/*BIP*CCSD*
+**/Enrich_Snapshots*
+**/Enrich*Snapshot*
 uploads/**
 *.caseload.json
+**/enrich-students*.json
 
 api/local.settings.json
 api/node_modules/
