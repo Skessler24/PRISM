@@ -42,6 +42,7 @@ From Million Dollar Idea / Phase 8 — **must feel alive**:
 - [x] Icon library with categories, search, favorites, recent, download
 - [x] Phase 2 category soul (communication, emotions, school, animals, sports, needs…)
 - [x] Fitzgerald AAC offline pack (core vocab + emotion line/emoji) in `public/icons/aac/`
+- [x] Animated action/emotion twins (`public/icons/aac/animated/`) for digital AAC / Smart TV boards
 - [ ] Drag-and-drop ribbon into live board editors (materials already use catalog resolve)
 - [ ] Token boards 3/4/5-spot editable PDFs (Classroom Materials — deepen)
 - [ ] Visual schedule dropdowns (numbered/times/first-then/needs) — deepen Materials

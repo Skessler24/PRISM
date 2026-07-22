@@ -2,10 +2,12 @@
  * PRISM icon catalog — heart of Creation Station (Master Plan Phase 8 / Million Dollar Idea).
  *
  * Primary glyphs: uploaded AAC Icon Library (offline) Fitzgerald-color pack → `public/icons/aac/`.
+ * Animated duplicates for actions + emotions → `public/icons/aac/animated/` (inline SVG for Smart TV boards).
  * Phase 2 emoji categories fill gaps for boards / schedules / tokens.
  */
 
 import { AAC_PACK as AAC_PACK_RAW } from './aac-pack.generated'
+import { AAC_ANIMATED_PACK as AAC_ANIMATED_RAW } from './aac-animated.generated'
 
 export type IconCategory =
   | 'core'
@@ -34,6 +36,12 @@ export type PrismIcon = {
   /** Optional path under public/ when file pack lands */
   file?: string
   emojiFallback: string
+  /** CSS-animated SVG — must render inline (not <img>) for motion */
+  animated?: boolean
+  /** Static twin id when this is an animated duplicate */
+  staticId?: string
+  /** Motion recipe name (pulse, bounce, …) */
+  motion?: string
 }
 
 function emojiTile(emoji: string, bg = '#f0f9ff'): string {
@@ -62,6 +70,20 @@ export const AAC_PACK: PrismIcon[] = AAC_PACK_RAW.map((i) => ({
   emojiFallback: i.emojiFallback,
   file: i.file,
   svg: i.svg,
+  animated: false,
+}))
+
+/** Animated action + emotion twins (same Fitzgerald theme). */
+export const AAC_ANIMATED_PACK: PrismIcon[] = AAC_ANIMATED_RAW.map((i) => ({
+  id: i.id,
+  label: i.label,
+  category: i.category as IconCategory,
+  emojiFallback: i.emojiFallback,
+  file: i.file,
+  svg: i.svg,
+  animated: true,
+  staticId: i.staticId,
+  motion: i.motion,
 }))
 
 /** Phase 2 ICON_DATA — fills categories not covered by the AAC pack. */
@@ -195,19 +217,21 @@ const PHASE2_LIBRARY: PrismIcon[] = [
   ),
 ]
 
-/** Prefer AAC pack on id collisions; then Phase 2 fillers. */
-function mergeCatalog(primary: PrismIcon[], secondary: PrismIcon[]): PrismIcon[] {
+/** Prefer AAC pack on id collisions; then animated twins; then Phase 2 fillers. */
+function mergeCatalog(...groups: PrismIcon[][]): PrismIcon[] {
   const seen = new Set<string>()
   const out: PrismIcon[] = []
-  for (const icon of [...primary, ...secondary]) {
-    if (seen.has(icon.id)) continue
-    seen.add(icon.id)
-    out.push(icon)
+  for (const group of groups) {
+    for (const icon of group) {
+      if (seen.has(icon.id)) continue
+      seen.add(icon.id)
+      out.push(icon)
+    }
   }
   return out
 }
 
-export const ICON_CATALOG: PrismIcon[] = mergeCatalog(AAC_PACK, PHASE2_LIBRARY)
+export const ICON_CATALOG: PrismIcon[] = mergeCatalog(AAC_PACK, AAC_ANIMATED_PACK, PHASE2_LIBRARY)
 
 export const ICON_CATEGORY_ORDER: IconCategory[] = [
   'core',
@@ -239,8 +263,20 @@ export function resolveIcon(word: string): PrismIcon | undefined {
     byId.get(slug) ||
     byId.get(key) ||
     byId.get(`emotion-${slug}`) ||
+    byId.get(`${slug}-anim`) ||
     byLabel.get(key)
   )
+}
+
+export function animatedTwin(icon: PrismIcon): PrismIcon | undefined {
+  if (icon.animated) return icon
+  return byId.get(`${icon.id}-anim`)
+}
+
+export function staticTwin(icon: PrismIcon): PrismIcon | undefined {
+  if (!icon.animated) return icon
+  if (icon.staticId) return byId.get(icon.staticId)
+  return byId.get(icon.id.replace(/-anim$/, ''))
 }
 
 export function iconDataUri(icon: PrismIcon): string {
