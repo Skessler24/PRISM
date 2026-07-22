@@ -113,6 +113,39 @@ h3,
     box-shadow: var(--shadow);
     padding: 16px;
   }
+
+  .tile-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .tint-sky {
+    background: var(--sky);
+  }
+  .tint-mint {
+    background: var(--mint);
+  }
+  .tint-lav {
+    background: var(--lav);
+  }
+  .tint-sun {
+    background: var(--sun);
+  }
+  .tint-coral {
+    background: var(--coral);
+  }
+  .tint-pink {
+    background: var(--pink);
+  }
+  .tint-softorange {
+    background: var(--softorange);
+  }
+  .tint-slate {
+    background: var(--slate);
+  }
 }
 
 @keyframes marquee {

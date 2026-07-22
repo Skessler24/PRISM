@@ -17,7 +17,27 @@ import {
 } from '../../lib/team-chat/store'
 import { joinCloudRoom, listCloudRoom, postCloudMessage } from '../../lib/team-chat/cloud'
 
-export function TeamChatPanel() {
+const DOCK_KEY = 'prism_team_chat_dock_open_v1'
+
+function readDockOpen(): boolean {
+  try {
+    return localStorage.getItem(DOCK_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+function writeDockOpen(open: boolean) {
+  try {
+    localStorage.setItem(DOCK_KEY, open ? '1' : '0')
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Floating Team Chat — minimized FAB + expandable pop-out (not a full dashboard card). */
+export function TeamChatDock() {
+  const [open, setOpen] = useState(() => readDockOpen())
   const [state, setState] = useState<TeamChatState>(() => loadTeamChat())
   const [draft, setDraft] = useState('')
   const [channelName, setChannelName] = useState('')
@@ -32,12 +52,11 @@ export function TeamChatPanel() {
   }, [])
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [state.messages, state.activeChannelId])
+    if (open) bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [state.messages, state.activeChannelId, open])
 
-  // Poll cloud room when a room code is set and mode is prism
   useEffect(() => {
-    if (state.mode !== 'prism' || !roomCode.trim()) return
+    if (state.mode !== 'prism' || !roomCode.trim() || !open) return
     let cancelled = false
     async function tick() {
       const res = await listCloudRoom(roomCode.trim().toUpperCase())
@@ -72,7 +91,7 @@ export function TeamChatPanel() {
       cancelled = true
       window.clearInterval(id)
     }
-  }, [state.mode, roomCode])
+  }, [state.mode, roomCode, open])
 
   function flash(msg: string) {
     setToast(msg)
@@ -83,8 +102,13 @@ export function TeamChatPanel() {
     setState(next)
   }
 
+  function setDock(next: boolean) {
+    setOpen(next)
+    writeDockOpen(next)
+  }
+
   const messages = messagesForChannel(state, state.activeChannelId)
-  const active = state.channels.find((c) => c.id === state.activeChannelId)
+  const unreadHint = messages.length
 
   async function send() {
     if (!draft.trim()) return
@@ -116,251 +140,244 @@ export function TeamChatPanel() {
   }
 
   return (
-    <section className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card">
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <h2 className="font-heading text-sm font-bold">💬 Team Chat</h2>
-          <p className="mt-0.5 text-[10px] text-[var(--subtext)]">
-            {state.teamName} · invite-only ·{' '}
-            {state.mode === 'prism' ? 'PRISM channels (local live)' : 'District Teams / approved messenger'}
-          </p>
-        </div>
-        <div className="flex rounded-lg border border-[var(--border)] p-0.5 text-[10px] font-bold">
-          <button
-            type="button"
-            className={`rounded-md px-2 py-1 ${
-              state.mode === 'prism' ? 'bg-[var(--accent)] text-white' : 'text-[var(--subtext)]'
-            }`}
-            onClick={() => refresh(setChatMode(state, 'prism'))}
-          >
-            PRISM
-          </button>
-          <button
-            type="button"
-            className={`rounded-md px-2 py-1 ${
-              state.mode === 'teams' ? 'bg-[var(--accent)] text-white' : 'text-[var(--subtext)]'
-            }`}
-            onClick={() => refresh(setChatMode(state, 'teams'))}
-          >
-            Teams
-          </button>
-        </div>
-      </div>
-
-      {toast && (
-        <div className="mt-2 rounded-lg bg-[var(--accent)] px-2 py-1 text-[10px] font-semibold text-white">
-          {toast}
-        </div>
-      )}
-
-      <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-2 py-1.5 text-[10px] text-amber-950">
-        FERPA: no student names, IDs, or PHI in chat. Use Enrich / SoR for official records.
-      </p>
-
-      {state.mode === 'teams' ? (
-        <div className="mt-3 space-y-3">
-          <p className="text-xs text-[var(--subtext)]">
-            District-approved path: open Microsoft Teams (or your district messenger). Full Graph Chat
-            sync lands after Azure AD / MSAL is wired — same pattern as OneDrive storage.
-          </p>
-          <label className="block text-xs font-semibold">
-            Teams / messenger link
-            <input
-              className="mt-1 w-full rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
-              value={state.teamsDeepLink}
-              onChange={(e) => refresh(setTeamsDeepLink(state, e.target.value))}
-              placeholder="https://teams.microsoft.com/l/channel/..."
-            />
-          </label>
-          <button
-            type="button"
-            className="rounded-lg bg-[#5059C9] px-3 py-2 text-xs font-semibold text-white"
-            onClick={() => {
-              openDistrictMessenger(state)
-              flash('Opened district messenger')
-            }}
-          >
-            Open Teams / approved chat
-          </button>
-        </div>
-      ) : (
-        <div className="mt-3 grid gap-3 lg:grid-cols-[9rem_1fr]">
-          <aside className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--subtext)]">
-              Channels
-            </p>
-            <ul className="space-y-1">
-              {state.channels.map((c) => (
-                <li key={c.id}>
-                  <button
-                    type="button"
-                    className={`w-full rounded-lg px-2 py-1.5 text-left text-xs font-semibold ${
-                      c.id === state.activeChannelId
-                        ? 'bg-[var(--accent)] text-white'
-                        : 'bg-[var(--slate)] text-[var(--text)]'
-                    }`}
-                    onClick={() => refresh(setActiveChannel(state, c.id))}
-                  >
-                    # {c.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <div className="flex gap-1">
-              <input
-                className="min-w-0 flex-1 rounded border border-[var(--border)] px-1 py-1 text-[10px]"
-                placeholder="new-channel"
-                value={channelName}
-                onChange={(e) => setChannelName(e.target.value)}
-              />
+    <div className="pointer-events-none fixed bottom-[calc(2.75rem+env(safe-area-inset-bottom,0px))] right-3 z-[950] flex flex-col items-end gap-2 md:right-4">
+      {open && (
+        <section
+          className="pointer-events-auto flex max-h-[min(70vh,32rem)] w-[min(100vw-1.5rem,22rem)] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] shadow-xl"
+          style={{ borderTop: '4px solid var(--accent)' }}
+          role="dialog"
+          aria-label="Team Chat"
+        >
+          <header className="flex items-center justify-between gap-2 border-b border-[var(--border)] bg-[var(--lav)] px-3 py-2">
+            <div className="min-w-0">
+              <p className="truncate text-xs font-bold">💬 Team Chat</p>
+              <p className="truncate text-[10px] text-[var(--subtext)]">
+                {state.mode === 'prism' ? 'PRISM channels' : 'Teams'} ·{' '}
+                {cloudStatus === 'live' ? 'cloud live' : cloudStatus === 'offline' ? 'local' : 'idle'}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-1">
+              <div className="flex rounded-lg border border-[var(--border)] bg-[var(--card-bg)] p-0.5 text-[9px] font-bold">
+                <button
+                  type="button"
+                  className={`rounded-md px-1.5 py-0.5 ${
+                    state.mode === 'prism' ? 'bg-[var(--accent)] text-white' : 'text-[var(--subtext)]'
+                  }`}
+                  onClick={() => refresh(setChatMode(state, 'prism'))}
+                >
+                  PRISM
+                </button>
+                <button
+                  type="button"
+                  className={`rounded-md px-1.5 py-0.5 ${
+                    state.mode === 'teams' ? 'bg-[var(--accent)] text-white' : 'text-[var(--subtext)]'
+                  }`}
+                  onClick={() => refresh(setChatMode(state, 'teams'))}
+                >
+                  Teams
+                </button>
+              </div>
               <button
                 type="button"
-                className="rounded border border-[var(--border)] px-2 text-[10px] font-bold"
-                onClick={() => {
-                  refresh(createChannel(state, channelName))
-                  setChannelName('')
-                  flash('Channel created')
-                }}
+                className="rounded-lg border border-[var(--border)] bg-[var(--card-bg)] px-2 py-1 text-xs font-bold"
+                aria-label="Minimize Team Chat"
+                onClick={() => setDock(false)}
               >
-                +
+                —
               </button>
             </div>
+          </header>
 
-            <p className="pt-2 text-[10px] font-bold uppercase tracking-wide text-[var(--subtext)]">
-              Members ({state.members.length})
-            </p>
-            <ul className="max-h-24 space-y-0.5 overflow-auto text-[10px]">
-              {state.members.map((m) => (
-                <li key={m.id}>
-                  {m.displayName}{' '}
-                  <span className="text-[var(--subtext)]">· {m.role}</span>
-                </li>
-              ))}
-            </ul>
-          </aside>
-
-          <div className="flex min-h-[16rem] flex-col rounded-xl border border-[var(--border)] bg-[var(--slate)]">
-            <div className="border-b border-[var(--border)] px-3 py-2">
-              <p className="text-xs font-bold">#{active?.name || 'channel'}</p>
-              <p className="text-[10px] text-[var(--subtext)]">{active?.description}</p>
-            </div>
-            <div className="flex-1 space-y-2 overflow-y-auto p-3">
-              {messages.map((m) => (
-                <div key={m.id} className="text-xs">
-                  <span className="font-bold text-[var(--accent)]">{m.authorName}</span>{' '}
-                  <span className="text-[10px] text-[var(--subtext)]">
-                    {new Date(m.createdAt).toLocaleTimeString()}
-                  </span>
-                  <p className="whitespace-pre-wrap">{m.body}</p>
-                </div>
-              ))}
-              <div ref={bottomRef} />
-            </div>
-            <div className="flex gap-2 border-t border-[var(--border)] p-2">
-              <input
-                className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--card-bg)] px-2 py-2 text-xs"
-                placeholder="Message #channel (no PHI)…"
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault()
-                    void send()
-                  }
-                }}
-              />
-              <button
-                type="button"
-                className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white"
-                onClick={() => void send()}
-              >
-                Send
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="mt-3 grid gap-2 border-t border-[var(--border)] pt-3 md:grid-cols-2">
-        <label className="text-xs font-semibold">
-          Your display name
-          <input
-            className="mt-1 w-full rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
-            value={state.me.displayName}
-            onChange={(e) => refresh(setDisplayName(state, e.target.value))}
-          />
-        </label>
-          <div className="text-xs">
-          <p className="font-semibold">Invites & cloud room</p>
-          <p className="mt-0.5 text-[10px] text-[var(--subtext)]">
-            Cloud:{' '}
-            {cloudStatus === 'live'
-              ? 'live sync'
-              : cloudStatus === 'offline'
-                ? 'offline (local only)'
-                : 'not connected'}
-          </p>
-          <div className="mt-1 flex flex-wrap gap-2">
-            <button
-              type="button"
-              className="rounded-lg border border-[var(--border)] px-2 py-1.5 text-[10px] font-semibold"
-              onClick={() => {
-                const next = createInvite(state)
-                refresh(next)
-                const code = next.invites[0]?.code
-                if (code) {
-                  setRoomCode(code)
-                  void navigator.clipboard.writeText(code)
-                  flash(`Invite ${code} copied`)
-                }
-              }}
-            >
-              Create + copy invite code
-            </button>
-            <button
-              type="button"
-              className="rounded-lg border border-[var(--border)] px-2 py-1.5 text-[10px] font-semibold"
-              onClick={() => void connectCloud()}
-            >
-              Connect cloud room
-            </button>
-          </div>
-          {state.invites[0] && (
-            <p className="mt-1 font-mono text-[10px] text-[var(--subtext)]">
-              Latest: {state.invites[0].code} · used {state.invites[0].uses}/
-              {state.invites[0].maxUses}
-            </p>
+          {toast && (
+            <div className="bg-[var(--accent)] px-2 py-1 text-[10px] font-semibold text-white">{toast}</div>
           )}
-          <label className="mt-2 block text-[10px] font-semibold">
-            Room / invite code
-            <input
-              className="mt-0.5 w-full rounded border border-[var(--border)] px-2 py-1 font-mono"
-              value={roomCode}
-              onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-              placeholder="ABCD-EFGH"
-            />
-          </label>
-          <div className="mt-2 flex gap-1">
-            <input
-              className="min-w-0 flex-1 rounded border border-[var(--border)] px-2 py-1 text-[10px] font-mono"
-              placeholder="Join local invite…"
-              value={inviteInput}
-              onChange={(e) => setInviteInput(e.target.value)}
-            />
-            <button
-              type="button"
-              className="rounded border border-[var(--border)] px-2 text-[10px] font-bold"
-              onClick={() => {
-                refresh(redeemInvite(state, inviteInput, state.me.displayName))
-                setInviteInput('')
-                flash('Joined via invite')
-              }}
-            >
-              Join
-            </button>
+
+          <p className="border-b border-[var(--border)] bg-[var(--sun)] px-2 py-1 text-[9px] text-[var(--text)]">
+            FERPA: no student names, IDs, or PHI in chat.
+          </p>
+
+          <div className="min-h-0 flex-1 overflow-y-auto p-2">
+            {state.mode === 'teams' ? (
+              <div className="space-y-2">
+                <label className="block text-[10px] font-semibold">
+                  Teams / messenger link
+                  <input
+                    className="mt-0.5 w-full rounded-lg border border-[var(--border)] px-2 py-1.5 text-[10px]"
+                    value={state.teamsDeepLink}
+                    onChange={(e) => refresh(setTeamsDeepLink(state, e.target.value))}
+                    placeholder="https://teams.microsoft.com/…"
+                  />
+                </label>
+                <button
+                  type="button"
+                  className="w-full rounded-lg bg-[#5059C9] px-2 py-2 text-[10px] font-semibold text-white"
+                  onClick={() => {
+                    openDistrictMessenger(state)
+                    flash('Opened district messenger')
+                  }}
+                >
+                  Open Teams
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-1 overflow-x-auto">
+                  {state.channels.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-semibold ${
+                        c.id === state.activeChannelId
+                          ? 'bg-[var(--accent)] text-white'
+                          : 'bg-[var(--slate)] text-[var(--text)]'
+                      }`}
+                      onClick={() => refresh(setActiveChannel(state, c.id))}
+                    >
+                      #{c.name}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex min-h-[10rem] flex-col rounded-xl border border-[var(--border)] bg-[var(--slate)]">
+                  <div className="flex-1 space-y-1.5 overflow-y-auto p-2">
+                    {messages.map((m) => (
+                      <div key={m.id} className="text-[11px]">
+                        <span className="font-bold text-[var(--accent)]">{m.authorName}</span>{' '}
+                        <span className="text-[9px] text-[var(--subtext)]">
+                          {new Date(m.createdAt).toLocaleTimeString()}
+                        </span>
+                        <p className="whitespace-pre-wrap">{m.body}</p>
+                      </div>
+                    ))}
+                    <div ref={bottomRef} />
+                  </div>
+                  <div className="flex gap-1 border-t border-[var(--border)] p-1.5">
+                    <input
+                      className="min-w-0 flex-1 rounded-lg border border-[var(--border)] bg-[var(--card-bg)] px-2 py-1.5 text-[11px]"
+                      placeholder="Message (no PHI)…"
+                      value={draft}
+                      onChange={(e) => setDraft(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault()
+                          void send()
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="rounded-lg bg-[var(--accent)] px-2.5 py-1.5 text-[10px] font-semibold text-white"
+                      onClick={() => void send()}
+                    >
+                      Send
+                    </button>
+                  </div>
+                </div>
+                <details className="rounded-lg border border-[var(--border)] bg-[var(--mint)]/40 px-2 py-1">
+                  <summary className="cursor-pointer text-[10px] font-bold">Channels & invites</summary>
+                  <div className="mt-2 space-y-2 pb-1">
+                    <div className="flex gap-1">
+                      <input
+                        className="min-w-0 flex-1 rounded border border-[var(--border)] px-1 py-1 text-[10px]"
+                        placeholder="new-channel"
+                        value={channelName}
+                        onChange={(e) => setChannelName(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        className="rounded border border-[var(--border)] px-2 text-[10px] font-bold"
+                        onClick={() => {
+                          refresh(createChannel(state, channelName))
+                          setChannelName('')
+                          flash('Channel created')
+                        }}
+                      >
+                        +
+                      </button>
+                    </div>
+                    <label className="block text-[10px] font-semibold">
+                      Display name
+                      <input
+                        className="mt-0.5 w-full rounded border border-[var(--border)] px-1 py-1 text-[10px]"
+                        value={state.me.displayName}
+                        onChange={(e) => refresh(setDisplayName(state, e.target.value))}
+                      />
+                    </label>
+                    <div className="flex flex-wrap gap-1">
+                      <button
+                        type="button"
+                        className="rounded border border-[var(--border)] bg-[var(--card-bg)] px-2 py-1 text-[9px] font-semibold"
+                        onClick={() => {
+                          const next = createInvite(state)
+                          refresh(next)
+                          const code = next.invites[0]?.code
+                          if (code) {
+                            setRoomCode(code)
+                            void navigator.clipboard.writeText(code)
+                            flash(`Invite ${code} copied`)
+                          }
+                        }}
+                      >
+                        Invite code
+                      </button>
+                      <button
+                        type="button"
+                        className="rounded border border-[var(--border)] bg-[var(--card-bg)] px-2 py-1 text-[9px] font-semibold"
+                        onClick={() => void connectCloud()}
+                      >
+                        Cloud room
+                      </button>
+                    </div>
+                    <input
+                      className="w-full rounded border border-[var(--border)] px-1 py-1 font-mono text-[10px]"
+                      value={roomCode}
+                      onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                      placeholder="Room code"
+                    />
+                    <div className="flex gap-1">
+                      <input
+                        className="min-w-0 flex-1 rounded border border-[var(--border)] px-1 py-1 font-mono text-[10px]"
+                        placeholder="Join invite…"
+                        value={inviteInput}
+                        onChange={(e) => setInviteInput(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        className="rounded border border-[var(--border)] px-2 text-[10px] font-bold"
+                        onClick={() => {
+                          refresh(redeemInvite(state, inviteInput, state.me.displayName))
+                          setInviteInput('')
+                          flash('Joined')
+                        }}
+                      >
+                        Join
+                      </button>
+                    </div>
+                  </div>
+                </details>
+              </div>
+            )}
           </div>
-        </div>
-      </div>
-    </section>
+        </section>
+      )}
+
+      <button
+        type="button"
+        className="pointer-events-auto relative flex h-14 w-14 touch-manipulation items-center justify-center rounded-full text-2xl text-white shadow-lg transition hover:brightness-110"
+        style={{ background: 'var(--accent)' }}
+        aria-label={open ? 'Minimize Team Chat' : 'Open Team Chat'}
+        aria-expanded={open}
+        onClick={() => setDock(!open)}
+      >
+        {open ? '×' : '💬'}
+        {!open && unreadHint > 0 && (
+          <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--coral)] px-1 text-[9px] font-bold text-[var(--text)] ring-2 ring-[var(--card-bg)]">
+            {Math.min(unreadHint, 99)}
+          </span>
+        )}
+      </button>
+    </div>
   )
 }
+
+/** @deprecated Use TeamChatDock — kept name alias for imports. */
+export const TeamChatPanel = TeamChatDock

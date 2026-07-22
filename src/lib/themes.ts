@@ -328,11 +328,37 @@ export function getFamily(familyId: string): ThemeFamily | undefined {
 }
 
 /** Map a Vision Board palette (+ family fonts) onto index.html CSS variables. */
+function mixHex(hex: string, toward: string, amount: number): string {
+  const parse = (h: string) => {
+    const x = h.replace('#', '').slice(0, 6)
+    if (x.length !== 6) return null
+    return [parseInt(x.slice(0, 2), 16), parseInt(x.slice(2, 4), 16), parseInt(x.slice(4, 6), 16)] as const
+  }
+  const a = parse(hex)
+  const b = parse(toward)
+  if (!a || !b) return hex
+  const m = (i: number) => Math.round(a[i] + (b[i] - a[i]) * amount)
+  const to = (n: number) => n.toString(16).padStart(2, '0')
+  return `#${to(m(0))}${to(m(1))}${to(m(2))}`
+}
+
 export function paletteToCssVars(
   palette: ThemePalette,
   family?: ThemeFamily,
 ): Record<string, string> {
   const isDark = family?.id === 'dark-mode' || palette.bg.startsWith('#0') || palette.bg.startsWith('#1C')
+  const base = isDark ? palette.card : '#FFFFFF'
+  const ink = isDark ? palette.text : palette.primary
+  // Soft pastel surfaces derived from the active palette (tile-like life on every page)
+  const sky = isDark ? mixHex(palette.primary, palette.card, 0.75) : mixHex(palette.primary, base, 0.88)
+  const mint = isDark ? mixHex(palette.accent, palette.card, 0.75) : mixHex(palette.accent, base, 0.86)
+  const coral = isDark ? mixHex('#F43F5E', palette.card, 0.7) : mixHex('#F43F5E', base, 0.9)
+  const sun = isDark ? mixHex('#F59E0B', palette.card, 0.7) : mixHex(palette.accent, base, 0.82)
+  const lav = isDark ? mixHex('#A78BFA', palette.card, 0.7) : mixHex(palette.primary, base, 0.9)
+  const softorange = isDark ? mixHex('#FB923C', palette.card, 0.7) : mixHex('#FB923C', base, 0.9)
+  const pink = isDark ? mixHex('#F472B6', palette.card, 0.7) : mixHex('#F472B6', base, 0.9)
+  const slate = isDark ? palette.navInactive : mixHex(palette.border, base, 0.35)
+
   return {
     '--bg': palette.bg,
     '--card-bg': palette.card,
@@ -347,16 +373,18 @@ export function paletteToCssVars(
     '--nav-inactive-txt': palette.navInactiveTxt,
     '--header-bg': palette.header,
     '--header-txt': palette.headerTxt,
-    '--sky': isDark ? palette.border : '#DBEAFE',
-    '--mint': isDark ? palette.border : '#D1FAE5',
-    '--coral': isDark ? palette.border : '#FEE2E2',
-    '--sun': isDark ? palette.border : '#FEF3C7',
-    '--lav': isDark ? palette.border : '#EDE9FE',
-    '--softorange': isDark ? palette.border : '#FFEDD5',
-    '--pink': isDark ? palette.border : '#FCE7F3',
-    '--slate': isDark ? palette.navInactive : '#F1F5F9',
+    '--sky': sky,
+    '--mint': mint,
+    '--coral': coral,
+    '--sun': sun,
+    '--lav': lav,
+    '--softorange': softorange,
+    '--pink': pink,
+    '--slate': slate,
+    '--surface-tint': mint,
+    '--chip-ink': ink,
     '--font-heading': family?.fontPrimary ?? "'Inter', sans-serif",
     '--font-body': family?.fontSecondary ?? "'Inter', sans-serif",
-    '--shadow': isDark ? '0 1px 3px rgba(0,0,0,.35)' : '0 1px 3px rgba(0,0,0,.08)',
+    '--shadow': isDark ? '0 1px 3px rgba(0,0,0,.35)' : '0 4px 14px rgba(15, 23, 42, 0.06)',
   }
 }

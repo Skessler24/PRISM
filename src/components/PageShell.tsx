@@ -12,7 +12,10 @@ export function PageShell({ title, description, children, trail }: PageShellProp
   return (
     <div>
       <Breadcrumbs trail={trail} />
-      <div className="mb-4">
+      <div
+        className="mb-4 rounded-2xl border border-[var(--border)] p-4 tint-lav shadow-card"
+        style={{ borderTop: '4px solid var(--accent)' }}
+      >
         <h1 className="font-heading text-2xl font-bold text-[var(--text)]">{title}</h1>
         <p className="mt-1 max-w-3xl text-sm text-[var(--subtext)]">{description}</p>
       </div>

@@ -7,18 +7,9 @@ import type { Student } from '../../lib/students/types'
 import { materialsForStudent, type SavedMaterial } from '../../lib/classroom-materials/store'
 import { downloadMaterialPdf } from '../../lib/classroom-materials/generateMaterialPdf'
 import { loadFbaSessions, openFbaSessions } from '../../lib/fba/store'
+import { studentInitials } from '../../lib/students/display'
 
 const FILTERS = ['All', 'IEP', '504', 'MLL', 'SLP', 'OT', 'Behavior', 'Academic'] as const
-
-function initials(name: string) {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 3)
-    .toUpperCase()
-}
 
 function matchesFilter(s: Student, filter: string) {
   if (filter === 'All') return true
@@ -60,7 +51,7 @@ function StudentCard({
           className="flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold text-slate-800"
           style={{ background: s.color }}
         >
-          {initials(s.name)}
+          {studentInitials(s.name)}
         </div>
         <div>
           <p className="text-sm font-bold text-[var(--text)]">{s.name}</p>
