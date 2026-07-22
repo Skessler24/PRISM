@@ -263,5 +263,38 @@
     "eldLevel": "Developing",
     "interpreterNeeded": false,
     "dob": "2016-11-08"
+  },
+  {
+    "id": "nora",
+    "name": "Nora L.",
+    "grade": "Gr4",
+    "teacher": "Private placement",
+    "discipline": ["SLP"],
+    "provider": "Samantha",
+    "caseManager": "Samantha",
+    "tier": 2,
+    "iepDue": "",
+    "reevalDue": "",
+    "status": "On Track",
+    "color": "#C4B5FD",
+    "interests": "Horses, reading, art",
+    "triggers": "Noise in cafeteria",
+    "calming": "Noise-reducing headphones, quiet corner",
+    "goals": [
+      "Produce /s/ blends in sentences 80%",
+      "Follow 3-step directions in therapy 75%"
+    ],
+    "accommodations": ["Visual schedule", "Preferential seating"],
+    "disability": "SLD/SLI",
+    "lastContact": "2026-07-12",
+    "fallEval": false,
+    "source": "demo",
+    "hasIEP": false,
+    "has504": false,
+    "hasMLL": false,
+    "hasPrivateSchool": true,
+    "privateSchoolName": "St. Francis Academy",
+    "privateSchoolPlanDue": "2026-10-01",
+    "dob": "2016-04-03"
   }
 ]

@@ -145,3 +145,8 @@ Frontend talks only to `/api/ai-*`. Provider (Anthropic / Gemini / other) is a s
 
 - **Print Center** (`/binder`, feature `print`): selective PDF sections (roster / contacts / progress / planner / motivation), whole binder, or **single-student packet** (cover + goals/accommodations + filtered data).
 - Weekly Planner slots fill planner pages (no more blank-only Mon–Fri boxes when data exists).
+
+## Decisions locked (Private School + PWA shell)
+
+- **Private School Service Plans** (`/private-school`, feature `privateSchool`): ISP draft builder for parentally placed private school students; `hasPrivateSchool` / school name / plan due on student model; drafts in `prism_private_school_plans_v1`. CCSD default toggle remains **off** (enable in District Admin for districts that need it). Demo student: Nora L.
+- **PWA shell:** `manifest.webmanifest` + production service worker (`public/sw.js`) caches app shell only — never `/api/*` or PHI. Installable on tablet/phone; full mobile UX polish still later.

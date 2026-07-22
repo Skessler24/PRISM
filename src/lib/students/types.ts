@@ -27,6 +27,10 @@ export type Student = {
   hasIEP: boolean
   has504: boolean
   hasMLL: boolean
+  /** Parentally placed private school — equitable services / ISP */
+  hasPrivateSchool?: boolean
+  privateSchoolName?: string
+  privateSchoolPlanDue?: string
   homeLanguage?: string
   eldLevel?: string
   interpreterNeeded?: boolean

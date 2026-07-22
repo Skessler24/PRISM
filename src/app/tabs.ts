@@ -103,6 +103,14 @@ export const APP_TABS: AppTab[] = [
     featureId: 'mll',
   },
   {
+    id: 'private-school',
+    path: '/private-school',
+    label: 'Private School Plans',
+    shortLabel: 'Private',
+    icon: '🏫',
+    featureId: 'privateSchool',
+  },
+  {
     id: 'accessibility',
     path: '/accessibility',
     label: 'Accessibility Studio',
