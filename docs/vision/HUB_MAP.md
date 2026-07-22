@@ -15,7 +15,7 @@ Sources (also in this folder): `Master_Platform_Plan.txt`, `Million_Dollar_Idea.
 | **🧩 Student Tiles** | Data wall, continuum profile, material history ZIP, prepare→ drafts | Partial — tiles strong; continuum report + material history folder deepen next |
 | **👤 Caseload** | My students, session check-off → SOAP, schedule widget | Partial — SOAP exists; group check-off from Scheduling deepen |
 | **📅 Scheduling** | Live groups, clickable pop-outs, sub packet, stand-alone + Team Scheduling link | Restored (groups + sub packet); bidirectional Team Scheduling app later |
-| **📋 MTSS** | Core Board, Arrowhead toolkit, cycles, SLP RTI Guide, DAT, eligibility | Shipped |
+| **📋 MTSS** | Overview, Arrowhead toolkit, cycles, SLP RTI Guide, DAT, eligibility | Shipped |
 | **📊 Evals** | Live tracker, checklists, DAT workflow, 60-day | Partial |
 | **📈 Progress** | Goal graphs / probes | Partial — in primary strip |
 | **🎨 Creation Station** | Templates & Forms **merged** with Icon Library, token boards, visual schedules, comm boards, social stories + **Accessibility** + **Generation** | Hub exists; Icon Library expanded; boards live under Templates panel |
