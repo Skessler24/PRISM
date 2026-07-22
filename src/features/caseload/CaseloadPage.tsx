@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PageShell } from '../../components/PageShell'
+import { StudentEditorModal } from '../../components/StudentEditorModal'
 import { useDistrictProfile } from '../../lib/district-profiles/useDistrictProfile'
 import { useStudents } from '../../lib/students/useStudents'
 import { daysUntil, statusBadgeClass } from '../../lib/students/normalizeStudent'
+import type { Student } from '../../lib/students/types'
 import { FieldTip } from '../../lib/help-assist/FieldTip'
 import {
   formatSoapForEnrich,
@@ -18,7 +20,7 @@ import {
 type Tab = 'table' | 'soap' | 'progress'
 
 export function CaseloadPage() {
-  const { students } = useStudents()
+  const { students, addStudent, updateStudent, removeStudent } = useStudents()
   const { profile } = useDistrictProfile()
   const [provider, setProvider] = useState('All')
   const [tab, setTab] = useState<Tab>('table')
@@ -31,6 +33,7 @@ export function CaseloadPage() {
   const [notes, setNotes] = useState<SoapNote[]>(() => loadSoapNotes())
   const [probes, setProbes] = useState<ProgressProbe[]>(() => loadProgressProbes())
   const [toast, setToast] = useState('')
+  const [editor, setEditor] = useState<'add' | Student | null>(null)
 
   const hours = profile.rules.serviceLogHours
   const iep = profile.iepSystem || 'Enrich'
@@ -123,10 +126,23 @@ export function CaseloadPage() {
     flash('Probe saved locally')
   }
 
+  function deleteStudent(s: Student) {
+    if (
+      !window.confirm(
+        `Remove ${s.name} from your caseload in this browser?\n\nSOAP notes / materials for this id stay until cleaned separately.`,
+      )
+    ) {
+      return
+    }
+    removeStudent(s.id)
+    if (soapStudentId === s.id) setSoapStudentId('')
+    flash(`${s.name} removed`)
+  }
+
   return (
     <PageShell
       title="👤 My Caseload"
-      description={`Shared caseload, SOAP service logs (log within ${hours}h), and progress probes. Companion: Copy into ${iep} — no live sync.`}
+      description={`Shared caseload, SOAP service logs (log within ${hours}h), and progress probes. Click a name to open the Student Tile. Companion: Copy into ${iep} — no live sync.`}
     >
       {toast && (
         <div className="mb-3 rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white">
@@ -175,6 +191,13 @@ export function CaseloadPage() {
               </select>
             </label>
             <span className="text-xs text-[var(--subtext)]">{rows.length} students</span>
+            <button
+              type="button"
+              className="ml-auto rounded-lg bg-[var(--accent)] px-3 py-1.5 text-xs font-semibold text-white"
+              onClick={() => setEditor('add')}
+            >
+              + Add student
+            </button>
           </div>
 
           <div className="overflow-x-auto rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] shadow-card">
@@ -188,6 +211,7 @@ export function CaseloadPage() {
                   <th className="p-3 font-semibold">IEP / 504 due</th>
                   <th className="p-3 font-semibold">Days</th>
                   <th className="p-3 font-semibold">Status</th>
+                  <th className="p-3 font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -197,7 +221,13 @@ export function CaseloadPage() {
                   return (
                     <tr key={s.id} className="border-b border-[var(--border)] last:border-0">
                       <td className="p-3 font-semibold text-[var(--text)]">
-                        {s.name}
+                        <Link
+                          to={`/students?id=${encodeURIComponent(s.id)}`}
+                          className="text-[var(--accent)] hover:underline"
+                          title="Open Student Tile"
+                        >
+                          {s.name}
+                        </Link>
                         <div className="font-normal text-[var(--subtext)]">{s.caseManager}</div>
                       </td>
                       <td className="p-3">{s.grade}</td>
@@ -216,13 +246,40 @@ export function CaseloadPage() {
                           {s.status}
                         </span>
                       </td>
+                      <td className="p-3">
+                        <div className="flex flex-wrap gap-1">
+                          <button
+                            type="button"
+                            className="rounded border border-[var(--border)] px-2 py-1 text-[10px] font-semibold"
+                            onClick={() => setEditor(s)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            className="rounded border border-red-200 px-2 py-1 text-[10px] font-semibold text-red-700"
+                            onClick={() => deleteStudent(s)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   )
                 })}
               </tbody>
             </table>
             {!rows.length && (
-              <p className="p-4 text-sm text-[var(--subtext)]">No students in this caseload filter.</p>
+              <p className="p-4 text-sm text-[var(--subtext)]">
+                No students in this caseload filter.{' '}
+                <button
+                  type="button"
+                  className="font-semibold text-[var(--accent)]"
+                  onClick={() => setEditor('add')}
+                >
+                  Add one →
+                </button>
+              </p>
             )}
           </div>
         </>
@@ -373,7 +430,14 @@ export function CaseloadPage() {
                 <div key={s.id} className="rounded-xl border border-[var(--border)] p-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
-                      <p className="text-xs font-bold">{s.name}</p>
+                      <p className="text-xs font-bold">
+                        <Link
+                          to={`/students?id=${encodeURIComponent(s.id)}`}
+                          className="text-[var(--accent)] hover:underline"
+                        >
+                          {s.name}
+                        </Link>
+                      </p>
                       <p className="text-[10px] text-[var(--subtext)]">
                         {probe?.label || s.goals[0] || 'Add probe data'} · last{' '}
                         {probe?.lastScore ?? '—'}
@@ -422,6 +486,25 @@ export function CaseloadPage() {
           </div>
         </section>
       )}
+
+      {editor ? (
+        <StudentEditorModal
+          mode={editor === 'add' ? 'add' : 'edit'}
+          initial={editor === 'add' ? undefined : editor}
+          existing={students}
+          onClose={() => setEditor(null)}
+          onSave={(student) => {
+            if (editor === 'add') {
+              addStudent(student)
+              flash(`${student.name} added`)
+            } else {
+              updateStudent(student.id, student)
+              flash(`${student.name} updated`)
+            }
+            setEditor(null)
+          }}
+        />
+      ) : null}
     </PageShell>
   )
 }
