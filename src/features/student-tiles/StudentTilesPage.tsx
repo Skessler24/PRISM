@@ -9,6 +9,10 @@ import {
   mergeEnrichIntoCaseload,
   parseEnrichSnapshotFiles,
 } from '../../lib/students/enrichSnapshotImport'
+import {
+  mergeIepGoalsIntoCaseload,
+  parseIepGoalsReportFile,
+} from '../../lib/students/iepGoalsImport'
 import { materialsForStudent, type SavedMaterial } from '../../lib/classroom-materials/store'
 import { downloadMaterialPdf } from '../../lib/classroom-materials/generateMaterialPdf'
 import {
@@ -136,6 +140,7 @@ export function StudentTilesPage() {
   const [, bump] = useState(0)
   const csvRef = useRef<HTMLInputElement>(null)
   const enrichRef = useRef<HTMLInputElement>(null)
+  const goalsRef = useRef<HTMLInputElement>(null)
   const toastTimer = useRef<number | null>(null)
 
   const selectedId = searchParams.get('id')
@@ -226,6 +231,38 @@ export function StudentTilesPage() {
     }
   }
 
+  async function onIepGoalsXlsx(file: File) {
+    if (!/\.xlsx$/i.test(file.name) && !/\.xls$/i.test(file.name)) {
+      flash(`Expected Enrich IEP Goals Report .xlsx — got “${file.name}”`, 'err')
+      return
+    }
+    setImportBusy(true)
+    try {
+      const bundles = await parseIepGoalsReportFile(file)
+      if (!bundles.length) {
+        flash('No students/goals found in that IEP Goals Report', 'err')
+        return
+      }
+      const mode =
+        students.some((s) => s.source === 'demo') && students.every((s) => s.source === 'demo')
+          ? 'goals-only'
+          : 'merge'
+      const result = mergeIepGoalsIntoCaseload(students, bundles, mode)
+      setStudents(result.students)
+      flash(
+        `IEP Goals OK — ${result.bundles} students · ${result.goalLines} goals · ${result.matched} matched · +${result.added} added (browser only)`,
+        'ok',
+      )
+    } catch (err) {
+      flash(
+        `IEP Goals import failed: ${err instanceof Error ? err.message : 'Could not read Excel'} — file issue, not AI`,
+        'err',
+      )
+    } finally {
+      setImportBusy(false)
+    }
+  }
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     return students.filter((s) => {
@@ -251,7 +288,7 @@ export function StudentTilesPage() {
   return (
     <PageShell
       title="🧩 Student Tiles"
-      description="Individual student data walls — import ARR CSV + Enrich Snapshot PDFs (browser only), materials, and start FBA sessions. Real caseloads never leave this browser (FERPA)."
+      description="Individual student data walls — import ARR CSV, Enrich Snapshot PDFs, and IEP Goals Report (.xlsx) (browser only), materials, and start FBA sessions. Real caseloads never leave this browser (FERPA)."
     >
       {toast && (
         <div
@@ -281,6 +318,10 @@ export function StudentTilesPage() {
           {students.some((s) => s.source === 'demo') ? ' · demo caseload' : ''}
           {students.some((s) => s.source === 'arr-csv') ? ' · ARR CSV' : ''}
           {students.some((s) => s.source === 'enrich-snapshot') ? ' · Enrich snapshots' : ''}
+          {students.some((s) => s.source === 'iep-goals-report') ? ' · IEP Goals Report' : ''}
+          {students.some((s) => s.goals.length > 0)
+            ? ` · ${students.filter((s) => s.goals.length).length} with goals`
+            : ''}
         </p>
         <div className="flex flex-wrap gap-2">
           <button
@@ -317,6 +358,25 @@ export function StudentTilesPage() {
             className="hidden"
             onChange={(e) => {
               if (e.target.files?.length) void onEnrichPdfs(e.target.files)
+              e.target.value = ''
+            }}
+          />
+          <button
+            type="button"
+            className="rounded-lg border border-emerald-600 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-900 disabled:opacity-60"
+            disabled={importBusy}
+            onClick={() => goalsRef.current?.click()}
+          >
+            {importBusy ? 'Reading…' : 'Import IEP Goals (.xlsx)'}
+          </button>
+          <input
+            ref={goalsRef}
+            type="file"
+            accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0]
+              if (f) void onIepGoalsXlsx(f)
               e.target.value = ''
             }}
           />
