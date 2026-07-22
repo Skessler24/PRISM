@@ -44,7 +44,7 @@ type Tab =
   | 'eligibility'
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'board', label: 'Core Board' },
+  { id: 'board', label: 'Overview' },
   { id: 'toolkit', label: 'Toolkit' },
   { id: 'cycles', label: 'Cycles' },
   { id: 'referral', label: 'Referral' },
@@ -235,7 +235,7 @@ Include: referral reason scaffold, intervention data checklist, eligibility crit
 
   return (
     <PageShell
-      title="📋 MTSS Core Board"
+      title="📋 MTSS"
       description={`${profile.name} RTI/MTSS hub — Arrowhead 25-26 process + SLP RTI Guide (Kessler). Gate: ${minCycles}×${cycleWeeks} weeks. Browser-only tracking; companion to Enrich/DAT.`}
     >
       {toast && (
@@ -264,7 +264,7 @@ Include: referral reason scaffold, intervention data checklist, eligibility crit
       {tab === 'board' && (
         <div className="grid gap-3 lg:grid-cols-2">
           <section className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card lg:col-span-2">
-            <h2 className="font-heading text-sm font-bold">Core Board — caseload by tier</h2>
+            <h2 className="font-heading text-sm font-bold">Caseload by tier</h2>
             <p className="mt-1 text-xs text-[var(--subtext)]">
               Live from Student Tiles · open cycles: {state.cycles.filter((c) => c.outcome === 'in-progress').length}
             </p>

@@ -1,4 +1,4 @@
-# MTSS Core Board
+# MTSS
 
 PRISM’s MTSS hub is wired to:
 
@@ -11,12 +11,12 @@ Raw uploads stay out of git (FERPA / size). Content is curated into code as proc
 
 | Tab | Purpose |
 |-----|---------|
-| Core Board | Tier counts, RTI gate, live cycle alerts, quick links |
-| Toolkit | Arrowhead PM tools, supports, teacher checklist, parent prompts |
+| Overview | Tier counts, RTI gate, live cycle alerts, quick links |
+| Toolkit | Arrowhead PM tools, supports, teacher checklist, parent prompts, SST sections |
 | Cycles | Track 6-week intervention cycles (browser localStorage) |
 | Referral | School referral pipeline + persisted checks |
-| SLP RTI | Kessler guide tiers, screening cycle, artic norms, data form export |
+| SLP RTI | Kessler guide tiers, screening cycle, artic norms, K milestones, data form export |
 | DAT | CCSD dual-referral checklist |
-| Eligibility | AI or offline scaffold |
+| Eligibility | AI draft or offline scaffold |
 
 State key: `prism_mtss_state_v1`
