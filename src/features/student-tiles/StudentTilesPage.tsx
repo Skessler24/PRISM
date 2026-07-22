@@ -1,12 +1,21 @@
-import { useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useMemo, useRef, useState } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { PageShell } from '../../components/PageShell'
 import { useStudents } from '../../lib/students/useStudents'
 import { daysUntil, statusBadgeClass } from '../../lib/students/normalizeStudent'
 import type { Student } from '../../lib/students/types'
+import { studentsFromArrCsv } from '../../lib/students/arrImport'
+import {
+  mergeEnrichIntoCaseload,
+  parseEnrichSnapshotFiles,
+} from '../../lib/students/enrichSnapshotImport'
 import { materialsForStudent, type SavedMaterial } from '../../lib/classroom-materials/store'
 import { downloadMaterialPdf } from '../../lib/classroom-materials/generateMaterialPdf'
-import { loadFbaSessions, openFbaSessions } from '../../lib/fba/store'
+import {
+  loadFbaSessions,
+  openFbaSessions,
+  startFbaForStudent,
+} from '../../lib/fba/store'
 import { studentInitials } from '../../lib/students/display'
 
 const FILTERS = ['All', 'IEP', '504', 'MLL', 'SLP', 'OT', 'Behavior', 'Academic'] as const
@@ -114,13 +123,23 @@ function StudentCard({
 }
 
 export function StudentTilesPage() {
-  const { students, restoreDemo } = useStudents()
+  const { students, restoreDemo, setStudents } = useStudents()
   const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
   const [filter, setFilter] = useState<string>('All')
   const [search, setSearch] = useState('')
+  const [toast, setToast] = useState('')
+  const [importBusy, setImportBusy] = useState(false)
   const [, bump] = useState(0)
+  const csvRef = useRef<HTMLInputElement>(null)
+  const enrichRef = useRef<HTMLInputElement>(null)
 
   const selectedId = searchParams.get('id')
+
+  function flash(msg: string) {
+    setToast(msg)
+    window.setTimeout(() => setToast(''), 4000)
+  }
 
   function openStudent(id: string) {
     bump((n) => n + 1)
@@ -129,6 +148,51 @@ export function StudentTilesPage() {
 
   function closeStudent() {
     setSearchParams({}, { replace: true })
+  }
+
+  async function onArrCsv(file: File) {
+    try {
+      const text = await file.text()
+      const imported = studentsFromArrCsv(text)
+      setStudents(imported)
+      flash(`Imported ${imported.length} students from ARR CSV (this browser only)`)
+    } catch (err) {
+      flash(err instanceof Error ? err.message : 'CSV import failed')
+    }
+  }
+
+  async function onEnrichPdfs(files: FileList | File[]) {
+    const list = [...files].filter((f) => /\.pdf$/i.test(f.name))
+    if (!list.length) {
+      flash('Select Enrich Snapshot PDF file(s)')
+      return
+    }
+    setImportBusy(true)
+    try {
+      const parsed = await parseEnrichSnapshotFiles(list)
+      if (!parsed.length) {
+        flash('No student profiles found in those PDFs')
+        return
+      }
+      const mergeMode =
+        students.some((s) => s.source === 'demo') && students.every((s) => s.source === 'demo')
+          ? 'enrich-only'
+          : 'merge'
+      // If only demo data, replace with Enrich; otherwise enrich existing ARR/caseload
+      const result = mergeEnrichIntoCaseload(
+        students,
+        parsed,
+        mergeMode === 'enrich-only' ? 'enrich-only' : 'merge',
+      )
+      setStudents(result.students)
+      flash(
+        `Enrich snapshots: ${result.parsed} profiles · +${result.added} added · ${result.updated} updated (browser only)`,
+      )
+    } catch (err) {
+      flash(err instanceof Error ? err.message : 'Enrich PDF import failed')
+    } finally {
+      setImportBusy(false)
+    }
   }
 
   const filtered = useMemo(() => {
@@ -140,7 +204,8 @@ export function StudentTilesPage() {
         s.name.toLowerCase().includes(q) ||
         (s.caseManager || '').toLowerCase().includes(q) ||
         (s.teacher || '').toLowerCase().includes(q) ||
-        (s.homeLanguage || '').toLowerCase().includes(q)
+        (s.homeLanguage || '').toLowerCase().includes(q) ||
+        (s.lasid || '').includes(q)
       )
     })
   }, [students, filter, search])
@@ -155,8 +220,13 @@ export function StudentTilesPage() {
   return (
     <PageShell
       title="🧩 Student Tiles"
-      description="Individual student data walls — materials (token / schedule / comm / behavior), open FBA sessions, and program flags. Open from Caseload via /students?id=…. Demo data is fictional; real caseloads stay in browser localStorage only (FERPA)."
+      description="Individual student data walls — import ARR CSV + Enrich Snapshot PDFs (browser only), materials, and start FBA sessions. Real caseloads never leave this browser (FERPA)."
     >
+      {toast && (
+        <div className="mb-3 rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white">
+          {toast}
+        </div>
+      )}
       {selectedId && !selected ? (
         <div className="mb-3 rounded-lg tint-sun px-3 py-2 text-xs font-semibold">
           No student found for id <code>{selectedId}</code>.{' '}
@@ -169,16 +239,57 @@ export function StudentTilesPage() {
         <p className="text-xs text-[var(--subtext)]">
           {filtered.length} of {students.length} students
           {students.some((s) => s.source === 'demo') ? ' · demo caseload' : ''}
+          {students.some((s) => s.source === 'arr-csv') ? ' · ARR CSV' : ''}
+          {students.some((s) => s.source === 'enrich-snapshot') ? ' · Enrich snapshots' : ''}
         </p>
-        <button
-          type="button"
-          className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-semibold text-[var(--text)]"
-          onClick={() => {
-            if (confirm('Restore fictional demo students in this browser?')) restoreDemo()
-          }}
-        >
-          Restore Demo
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-semibold"
+            onClick={() => csvRef.current?.click()}
+          >
+            Import ARR CSV
+          </button>
+          <input
+            ref={csvRef}
+            type="file"
+            accept=".csv,text/csv"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0]
+              if (f) void onArrCsv(f)
+              e.target.value = ''
+            }}
+          />
+          <button
+            type="button"
+            className="rounded-lg bg-[var(--accent)] px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
+            disabled={importBusy}
+            onClick={() => enrichRef.current?.click()}
+          >
+            {importBusy ? 'Reading PDFs…' : 'Import Enrich Snapshots'}
+          </button>
+          <input
+            ref={enrichRef}
+            type="file"
+            accept="application/pdf,.pdf"
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files?.length) void onEnrichPdfs(e.target.files)
+              e.target.value = ''
+            }}
+          />
+          <button
+            type="button"
+            className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-semibold text-[var(--text)]"
+            onClick={() => {
+              if (confirm('Restore fictional demo students in this browser?')) restoreDemo()
+            }}
+          >
+            Restore Demo
+          </button>
+        </div>
       </div>
 
       <div className="mb-3 flex flex-wrap gap-2">
@@ -287,7 +398,10 @@ export function StudentTilesPage() {
               <div className="mb-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs">
                 <p className="font-semibold">Open FBA session</p>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  <Link to={`/fba?session=${loadFbaSessions().find((f) => f.studentId === selected.id && f.open)?.id || ''}`} className="font-semibold text-[var(--accent)]">
+                  <Link
+                    to={`/fba?session=${loadFbaSessions().find((f) => f.studentId === selected.id && f.open)?.id || ''}`}
+                    className="font-semibold text-[var(--accent)]"
+                  >
                     Open FBA sheet →
                   </Link>
                   <button
@@ -297,7 +411,8 @@ export function StudentTilesPage() {
                       const sid = loadFbaSessions().find(
                         (f) => f.studentId === selected.id && f.open,
                       )?.id
-                      if (sid) window.open(`/fba/tally/${sid}`, 'prism-fba-tally', 'width=420,height=640')
+                      if (sid)
+                        window.open(`/fba/tally/${sid}`, 'prism-fba-tally', 'width=420,height=640')
                     }}
                   >
                     +/- tally pop-out
@@ -305,16 +420,55 @@ export function StudentTilesPage() {
                 </div>
               </div>
             ) : (
-              <p className="mb-3 text-xs text-[var(--subtext)]">
-                No open FBA.{' '}
-                <Link to="/fba" className="font-semibold text-[var(--accent)]">
-                  Start one →
-                </Link>
-              </p>
+              <div className="mb-3 rounded-xl border border-[var(--border)] bg-[var(--slate)] p-3 text-xs">
+                <p className="mb-2 text-[var(--subtext)]">No open FBA for this student yet.</p>
+                <button
+                  type="button"
+                  className="rounded-lg bg-rose-600 px-3 py-1.5 font-semibold text-white"
+                  onClick={() => {
+                    const sess = startFbaForStudent(selected.id, selected.name)
+                    bump((n) => n + 1)
+                    navigate(`/fba?session=${sess.id}`)
+                  }}
+                >
+                  Start FBA for {selected.name.split(' ')[0]}
+                </button>
+              </div>
+            )}
+
+            {(selected.goals.length > 0 || selected.accommodations.length > 0) && (
+              <div className="mb-3 space-y-2 text-[10px] text-[var(--subtext)]">
+                {selected.disability && selected.disability !== '—' && (
+                  <p>
+                    <strong className="text-[var(--text)]">Disability:</strong> {selected.disability}
+                  </p>
+                )}
+                {selected.goals.length > 0 && (
+                  <div>
+                    <strong className="text-[var(--text)]">Goals</strong>
+                    <ul className="mt-1 list-disc space-y-1 pl-4">
+                      {selected.goals.slice(0, 4).map((g) => (
+                        <li key={g.slice(0, 40)}>{g}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {selected.accommodations.length > 0 && (
+                  <div>
+                    <strong className="text-[var(--text)]">Accommodations</strong>
+                    <ul className="mt-1 list-disc space-y-1 pl-4">
+                      {selected.accommodations.slice(0, 5).map((a) => (
+                        <li key={a.slice(0, 40)}>{a}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             )}
 
             <p className="text-[10px] text-[var(--subtext)]">
-              Goals: {selected.goals.join(' · ') || '—'}
+              Goals: {selected.goals.length ? `${selected.goals.length} on file` : '—'}
+              {selected.lasid ? ` · LASID ${selected.lasid}` : ''}
             </p>
           </aside>
         </div>

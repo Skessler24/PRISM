@@ -75,6 +75,27 @@ export function openFbaSessions(): FbaSession[] {
   return read().filter((s) => s.open)
 }
 
+/** Start or reopen an FBA session for a caseload student. */
+export function startFbaForStudent(studentId: string, studentName: string): FbaSession {
+  const existing = read().find((s) => s.studentId === studentId && s.open)
+  if (existing) return existing
+  const session: FbaSession = {
+    id: `fba-${studentId || 'new'}-${Date.now()}`,
+    studentId,
+    studentName,
+    targetBehavior: '',
+    abc: [],
+    functions: [],
+    tallies: [],
+    open: true,
+    fbaOut: '',
+    bipOut: '',
+    updatedAt: new Date().toISOString(),
+  }
+  upsertFbaSession(session)
+  return session
+}
+
 export function applyTally(
   sessionId: string,
   delta: number,

@@ -40,6 +40,10 @@ export type Student = {
   hasAlp?: boolean
   /** ISO date YYYY-MM-DD — optional for age calculator */
   dob?: string
+  /** Local district student number (LASID) — browser only */
+  lasid?: string
+  /** State SASID — browser only */
+  sasid?: string
 }
 
 export type StudentFilter = 'All' | 'IEP' | '504' | 'MLL' | string

@@ -6,6 +6,7 @@ import { useStudents } from '../../lib/students/useStudents'
 import { chat } from '../../lib/ai/client'
 import { FieldTip } from '../../lib/help-assist/FieldTip'
 import { readSuiteMode } from '../../lib/templates/catalog'
+import { draftBipPlan, draftFbaSummary } from '../../lib/fba/offlineDrafts'
 import {
   getFbaSession,
   loadFbaSessions,
@@ -149,14 +150,15 @@ export function FbaBipPage() {
       )
       .join('\n')
     const tallyLine = `Live tallies total: ${tallyTotal(session)} (${session.tallies.length} events)`
-    const res = await chat([
-      {
-        role: 'system',
-        content: `You are a behavior specialist writing FBA summaries for ${profile.name}. Be clinical, operational, and IDEA-aligned. Do not invent live ${iep} sync. FBA is required before BIP per district practice.`,
-      },
-      {
-        role: 'user',
-        content: `Write an FBA Summary for ${student?.name || session.studentName || 'the student'} (${student?.grade || 'grade TBD'}, disability: ${student?.disability || 'n/a'}).
+    try {
+      const res = await chat([
+        {
+          role: 'system',
+          content: `You are a behavior specialist writing FBA summaries for ${profile.name}. Be clinical, operational, and IDEA-aligned. Do not invent live ${iep} sync. FBA is required before BIP per district practice.`,
+        },
+        {
+          role: 'user',
+          content: `Write an FBA Summary for ${student?.name || session.studentName || 'the student'} (${student?.grade || 'grade TBD'}, disability: ${student?.disability || 'n/a'}).
 Target behavior: ${session.targetBehavior || 'not specified'}
 Hypothesized function(s): ${session.functions.join(', ') || 'not selected'}
 ${tallyLine}
@@ -165,29 +167,40 @@ ${abcText || 'None entered'}
 Triggers/calming notes: ${student?.triggers || '—'} / ${student?.calming || '—'}
 
 Include: operational definition, setting events, pattern summary, hypothesized function with rationale, recommended next steps toward BIP.`,
-      },
-    ])
-    setBusy(null)
-    if (res.error && !res.content) {
-      flash(res.error)
-      return
+        },
+      ])
+      setBusy(null)
+      if (res.error && !res.content) {
+        const offline = draftFbaSummary(session, student)
+        persist({ ...session, fbaOut: offline, open: true })
+        flash(`AI unavailable — offline FBA draft ready (${res.error})`)
+        return
+      }
+      persist({ ...session, fbaOut: res.content, open: true })
+      if (!bipBehavior && session.targetBehavior) setBipBehavior(session.targetBehavior)
+      if (!bipFunction && session.functions.length) setBipFunction(session.functions.join(', '))
+      flash('FBA summary ready — review before Copy')
+    } catch (err) {
+      setBusy(null)
+      const offline = draftFbaSummary(session, student)
+      persist({ ...session, fbaOut: offline, open: true })
+      flash(
+        `AI unavailable — offline FBA draft ready (${err instanceof Error ? err.message : 'network'})`,
+      )
     }
-    persist({ ...session, fbaOut: res.content, open: true })
-    if (!bipBehavior && session.targetBehavior) setBipBehavior(session.targetBehavior)
-    if (!bipFunction && session.functions.length) setBipFunction(session.functions.join(', '))
-    flash('FBA summary ready — review before Copy')
   }
 
   async function generateBip() {
     setBusy('bip')
-    const res = await chat([
-      {
-        role: 'system',
-        content: `You write Behavior Intervention Plans for ${profile.name}. Include prevention, replacement, reinforcement, crisis/safety, and progress monitoring. Human review required. Companion: draft for paste into ${iep}.`,
-      },
-      {
-        role: 'user',
-        content: `Generate a BIP draft for ${student?.name || session.studentName || 'the student'}.
+    try {
+      const res = await chat([
+        {
+          role: 'system',
+          content: `You write Behavior Intervention Plans for ${profile.name}. Include prevention, replacement, reinforcement, crisis/safety, and progress monitoring. Human review required. Companion: draft for paste into ${iep}.`,
+        },
+        {
+          role: 'user',
+          content: `Generate a BIP draft for ${student?.name || session.studentName || 'the student'}.
 Target behavior: ${bipBehavior || session.targetBehavior || 'n/a'}
 Function: ${bipFunction || session.functions.join(', ') || 'n/a'}
 Prevention notes: ${bipPrevention || 'n/a'}
@@ -200,15 +213,32 @@ FBA summary context:
 ${session.fbaOut || 'None yet'}
 
 Produce a complete BIP draft ready for team review.`,
-      },
-    ])
-    setBusy(null)
-    if (res.error && !res.content) {
-      flash(res.error)
-      return
+        },
+      ])
+      setBusy(null)
+      if (res.error && !res.content) {
+        const offline = draftBipPlan(
+          {
+            ...session,
+            targetBehavior: bipBehavior || session.targetBehavior,
+            functions: bipFunction ? [bipFunction, ...session.functions] : session.functions,
+          },
+          student,
+        )
+        persist({ ...session, bipOut: offline })
+        flash(`AI unavailable — offline BIP draft ready (${res.error})`)
+        return
+      }
+      persist({ ...session, bipOut: res.content })
+      flash('BIP draft ready — review before Copy')
+    } catch (err) {
+      setBusy(null)
+      const offline = draftBipPlan(session, student)
+      persist({ ...session, bipOut: offline })
+      flash(
+        `AI unavailable — offline BIP draft ready (${err instanceof Error ? err.message : 'network'})`,
+      )
     }
-    persist({ ...session, bipOut: res.content })
-    flash('BIP draft ready — review before Copy')
   }
 
   async function copyText(text: string, label: string) {
