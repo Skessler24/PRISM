@@ -162,3 +162,77 @@ h3,
   min-width: 200%;
   animation: marquee 45s linear infinite;
 }
+
+/* Team IEP schedule grid patterns (from Copilot artifact) */
+.team-pat-lunch {
+  background: repeating-linear-gradient(
+    45deg,
+    #fbbf24 0px,
+    #fbbf24 2px,
+    #fef9c3 2px,
+    #fef9c3 8px
+  );
+}
+.team-pat-specials {
+  background: repeating-linear-gradient(
+    45deg,
+    #fb923c 0px,
+    #fb923c 2px,
+    #ffedd5 2px,
+    #ffedd5 8px
+  );
+}
+.team-pat-testing {
+  background: repeating-linear-gradient(
+    45deg,
+    #f87171 0px,
+    #f87171 2px,
+    #fee2e2 2px,
+    #fee2e2 8px
+  );
+}
+.team-pat-iep {
+  background: repeating-linear-gradient(
+    45deg,
+    #a855f7 0px,
+    #a855f7 2px,
+    #f3e8ff 2px,
+    #f3e8ff 8px
+  );
+}
+.team-pat-other {
+  background: repeating-linear-gradient(
+    45deg,
+    #9ca3af 0px,
+    #9ca3af 2px,
+    #f3f4f6 2px,
+    #f3f4f6 8px
+  );
+}
+.team-pat-blocked {
+  background: repeating-linear-gradient(
+    45deg,
+    #9ca3af 0px,
+    #9ca3af 2px,
+    #e5e7eb 2px,
+    #e5e7eb 8px
+  );
+}
+
+@keyframes countdown-pop {
+  0% {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.countdown-badge {
+  animation: countdown-pop 0.45s ease-out;
+}

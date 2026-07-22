@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Team IEP Scheduling Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              fg: { 50:'#fafaf9',100:'#f5f5f4',200:'#e7e5e4',300:'#d6d3d1',400:'#a8a29e',500:'#78716c',600:'#57534e',700:'#44403c',800:'#292524',900:'#1c1917' },
+              bg: { 50:'#fafaf9',100:'#f5f5f4',150:'#f0eeec',200:'#e7e5e4',300:'#d6d3d1' },
+              pri: { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a5f' },
+              teal: { 50:'#f0fdfa',100:'#ccfbf1',200:'#99f6e8',300:'#5eead4',400:'#2dd4bf',500:'#14b8a6',600:'#0d9488',700:'#0f766e' },
+              grn: { 50:'#f0fdf4',100:'#dcfce7',200:'#bbf7d0',300:'#86efac',400:'#4ade80',500:'#22c55e',600:'#16a34a',700:'#15803d' },
+              red: { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',300:'#fca5a5',400:'#f87171',500:'#ef4444',600:'#dc2626',700:'#b91c1c' },
+              yel: { 50:'#fefce8',100:'#fef9c3',200:'#fef08a',300:'#fde047',400:'#facc15',500:'#eab308',600:'#ca8a04',700:'#a16207' },
+              ora: { 50:'#fff7ed',100:'#ffedd5',200:'#fed7aa',300:'#fdba74',400:'#fb923c',500:'#f97316',600:'#ea580c' },
+              pur: { 50:'#faf5ff',100:'#f3e8ff',200:'#e9d5ff',300:'#d8b4fe',400:'#c084fc',500:'#a855f7',600:'#9333ea',700:'#7e22ce' },
+            },
+            fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          },
+        },
+      };
+    </script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+      body { font-family: 'Inter', system-ui, sans-serif; margin: 0; background: #f5f5f4; }
+      .tab-btn { position: relative; }
+      .tab-btn.active::after { content:''; position:absolute; bottom:-1px; left:8px; right:8px; height:2px; background:#3b82f6; border-radius:2px; }
+      .schedule-cell { position:relative; min-height:40px; cursor:pointer; transition:background 0.12s; }
+      .schedule-cell:hover .cell-plus { opacity:1; }
+      .cell-plus { opacity:0; transition:opacity 0.12s; pointer-events:none; }
+      .schedule-cell.block-mode:not(.has-session):not(.is-blocked):not(.is-constraint):hover { background:#fef2f2 !important; }
+      .schedule-cell:not(.block-mode):not(.has-session):not(.is-blocked):not(.is-constraint):hover { background:#eff6ff !important; }
+      .session-card { border-radius:6px; padding:2px 5px; color:#fff; font-size:10px; line-height:1.25; cursor:pointer; position:relative; z-index:2; }
+      .session-card:hover { filter:brightness(1.12); }
+      .progress-bar-bg { height:5px; border-radius:3px; overflow:hidden; }
+      .progress-bar-fill { height:100%; border-radius:3px; transition:width 0.3s; }
+      .color-pick { width:26px; height:26px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:border-color 0.12s,transform 0.12s; }
+      .color-pick:hover,.color-pick.selected { border-color:#1c1917; transform:scale(1.15); }
+      .modal-overlay { opacity:0; transition:opacity 0.15s; }
+      .modal-overlay.active { opacity:1; }
+      .popover { position:fixed; z-index:60; min-width:200px; }
+      .toast-container { position:fixed; bottom:20px; right:20px; z-index:100; display:flex; flex-direction:column; gap:8px; pointer-events:none; }
+      .toast { pointer-events:auto; padding:10px 16px; border-radius:10px; font-size:13px; font-weight:500; color:#fff; box-shadow:0 4px 12px rgba(0,0,0,.15); animation:toastIn .25s ease; }
+      @keyframes toastIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+      .toast.success { background:#16a34a; }
+      .toast.error { background:#dc2626; }
+      .toast.info { background:#2563eb; }
+      .blocked-pattern { background:repeating-linear-gradient(45deg,#9ca3af 0px,#9ca3af 2px,#e5e7eb 2px,#e5e7eb 8px); }
+      .lunch-pattern { background:repeating-linear-gradient(45deg,#fbbf24 0px,#fbbf24 2px,#fef9c3 2px,#fef9c3 8px); }
+      .specials-pattern { background:repeating-linear-gradient(45deg,#fb923c 0px,#fb923c 2px,#ffedd5 2px,#ffedd5 8px); }
+      .iep-pattern { background:repeating-linear-gradient(45deg,#a855f7 0px,#a855f7 2px,#f3e8ff 2px,#f3e8ff 8px); }
+      .testing-pattern { background:repeating-linear-gradient(45deg,#f87171 0px,#f87171 2px,#fee2e2 2px,#fee2e2 8px); }
+      .other-pattern { background:repeating-linear-gradient(45deg,#9ca3af 0px,#9ca3af 2px,#f3f4f6 2px,#f3f4f6 8px); }
+      .sidebar-scroll::-webkit-scrollbar { width:4px; }
+      .sidebar-scroll::-webkit-scrollbar-thumb { background:#d6d3d1; border-radius:3px; }
+      .student-card-sidebar:hover .del-stu { opacity:1; }
+      .del-stu { opacity:0; transition:opacity 0.12s; }
+      .prov-card:hover .prov-actions { opacity:1; }
+      .prov-actions { opacity:0; transition:opacity 0.12s; }
+      .drag-zone { border:2px dashed #d6d3d1; border-radius:12px; padding:32px; text-align:center; transition:border-color 0.15s,background 0.15s; }
+      .drag-zone.dragover { border-color:#3b82f6; background:#eff6ff; }
+      .day-circle { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; }
+      .day-circle.active { background:#3b82f6; color:#fff; }
+      .day-circle.inactive { background:#e7e5e4; color:#a8a29e; }
+      @media print {
+        .top-nav,.schedule-sidebar,.toast-container { display:none !important; }
+        .schedule-main { margin-left:0 !important; }
+        body { background:#fff !important; }
+      }
+    </style>
+</head>
+<body data-id="0" class="min-h-screen">
+    <app-icon data-id="1" hidden data-icon="calendar-days" data-palette="Blue"></app-icon>
+
+    <!-- TOAST CONTAINER -->
+    <div data-id="2" id="toast-container" class="toast-container"></div>
+
+    <!-- TOP NAV -->
+    <nav data-id="3" id="top-nav" class="top-nav bg-white border-b border-bg-300 sticky top-0 z-40">
+      <div data-id="4" class="max-w-[1400px] mx-auto px-4 flex items-center justify-between h-12">
+        <div data-id="5" class="flex items-center gap-2">
+          <span data-id="6" class="text-lg">🎓</span>
+          <span data-id="7" class="font-bold text-fg-800 text-sm md:text-base">Team IEP Platform</span>
+        </div>
+        <div data-id="8" class="hidden md:flex items-center gap-1">
+          <button data-id="9" class="tab-btn active px-3 py-3 text-sm font-medium text-fg-700 hover:text-pri-600 transition" data-tab="schedule">📅 Schedule</button>
+          <button data-id="10" class="tab-btn px-3 py-3 text-sm font-medium text-fg-700 hover:text-pri-600 transition" data-tab="providers">👥 Providers</button>
+          <button data-id="11" class="tab-btn px-3 py-3 text-sm font-medium text-fg-700 hover:text-pri-600 transition" data-tab="students">🎓 Students</button>
+          <button data-id="12" class="tab-btn px-3 py-3 text-sm font-medium text-fg-700 hover:text-pri-600 transition" data-tab="parameters">⚙️ Parameters</button>
+        </div>
+        <button data-id="13" id="mobile-nav-btn" class="md:hidden p-2"><i data-id="14" data-lucide="menu" class="w-5 h-5 text-fg-700"></i></button>
+      </div>
+    </nav>
+
+    <!-- MOBILE NAV OVERLAY -->
+    <div data-id="15" id="mobile-nav-overlay" class="hidden fixed inset-0 z-50 bg-fg-900/40">
+      <div data-id="16" class="bg-white w-64 h-full p-4 flex flex-col gap-2">
+        <div data-id="17" class="flex justify-between items-center mb-4">
+          <span data-id="18" class="font-bold text-fg-800">Menu</span>
+          <button data-id="19" id="mobile-nav-close" class="p-2"><i data-id="20" data-lucide="x" class="w-5 h-5 text-fg-600"></i></button>
+        </div>
+        <button data-id="21" class="mob-tab-btn text-left px-3 py-2.5 rounded-lg text-sm font-medium text-fg-700 hover:bg-bg-200 transition" data-tab="schedule">📅 Schedule</button>
+        <button data-id="22" class="mob-tab-btn text-left px-3 py-2.5 rounded-lg text-sm font-medium text-fg-700 hover:bg-bg-200 transition" data-tab="providers">👥 Providers</button>
+        <button data-id="23" class="mob-tab-btn text-left px-3 py-2.5 rounded-lg text-sm font-medium text-fg-700 hover:bg-bg-200 transition" data-tab="students">🎓 Students</button>
+        <button data-id="24" class="mob-tab-btn text-left px-3 py-2.5 rounded-lg text-sm font-medium text-fg-700 hover:bg-bg-200 transition" data-tab="parameters">⚙️ Parameters</button>
+      </div>
+    </div>
+
+    <!-- TAB CONTENT -->
+    <div data-id="25" id="tab-schedule" class="tab-content">
+      <div data-id="26" class="flex min-h-[calc(100vh-48px)]">
+        <!-- Schedule Sidebar -->
+        <aside data-id="27" id="sched-sidebar" class="schedule-sidebar hidden md:flex flex-col w-72 bg-white border-r border-bg-300 flex-shrink-0">
+          <div data-id="28" class="px-4 pt-3 pb-2 border-b border-bg-200">
+            <label data-id="29" class="text-xs font-semibold text-fg-500 uppercase tracking-wide">Viewing</label>
+            <select data-id="30" id="provider-filter" class="mt-1 w-full bg-bg-150 rounded-lg px-2.5 py-2 text-sm text-fg-800 outline-none border border-bg-300 focus:border-pri-400"></select>
+          </div>
+          <div data-id="31" id="provider-legend" class="hidden px-4 py-2 border-b border-bg-200 flex-wrap gap-2"></div>
+          <div data-id="32" class="px-4 pt-3 pb-1 flex items-center justify-between">
+            <div data-id="33" class="flex items-center gap-1.5">
+              <span data-id="34" class="text-xs font-semibold text-fg-800">Caseload</span>
+              <span data-id="35" id="sidebar-count" class="text-xs bg-pri-100 text-pri-700 font-semibold px-1.5 py-0.5 rounded-full">0</span>
+            </div>
+          </div>
+          <div data-id="36" class="px-4 pb-2">
+            <button data-id="37" id="sidebar-add-student" class="w-full bg-pri-500 text-white text-xs font-medium py-2 rounded-lg hover:bg-pri-600 transition flex items-center justify-center gap-1">
+              <i data-id="38" data-lucide="plus" class="w-3.5 h-3.5"></i> Add Student
+            </button>
+          </div>
+          <div data-id="39" id="sidebar-students" class="flex-1 overflow-y-auto sidebar-scroll px-3 pb-2 space-y-1"></div>
+          <div data-id="40" class="border-t border-bg-200 px-4 py-2">
+            <h3 data-id="41" class="text-xs font-semibold text-fg-500 uppercase tracking-wide mb-1.5">Minutes Summary</h3>
+            <div data-id="42" id="sidebar-minutes" class="space-y-1.5 max-h-28 overflow-y-auto sidebar-scroll"></div>
+          </div>
+        </aside>
+
+        <!-- Schedule Main -->
+        <div data-id="43" class="schedule-main flex-1 flex flex-col">
+          <header data-id="44" class="bg-white border-b border-bg-200 px-4 py-2.5 flex items-center justify-between">
+            <h2 data-id="45" class="text-base font-semibold text-fg-800">Weekly Schedule</h2>
+            <div data-id="46" class="flex items-center gap-1.5">
+              <button data-id="47" id="block-toggle" class="text-xs font-medium px-2.5 py-1.5 rounded-lg border border-bg-300 hover:bg-bg-200 transition flex items-center gap-1 text-fg-700">
+                <i data-id="48" data-lucide="ban" class="w-3.5 h-3.5"></i> <span data-id="49" class="hidden sm:inline">Block Time</span>
+              </button>
+              <button data-id="50" id="tracker-btn" class="text-xs font-medium px-2.5 py-1.5 rounded-lg border border-bg-300 hover:bg-bg-200 transition flex items-center gap-1 text-fg-700">
+                <i data-id="51" data-lucide="clipboard-list" class="w-3.5 h-3.5"></i> <span data-id="52" class="hidden sm:inline">Tracker</span>
+              </button>
+              <button data-id="53" id="print-btn" class="text-xs font-medium px-2.5 py-1.5 rounded-lg border border-bg-300 hover:bg-bg-200 transition flex items-center gap-1 text-fg-700">
+                <i data-id="54" data-lucide="printer" class="w-3.5 h-3.5"></i> <span data-id="55" class="hidden sm:inline">Print</span>
+              </button>
+            </div>
+          </header>
+          <div data-id="56" class="flex-1 p-3 md:p-4 overflow-x-auto">
+            <div data-id="57" class="bg-white rounded-xl p-3 shadow-sm" style="min-width:680px;">
+              <table data-id="58" id="schedule-grid" class="w-full table-fixed border-collapse">
+                <thead data-id="59">
+                  <tr data-id="60">
+                    <th data-id="61" class="w-[60px] text-xs font-medium text-fg-400 uppercase tracking-wide py-1.5 text-left pl-1">Time</th>
+                    <th data-id="62" class="text-xs font-medium text-fg-400 uppercase tracking-wide py-1.5 text-center">Mon</th>
+                    <th data-id="63" class="text-xs font-medium text-fg-400 uppercase tracking-wide py-1.5 text-center">Tue</th>
+                    <th data-id="64" class="text-xs font-medium text-fg-400 uppercase tracking-wide py-1.5 text-center">Wed</th>
+                    <th data-id="65" class="text-xs font-medium text-fg-400 uppercase tracking-wide py-1.5 text-center">Thu</th>
+                    <th data-id="66" class="text-xs font-medium text-fg-400 uppercase tracking-wide py-1.5 text-center">Fri</th>
+                  </tr>
+                </thead>
+                <tbody data-id="67" id="schedule-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div data-id="68" id="tab-providers" class="tab-content hidden">
+      <div data-id="69" class="max-w-[1200px] mx-auto p-4 md:p-6">
+        <div data-id="70" class="flex items-center justify-between mb-5">
+          <h2 data-id="71" class="text-xl font-bold text-fg-900">Provider Team</h2>
+          <button data-id="72" id="add-provider-btn" class="bg-teal-500 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-teal-600 transition flex items-center gap-1.5">
+            <i data-id="73" data-lucide="plus" class="w-4 h-4"></i> Add Provider
+          </button>
+        </div>
+        <div data-id="74" id="providers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        <div data-id="75" class="mt-6">
+          <button data-id="76" id="import-providers-btn" class="text-sm font-medium text-pri-600 hover:text-pri-700 flex items-center gap-1.5">
+            <i data-id="77" data-lucide="download" class="w-4 h-4"></i> Import Providers from CSV
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div data-id="78" id="tab-students" class="tab-content hidden">
+      <div data-id="79" class="max-w-[1200px] mx-auto p-4 md:p-6">
+        <div data-id="80" class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 mb-5">
+          <h2 data-id="81" class="text-xl font-bold text-fg-900">Student Roster</h2>
+          <div data-id="82" class="flex gap-2">
+            <button data-id="83" id="add-student-page-btn" class="bg-pri-500 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-pri-600 transition flex items-center gap-1.5">
+              <i data-id="84" data-lucide="plus" class="w-4 h-4"></i> Add Student
+            </button>
+            <button data-id="85" id="import-students-btn" class="bg-bg-200 text-fg-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-bg-300 transition flex items-center gap-1.5">
+              <i data-id="86" data-lucide="download" class="w-4 h-4"></i> Import CSV
+            </button>
+          </div>
+        </div>
+        <div data-id="87" class="flex flex-col md:flex-row gap-2 mb-4">
+          <select data-id="88" id="filter-provider" class="bg-white border border-bg-300 rounded-lg px-3 py-2 text-sm text-fg-700 outline-none"><option data-id="89" value="">All Providers</option></select>
+          <select data-id="90" id="filter-grade" class="bg-white border border-bg-300 rounded-lg px-3 py-2 text-sm text-fg-700 outline-none"><option data-id="91" value="">All Grades</option></select>
+          <select data-id="92" id="filter-service" class="bg-white border border-bg-300 rounded-lg px-3 py-2 text-sm text-fg-700 outline-none"><option data-id="93" value="">All Services</option></select>
+          <input data-id="94" id="filter-search" type="text" placeholder="Search by name..." class="bg-white border border-bg-300 rounded-lg px-3 py-2 text-sm text-fg-700 outline-none flex-1 min-w-[150px]">
+        </div>
+        <div data-id="95" class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div data-id="96" class="overflow-x-auto">
+            <table data-id="97" class="w-full text-left">
+              <thead data-id="98" class="bg-bg-150 text-xs font-medium uppercase tracking-wide text-fg-500">
+                <tr data-id="99">
+                  <th data-id="100" class="px-4 py-2.5">Student</th>
+                  <th data-id="101" class="px-4 py-2.5">Grade</th>
+                  <th data-id="102" class="px-4 py-2.5">Service</th>
+                  <th data-id="103" class="px-4 py-2.5">Provider</th>
+                  <th data-id="104" class="px-4 py-2.5 text-right">Req Min/Wk</th>
+                  <th data-id="105" class="px-4 py-2.5 text-right">Sched Min</th>
+                  <th data-id="106" class="px-4 py-2.5">Progress</th>
+                  <th data-id="107" class="px-4 py-2.5">Notes</th>
+                  <th data-id="108" class="px-4 py-2.5 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody data-id="109" id="students-table-body" class="divide-y divide-bg-200"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div data-id="110" id="tab-parameters" class="tab-content hidden">
+      <div data-id="111" class="max-w-[1000px] mx-auto p-4 md:p-6 space-y-8">
+        <!-- Section A: Master Schedule -->
+        <section data-id="112">
+          <h2 data-id="113" class="text-lg font-bold text-fg-900 mb-1">📋 Master School Schedule</h2>
+          <p data-id="114" class="text-sm text-fg-500 mb-4">Upload your school's master schedule to set global protected times for all providers.</p>
+          <div data-id="115" id="master-drag-zone" class="drag-zone mb-4 cursor-pointer">
+            <input data-id="116" type="file" id="master-csv-input" accept=".csv" class="hidden">
+            <p data-id="117" class="text-fg-500 text-sm mb-2">📂 Drop a CSV file here or click to upload</p>
+            <p data-id="118" class="text-xs text-fg-400">Expected format: Day, StartTime, EndTime, Type, Label</p>
+          </div>
+          <div data-id="119" class="flex items-center justify-between mb-2">
+            <h3 data-id="120" class="text-sm font-semibold text-fg-700">Current Constraints</h3>
+            <button data-id="121" id="add-constraint-btn" class="text-xs font-medium text-pri-600 hover:text-pri-700 flex items-center gap-1"><i data-id="122" data-lucide="plus" class="w-3.5 h-3.5"></i> Add Constraint</button>
+          </div>
+          <div data-id="123" class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div data-id="124" class="overflow-x-auto">
+              <table data-id="125" class="w-full text-left text-sm">
+                <thead data-id="126" class="bg-bg-150 text-xs font-medium uppercase tracking-wide text-fg-500">
+                  <tr data-id="127"><th data-id="128" class="px-4 py-2">Day</th><th data-id="129" class="px-4 py-2">Time</th><th data-id="130" class="px-4 py-2">Type</th><th data-id="131" class="px-4 py-2">Label</th><th data-id="132" class="px-4 py-2 text-center">Actions</th></tr>
+                </thead>
+                <tbody data-id="133" id="constraints-table" class="divide-y divide-bg-200"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section B: IEP Days -->
+        <section data-id="134">
+          <h2 data-id="135" class="text-lg font-bold text-fg-900 mb-1">📅 IEP Days & Protected Dates</h2>
+          <p data-id="136" class="text-sm text-fg-500 mb-3">Track IEP meeting dates and block scheduling as needed.</p>
+          <button data-id="137" id="add-iep-day-btn" class="bg-pur-500 text-white text-xs font-medium px-3 py-2 rounded-lg hover:bg-pur-600 transition flex items-center gap-1 mb-3"><i data-id="138" data-lucide="plus" class="w-3.5 h-3.5"></i> Add IEP Day</button>
+          <div data-id="139" id="iep-days-list" class="space-y-2"></div>
+        </section>
+
+        <!-- Section C: Settings -->
+        <section data-id="140">
+          <h2 data-id="141" class="text-lg font-bold text-fg-900 mb-1">🏫 School Schedule Settings</h2>
+          <div data-id="142" class="bg-white rounded-xl shadow-sm p-4 space-y-4">
+            <div data-id="143" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div data-id="144"><label data-id="145" class="text-xs font-medium text-fg-500 uppercase">School Year Start</label><input data-id="146" type="date" id="set-year-start" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></div>
+              <div data-id="147"><label data-id="148" class="text-xs font-medium text-fg-500 uppercase">School Year End</label><input data-id="149" type="date" id="set-year-end" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></div>
+              <div data-id="150"><label data-id="151" class="text-xs font-medium text-fg-500 uppercase">Day Start Time</label><select data-id="152" id="set-day-start" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></select></div>
+              <div data-id="153"><label data-id="154" class="text-xs font-medium text-fg-500 uppercase">Day End Time</label><select data-id="155" id="set-day-end" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></select></div>
+            </div>
+            <div data-id="156">
+              <label data-id="157" class="text-xs font-medium text-fg-500 uppercase mb-1 block">Default Session Duration</label>
+              <div data-id="158" class="flex gap-3">
+                <label data-id="159" class="flex items-center gap-1.5 text-sm cursor-pointer"><input data-id="160" type="radio" name="def-dur" value="30" class="accent-pri-500"> 30 min</label>
+                <label data-id="161" class="flex items-center gap-1.5 text-sm cursor-pointer"><input data-id="162" type="radio" name="def-dur" value="60" class="accent-pri-500"> 60 min</label>
+              </div>
+            </div>
+            <button data-id="163" id="save-settings-btn" class="bg-pri-500 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-pri-600 transition">Save Settings</button>
+          </div>
+          <div data-id="164" class="flex gap-3 mt-4">
+            <button data-id="165" id="export-data-btn" class="bg-bg-200 text-fg-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-bg-300 transition flex items-center gap-1.5"><i data-id="166" data-lucide="download" class="w-4 h-4"></i> Export All Data (JSON)</button>
+            <button data-id="167" id="reset-data-btn" class="bg-red-100 text-red-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-red-200 transition flex items-center gap-1.5"><i data-id="168" data-lucide="trash-2" class="w-4 h-4"></i> Reset All Data</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer data-id="169" class="py-4 text-center border-t border-bg-200 bg-white mt-auto">
+      <p data-id="170" class="text-xs text-fg-400">Made by Copilot</p>
+    </footer>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- Provider Modal -->
+    <div data-id="171" id="provider-modal" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-fg-900/50 p-4">
+      <div data-id="172" class="bg-white rounded-xl w-full max-w-lg p-5 relative max-h-[90vh] overflow-y-auto shadow-xl">
+        <h3 data-id="173" id="provider-modal-title" class="text-lg font-semibold text-fg-900 mb-3">Add Provider</h3>
+        <div data-id="174" class="space-y-3">
+          <div data-id="175"><label data-id="176" class="text-xs font-medium text-fg-500 uppercase">Name *</label><input data-id="177" id="p-name" type="text" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none" placeholder="e.g. Jane Smith"></div>
+          <div data-id="178" class="grid grid-cols-2 gap-3">
+            <div data-id="179"><label data-id="180" class="text-xs font-medium text-fg-500 uppercase">Role</label><select data-id="181" id="p-role" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></select></div>
+            <div data-id="182"><label data-id="183" class="text-xs font-medium text-fg-500 uppercase">Grade Level</label><select data-id="184" id="p-grade" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></select></div>
+          </div>
+          <div data-id="185"><label data-id="186" class="text-xs font-medium text-fg-500 uppercase mb-1 block">Color</label><div data-id="187" id="p-colors" class="flex gap-2 flex-wrap"></div></div>
+          <div data-id="188">
+            <label data-id="189" class="text-xs font-medium text-fg-500 uppercase mb-1 block">Available Days</label>
+            <div data-id="190" id="p-days" class="flex gap-2"></div>
+          </div>
+          <div data-id="191">
+            <label data-id="192" class="text-xs font-medium text-fg-500 uppercase mb-1 block">Pull Time Windows</label>
+            <div data-id="193" id="p-pull-times" class="space-y-2"></div>
+          </div>
+        </div>
+        <div data-id="194" class="flex gap-2 mt-4">
+          <button data-id="195" id="save-provider" class="flex-1 bg-teal-500 text-white text-sm font-medium py-2 rounded-lg hover:bg-teal-600 transition">Save</button>
+          <button data-id="196" id="cancel-provider" class="flex-1 bg-bg-200 text-fg-700 text-sm font-medium py-2 rounded-lg hover:bg-bg-300 transition">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Modal -->
+    <div data-id="197" id="student-modal" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-fg-900/50 p-4">
+      <div data-id="198" class="bg-white rounded-xl w-full max-w-md p-5 relative max-h-[90vh] overflow-y-auto shadow-xl">
+        <h3 data-id="199" id="student-modal-title" class="text-lg font-semibold text-fg-900 mb-3">Add Student</h3>
+        <div data-id="200" class="space-y-3">
+          <div data-id="201"><label data-id="202" class="text-xs font-medium text-fg-500 uppercase">Name *</label><input data-id="203" id="s-name" type="text" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none" placeholder="e.g. Alex M."></div>
+          <div data-id="204" class="grid grid-cols-2 gap-3">
+            <div data-id="205"><label data-id="206" class="text-xs font-medium text-fg-500 uppercase">Grade</label><select data-id="207" id="s-grade" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></select></div>
+            <div data-id="208"><label data-id="209" class="text-xs font-medium text-fg-500 uppercase">Sessions/Wk</label><input data-id="210" id="s-sessions" type="number" min="1" max="5" value="2" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></div>
+          </div>
+          <div data-id="211"><label data-id="212" class="text-xs font-medium text-fg-500 uppercase">Service Type</label><select data-id="213" id="s-service" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></select></div>
+          <div data-id="214"><label data-id="215" class="text-xs font-medium text-fg-500 uppercase">Provider</label><select data-id="216" id="s-provider" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></select></div>
+          <div data-id="217"><label data-id="218" class="text-xs font-medium text-fg-500 uppercase">Required Min/Week</label><input data-id="219" id="s-minutes" type="number" min="1" value="30" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></div>
+          <div data-id="220"><label data-id="221" class="text-xs font-medium text-fg-500 uppercase mb-1 block">Color</label><div data-id="222" id="s-colors" class="flex gap-2 flex-wrap"></div></div>
+          <div data-id="223"><label data-id="224" class="text-xs font-medium text-fg-500 uppercase">Notes</label><textarea data-id="225" id="s-notes" rows="2" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none resize-none" placeholder="IEP notes..."></textarea></div>
+        </div>
+        <div data-id="226" class="flex gap-2 mt-4">
+          <button data-id="227" id="save-student" class="flex-1 bg-pri-500 text-white text-sm font-medium py-2 rounded-lg hover:bg-pri-600 transition">Save</button>
+          <button data-id="228" id="cancel-student" class="flex-1 bg-bg-200 text-fg-700 text-sm font-medium py-2 rounded-lg hover:bg-bg-300 transition">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session Modal -->
+    <div data-id="229" id="session-modal" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-fg-900/50 p-4">
+      <div data-id="230" class="bg-white rounded-xl w-full max-w-md p-5 relative max-h-[90vh] overflow-y-auto shadow-xl">
+        <h3 data-id="231" id="session-modal-title" class="text-lg font-semibold text-fg-900 mb-3">Add Session</h3>
+        <div data-id="232" id="sess-conflict-warn" class="hidden bg-red-100 text-red-700 text-xs font-medium px-3 py-2 rounded-lg mb-2">⚠️ Conflict: student already booked at this time.</div>
+        <div data-id="233" id="sess-pull-warn" class="hidden bg-yel-100 text-yel-700 text-xs font-medium px-3 py-2 rounded-lg mb-2">⚠️ Outside provider's available pull times.</div>
+        <div data-id="234" class="space-y-3">
+          <div data-id="235"><label data-id="236" class="text-xs font-medium text-fg-500 uppercase">Provider</label><select data-id="237" id="sess-provider" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></select></div>
+          <div data-id="238" class="grid grid-cols-2 gap-3">
+            <div data-id="239"><label data-id="240" class="text-xs font-medium text-fg-500 uppercase">Day</label><select data-id="241" id="sess-day" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></select></div>
+            <div data-id="242"><label data-id="243" class="text-xs font-medium text-fg-500 uppercase">Start Time</label><select data-id="244" id="sess-time" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></select></div>
+          </div>
+          <div data-id="245">
+            <label data-id="246" class="text-xs font-medium text-fg-500 uppercase mb-1 block">Duration</label>
+            <div data-id="247" class="flex gap-2">
+              <label data-id="248" class="flex items-center gap-1.5 bg-bg-150 px-3 py-2 rounded-lg cursor-pointer text-sm"><input data-id="249" type="radio" name="sess-dur" value="30" checked class="accent-pri-500"> 30 min</label>
+              <label data-id="250" class="flex items-center gap-1.5 bg-bg-150 px-3 py-2 rounded-lg cursor-pointer text-sm"><input data-id="251" type="radio" name="sess-dur" value="60" class="accent-pri-500"> 60 min</label>
+            </div>
+          </div>
+          <div data-id="252">
+            <label data-id="253" class="text-xs font-medium text-fg-500 uppercase mb-1 block">Session Type</label>
+            <div data-id="254" class="flex gap-2">
+              <label data-id="255" class="flex items-center gap-1.5 bg-bg-150 px-3 py-2 rounded-lg cursor-pointer text-sm"><input data-id="256" type="radio" name="sess-type" value="Individual" checked class="accent-pri-500"> Individual</label>
+              <label data-id="257" class="flex items-center gap-1.5 bg-bg-150 px-3 py-2 rounded-lg cursor-pointer text-sm"><input data-id="258" type="radio" name="sess-type" value="Group" class="accent-pri-500"> Group</label>
+            </div>
+          </div>
+          <div data-id="259">
+            <label data-id="260" class="text-xs font-medium text-fg-500 uppercase mb-1 block">Students</label>
+            <div data-id="261" id="sess-students" class="space-y-1 max-h-36 overflow-y-auto bg-bg-150 rounded-lg p-2.5"></div>
+          </div>
+        </div>
+        <div data-id="262" class="flex gap-2 mt-4">
+          <button data-id="263" id="save-session" class="flex-1 bg-pri-500 text-white text-sm font-medium py-2 rounded-lg hover:bg-pri-600 transition">Save</button>
+          <button data-id="264" id="cancel-session" class="flex-1 bg-bg-200 text-fg-700 text-sm font-medium py-2 rounded-lg hover:bg-bg-300 transition">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Block Modal -->
+    <div data-id="265" id="block-modal" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-fg-900/50 p-4">
+      <div data-id="266" class="bg-white rounded-xl w-full max-w-sm p-5 relative shadow-xl">
+        <h3 data-id="267" class="text-lg font-semibold text-fg-900 mb-3">🚫 Block Time</h3>
+        <div data-id="268" class="space-y-3">
+          <div data-id="269" class="grid grid-cols-2 gap-3">
+            <div data-id="270"><label data-id="271" class="text-xs font-medium text-fg-500 uppercase">Day</label><div data-id="272" id="block-day-label" class="mt-1 bg-bg-150 rounded-lg px-3 py-2 text-sm text-fg-600"></div></div>
+            <div data-id="273"><label data-id="274" class="text-xs font-medium text-fg-500 uppercase">Time</label><div data-id="275" id="block-time-label" class="mt-1 bg-bg-150 rounded-lg px-3 py-2 text-sm text-fg-600"></div></div>
+          </div>
+          <div data-id="276"><label data-id="277" class="text-xs font-medium text-fg-500 uppercase">Reason</label><select data-id="278" id="block-reason" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"><option data-id="279">Lunch</option><option data-id="280">Specials/Electives</option><option data-id="281">Recess</option><option data-id="282">Assembly</option><option data-id="283">Testing</option><option data-id="284">IEP Meeting</option><option data-id="285">Other</option></select></div>
+          <div data-id="286" id="block-custom-row" class="hidden"><label data-id="287" class="text-xs font-medium text-fg-500 uppercase">Custom Reason</label><input data-id="288" id="block-custom" type="text" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Enter reason..."></div>
+          <label data-id="289" class="flex items-center gap-2 text-sm text-fg-700 cursor-pointer"><input data-id="290" id="block-all-days" type="checkbox" class="accent-pri-500"> Apply to all days</label>
+        </div>
+        <div data-id="291" class="flex gap-2 mt-4">
+          <button data-id="292" id="save-block" class="flex-1 bg-red-500 text-white text-sm font-medium py-2 rounded-lg hover:bg-red-600 transition">Block</button>
+          <button data-id="293" id="cancel-block" class="flex-1 bg-bg-200 text-fg-700 text-sm font-medium py-2 rounded-lg hover:bg-bg-300 transition">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Constraint Modal -->
+    <div data-id="294" id="constraint-modal" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-fg-900/50 p-4">
+      <div data-id="295" class="bg-white rounded-xl w-full max-w-sm p-5 relative shadow-xl">
+        <h3 data-id="296" id="constraint-modal-title" class="text-lg font-semibold text-fg-900 mb-3">Add Constraint</h3>
+        <div data-id="297" class="space-y-3">
+          <div data-id="298"><label data-id="299" class="text-xs font-medium text-fg-500 uppercase">Day</label><select data-id="300" id="c-day" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></select></div>
+          <div data-id="301" class="grid grid-cols-2 gap-3">
+            <div data-id="302"><label data-id="303" class="text-xs font-medium text-fg-500 uppercase">Start Time</label><select data-id="304" id="c-start" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></select></div>
+            <div data-id="305"><label data-id="306" class="text-xs font-medium text-fg-500 uppercase">End Time</label><select data-id="307" id="c-end" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></select></div>
+          </div>
+          <div data-id="308"><label data-id="309" class="text-xs font-medium text-fg-500 uppercase">Type</label><select data-id="310" id="c-type" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"><option data-id="311" value="lunch">Lunch</option><option data-id="312" value="specials">Specials</option><option data-id="313" value="assembly">Assembly</option><option data-id="314" value="testing">Testing</option><option data-id="315" value="iep-day">IEP Day</option><option data-id="316" value="protected">Protected</option><option data-id="317" value="blocked">Blocked</option></select></div>
+          <div data-id="318"><label data-id="319" class="text-xs font-medium text-fg-500 uppercase">Label</label><input data-id="320" id="c-label" type="text" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none" placeholder="e.g. Lunch"></div>
+        </div>
+        <div data-id="321" class="flex gap-2 mt-4">
+          <button data-id="322" id="save-constraint" class="flex-1 bg-pri-500 text-white text-sm font-medium py-2 rounded-lg hover:bg-pri-600 transition">Save</button>
+          <button data-id="323" id="cancel-constraint" class="flex-1 bg-bg-200 text-fg-700 text-sm font-medium py-2 rounded-lg hover:bg-bg-300 transition">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- IEP Day Modal -->
+    <div data-id="324" id="iep-day-modal" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-fg-900/50 p-4">
+      <div data-id="325" class="bg-white rounded-xl w-full max-w-sm p-5 relative shadow-xl">
+        <h3 data-id="326" class="text-lg font-semibold text-fg-900 mb-3">Add IEP Day</h3>
+        <div data-id="327" class="space-y-3">
+          <div data-id="328"><label data-id="329" class="text-xs font-medium text-fg-500 uppercase">Date</label><input data-id="330" id="iep-date" type="date" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"></div>
+          <div data-id="331"><label data-id="332" class="text-xs font-medium text-fg-500 uppercase">Label</label><input data-id="333" id="iep-label" type="text" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none" placeholder="e.g. Annual IEP Review"></div>
+          <div data-id="334"><label data-id="335" class="text-xs font-medium text-fg-500 uppercase">Student (optional)</label><select data-id="336" id="iep-student" class="mt-1 w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none"><option data-id="337" value="">None</option></select></div>
+        </div>
+        <div data-id="338" class="flex gap-2 mt-4">
+          <button data-id="339" id="save-iep-day" class="flex-1 bg-pur-500 text-white text-sm font-medium py-2 rounded-lg hover:bg-pur-600 transition">Save</button>
+          <button data-id="340" id="cancel-iep-day" class="flex-1 bg-bg-200 text-fg-700 text-sm font-medium py-2 rounded-lg hover:bg-bg-300 transition">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CSV Import Modal -->
+    <div data-id="341" id="csv-modal" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-fg-900/50 p-4">
+      <div data-id="342" class="bg-white rounded-xl w-full max-w-xl p-5 relative max-h-[90vh] overflow-y-auto shadow-xl">
+        <h3 data-id="343" id="csv-modal-title" class="text-lg font-semibold text-fg-900 mb-3">Import CSV</h3>
+        <div data-id="344" id="csv-drag-zone" class="drag-zone mb-4 cursor-pointer">
+          <input data-id="345" type="file" id="csv-file-input" accept=".csv" class="hidden">
+          <p data-id="346" class="text-fg-500 text-sm mb-1">📂 Drop a CSV file here or click to upload</p>
+          <p data-id="347" id="csv-format-hint" class="text-xs text-fg-400"></p>
+        </div>
+        <div data-id="348" id="csv-preview" class="hidden">
+          <h4 data-id="349" class="text-sm font-semibold text-fg-700 mb-2">Preview</h4>
+          <div data-id="350" class="overflow-x-auto max-h-48 mb-3"><table data-id="351" id="csv-preview-table" class="w-full text-xs text-left border-collapse"><thead data-id="352" class="bg-bg-150"></thead><tbody data-id="353" class="divide-y divide-bg-200"></tbody></table></div>
+          <button data-id="354" id="csv-confirm-import" class="w-full bg-pri-500 text-white text-sm font-medium py-2 rounded-lg hover:bg-pri-600 transition">Import</button>
+        </div>
+        <button data-id="355" id="cancel-csv" class="w-full mt-2 bg-bg-200 text-fg-700 text-sm font-medium py-2 rounded-lg hover:bg-bg-300 transition">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Session Popover -->
+    <div data-id="356" id="session-popover" class="popover hidden bg-white rounded-xl p-3 border border-bg-300 shadow-lg" style="max-width:260px;">
+      <div data-id="357" id="popover-content"></div>
+      <div data-id="358" class="flex gap-2 mt-2">
+        <button data-id="359" id="popover-edit" class="flex-1 bg-pri-100 text-pri-700 text-xs font-medium py-1.5 rounded-lg hover:bg-pri-200 transition">Edit</button>
+        <button data-id="360" id="popover-delete" class="flex-1 bg-red-100 text-red-700 text-xs font-medium py-1.5 rounded-lg hover:bg-red-200 transition">Delete</button>
+      </div>
+    </div>
+
+    <!-- Reset Confirm Modal -->
+    <div data-id="361" id="reset-modal" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-fg-900/50 p-4">
+      <div data-id="362" class="bg-white rounded-xl w-full max-w-sm p-5 relative shadow-xl">
+        <h3 data-id="363" class="text-lg font-semibold text-red-700 mb-2">⚠️ Reset All Data</h3>
+        <p data-id="364" class="text-sm text-fg-600 mb-3">Type <strong data-id="365">RESET</strong> to confirm deletion of all data.</p>
+        <input data-id="366" id="reset-confirm-input" type="text" class="w-full bg-bg-150 border border-bg-300 rounded-lg px-3 py-2 text-sm outline-none mb-3" placeholder="Type RESET">
+        <div data-id="367" class="flex gap-2">
+          <button data-id="368" id="confirm-reset" class="flex-1 bg-red-500 text-white text-sm font-medium py-2 rounded-lg hover:bg-red-600 transition">Delete Everything</button>
+          <button data-id="369" id="cancel-reset" class="flex-1 bg-bg-200 text-fg-700 text-sm font-medium py-2 rounded-lg hover:bg-bg-300 transition">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tracker Overlay -->
+    <div data-id="370" id="tracker-overlay" class="hidden fixed inset-0 z-50 bg-bg-100 overflow-y-auto">
+      <div data-id="371" class="max-w-5xl mx-auto p-4 md:p-8">
+        <div data-id="372" class="flex items-center gap-3 mb-5">
+          <button data-id="373" id="tracker-back" class="bg-white text-fg-700 text-sm font-medium px-4 py-2 rounded-lg border border-bg-300 hover:bg-bg-200 transition flex items-center gap-1.5">
+            <i data-id="374" data-lucide="arrow-left" class="w-4 h-4"></i> Back
+          </button>
+          <h2 data-id="375" class="text-xl font-semibold text-fg-900">📋 Minutes Tracker</h2>
+        </div>
+        <div data-id="376" id="tracker-content" class="space-y-6"></div>
+      </div>
+    </div>
+
+<script>
+// ===== CONSTANTS =====
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+const DAY_SHORTS = ['Mon','Tue','Wed','Thu','Fri'];
+const GRADES = ['K','1','2','3','4','5','6','7','8','9','10','11','12'];
+const SERVICES = ['Speech-Language','Occupational Therapy','Physical Therapy','Resource/Academic Support','Counseling','Behavior Support','Other'];
+const ROLES = ['Speech-Language Pathologist','Occupational Therapist','Physical Therapist','Special Ed Teacher','School Counselor','Behavior Specialist','Other'];
+const GRADE_LEVELS = ['K-2','3-5','6-8','9-12','All Grades'];
+const PRESET_COLORS = ['#3b82f6','#14b8a6','#22c55e','#a855f7','#f97316','#ec4899','#ef4444','#6366f1','#0ea5e9','#84cc16'];
+
+function genTimeSlots(startH=7,startM=30,endH=16,endM=0){
+  const r=[];
+  let h=startH,m=startM;
+  while(h<endH||(h===endH&&m<=endM)){
+    r.push(`${h}:${m.toString().padStart(2,'0')}`);
+    m+=30; if(m>=60){m=0;h++;}
+  }
+  return r;
+}
+
+// ===== STATE =====
+let providers=[], students=[], sessions=[], blockedSlots=[], masterConstraints=[], iepDays=[], settings={};
+let activeTab='schedule', activeProviderId='all', blockMode=false;
+let editingProviderId=null, editingStudentId=null, editingSessionId=null, editingConstraintId=null;
+let selectedColor=PRESET_COLORS[0];
+let csvImportType=''; // 'students' | 'providers'
+let csvData=[];
+
+function getSettings(){
+  return {
+    yearStart: settings.yearStart||'2026-08-17',
+    yearEnd: settings.yearEnd||'2027-05-28',
+    dayStartH: settings.dayStartH??7, dayStartM: settings.dayStartM??30,
+    dayEndH: settings.dayEndH??16, dayEndM: settings.dayEndM??0,
+    defaultDuration: settings.defaultDuration||30
+  };
+}
+function getTimeSlots(){
+  const s=getSettings();
+  return genTimeSlots(s.dayStartH,s.dayStartM,s.dayEndH,s.dayEndM);
+}
+
+// ===== PERSISTENCE =====
+function save(){
+  localStorage.setItem('iep_providers',JSON.stringify(providers));
+  localStorage.setItem('iep_students',JSON.stringify(students));
+  localStorage.setItem('iep_sessions',JSON.stringify(sessions));
+  localStorage.setItem('iep_blocked',JSON.stringify(blockedSlots));
+  localStorage.setItem('iep_constraints',JSON.stringify(masterConstraints));
+  localStorage.setItem('iep_iepdays',JSON.stringify(iepDays));
+  localStorage.setItem('iep_settings',JSON.stringify(settings));
+  localStorage.setItem('iep_activeProvider',activeProviderId);
+  localStorage.setItem('iep_activeTab',activeTab);
+}
+function load(){
+  try{
+    const p=localStorage.getItem('iep_providers');if(p)providers=JSON.parse(p);
+    const s=localStorage.getItem('iep_students');if(s)students=JSON.parse(s);
+    const ss=localStorage.getItem('iep_sessions');if(ss)sessions=JSON.parse(ss);
+    const b=localStorage.getItem('iep_blocked');if(b)blockedSlots=JSON.parse(b);
+    const c=localStorage.getItem('iep_constraints');if(c)masterConstraints=JSON.parse(c);
+    const id=localStorage.getItem('iep_iepdays');if(id)iepDays=JSON.parse(id);
+    const st=localStorage.getItem('iep_settings');if(st)settings=JSON.parse(st);
+    const ap=localStorage.getItem('iep_activeProvider');if(ap)activeProviderId=ap;
+    const at=localStorage.getItem('iep_activeTab');if(at)activeTab=at;
+  }catch(e){}
+}
+
+// ===== HELPERS =====
+function gid(){return 'id_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);}
+function initials(n){return n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function fmt12(t){
+  const[h,m]=t.split(':').map(Number);
+  const ap=h>=12?'p':'a';const h12=h>12?h-12:(h===0?12:h);
+  return `${h12}:${m.toString().padStart(2,'0')}${ap}`;
+}
+function getSchedMin(sid){return sessions.filter(s=>s.studentIds.includes(sid)).reduce((a,s)=>a+s.duration,0);}
+function statusColor(sched,req){
+  const p=req>0?sched/req:0;
+  if(p>=1)return{bg:'#dcfce7',fill:'#22c55e',text:'#166534'};
+  if(p>=.5)return{bg:'#fef9c3',fill:'#eab308',text:'#854d0e'};
+  return{bg:'#fee2e2',fill:'#ef4444',text:'#991b1b'};
+}
+function toast(msg,type='success'){
+  const c=document.getElementById('toast-container');
+  const d=document.createElement('div');d.className='toast '+type;d.textContent=msg;
+  c.appendChild(d);setTimeout(()=>{d.style.opacity='0';d.style.transition='opacity .3s';setTimeout(()=>d.remove(),300);},3000);
+}
+function showModal(id){const m=document.getElementById(id);m.classList.remove('hidden');requestAnimationFrame(()=>m.classList.add('active'));}
+function hideModal(id){const m=document.getElementById(id);m.classList.remove('active');setTimeout(()=>m.classList.add('hidden'),150);}
+
+function isConstrained(day,time){
+  const TIME_SLOTS=getTimeSlots();
+  return masterConstraints.some(mc=>{
+    const days=mc.day==='All'?DAYS:[mc.day];
+    if(!days.includes(day))return false;
+    const si=TIME_SLOTS.indexOf(mc.startTime),ei=TIME_SLOTS.indexOf(mc.endTime);
+    const ti=TIME_SLOTS.indexOf(time);
+    if(si<0||ti<0)return false;
+    return ti>=si&&(ei<0?ti===si:ti<ei);
+  });
+}
+function getConstraintAt(day,time){
+  const TIME_SLOTS=getTimeSlots();
+  return masterConstraints.find(mc=>{
+    const days=mc.day==='All'?DAYS:[mc.day];
+    if(!days.includes(day))return false;
+    const si=TIME_SLOTS.indexOf(mc.startTime),ei=TIME_SLOTS.indexOf(mc.endTime);
+    const ti=TIME_SLOTS.indexOf(time);
+    if(si<0||ti<0)return false;
+    return ti>=si&&(ei<0?ti===si:ti<ei);
+  });
+}
+function constraintClass(type){
+  const m={'lunch':'lunch-pattern','specials':'specials-pattern','assembly':'specials-pattern','testing':'testing-pattern','iep-day':'iep-pattern','protected':'other-pattern','blocked':'other-pattern'};
+  return m[type]||'other-pattern';
+}
+function isBlocked(day,time,providerId){
+  return blockedSlots.some(b=>b.day===day&&b.startTime===time&&(b.providerId===providerId||b.providerId===null||!b.providerId));
+}
+function getSessionsStartingAt(day,time,providerId){
+  return sessions.filter(s=>{
+    if(s.day!==day||s.startTime!==time)return false;
+    if(providerId&&providerId!=='all'&&s.providerId!==providerId)return false;
+    return true;
+  });
+}
+function hasConflict(day,time,dur,studentIds,excludeId){
+  const TIME_SLOTS=getTimeSlots();
+  const slots=[time];
+  if(dur===60){const i=TIME_SLOTS.indexOf(time);if(i>=0&&i+1<TIME_SLOTS.length)slots.push(TIME_SLOTS[i+1]);}
+  for(const sl of slots){
+    for(const sess of sessions){
+      if(excludeId&&sess.id===excludeId)continue;
+      const ss=[sess.startTime];
+      if(sess.duration===60){const i2=TIME_SLOTS.indexOf(sess.startTime);if(i2>=0&&i2+1<TIME_SLOTS.length)ss.push(TIME_SLOTS[i2+1]);}
+      if(ss.includes(sl)&&sess.studentIds.some(sid=>studentIds.includes(sid)))return true;
+    }
+  }
+  return false;
+}
+function isInPullTimes(providerId,day,time){
+  const prov=providers.find(p=>p.id===providerId);
+  if(!prov||!prov.pullTimes||prov.pullTimes.length===0)return true;
+  const dayPulls=prov.pullTimes.filter(pt=>pt.day===day);
+  if(dayPulls.length===0)return false;
+  const TIME_SLOTS=getTimeSlots();
+  const ti=TIME_SLOTS.indexOf(time);
+  return dayPulls.some(pt=>{
+    const si=TIME_SLOTS.indexOf(pt.startTime),ei=TIME_SLOTS.indexOf(pt.endTime);
+    return ti>=si&&ti<ei;
+  });
+}
+
+// ===== SAMPLE DATA =====
+function loadSample(){
+  const pid1=gid(),pid2=gid(),pid3=gid();
+  providers=[
+    {id:pid1,name:'Jane Smith',role:'Speech-Language Pathologist',color:'#3b82f6',gradeLevel:'K-2',availableDays:DAYS.slice(),pullTimes:DAYS.map(d=>[{day:d,startTime:'8:00',endTime:'11:30'},{day:d,startTime:'12:30',endTime:'14:30'}]).flat()},
+    {id:pid2,name:'Mike Torres',role:'Special Ed Teacher',color:'#22c55e',gradeLevel:'3-5',availableDays:DAYS.slice(),pullTimes:DAYS.map(d=>[{day:d,startTime:'9:00',endTime:'11:00'},{day:d,startTime:'13:00',endTime:'15:00'}]).flat()},
+    {id:pid3,name:'Priya Patel',role:'Occupational Therapist',color:'#a855f7',gradeLevel:'All Grades',availableDays:['Monday','Wednesday','Friday'],pullTimes:['Monday','Wednesday','Friday'].map(d=>[{day:d,startTime:'8:30',endTime:'12:00'}]).flat()},
+  ];
+  const sid1=gid(),sid2=gid(),sid3=gid(),sid4=gid(),sid5=gid();
+  students=[
+    {id:sid1,name:'Alex M.',grade:'3',serviceType:'Speech-Language',requiredMinutes:60,sessionsPerWeek:3,color:'#3b82f6',providerId:pid1,notes:''},
+    {id:sid2,name:'Sam R.',grade:'1',serviceType:'Speech-Language',requiredMinutes:45,sessionsPerWeek:2,color:'#14b8a6',providerId:pid1,notes:''},
+    {id:sid3,name:'Jordan K.',grade:'5',serviceType:'Resource/Academic Support',requiredMinutes:120,sessionsPerWeek:5,color:'#22c55e',providerId:pid2,notes:''},
+    {id:sid4,name:'Casey L.',grade:'4',serviceType:'Resource/Academic Support',requiredMinutes:90,sessionsPerWeek:3,color:'#f97316',providerId:pid2,notes:''},
+    {id:sid5,name:'Taylor B.',grade:'2',serviceType:'Occupational Therapy',requiredMinutes:60,sessionsPerWeek:2,color:'#a855f7',providerId:pid3,notes:''},
+  ];
+  masterConstraints=[
+    {id:gid(),day:'All',startTime:'12:00',endTime:'12:30',type:'lunch',label:'Lunch',affectsAll:true},
+    {id:gid(),day:'Monday',startTime:'10:00',endTime:'10:30',type:'specials',label:'PE',affectsAll:true},
+    {id:gid(),day:'Wednesday',startTime:'10:00',endTime:'10:30',type:'specials',label:'PE',affectsAll:true},
+    {id:gid(),day:'Friday',startTime:'10:00',endTime:'10:30',type:'specials',label:'PE',affectsAll:true},
+    {id:gid(),day:'Tuesday',startTime:'9:30',endTime:'10:00',type:'specials',label:'Art',affectsAll:true},
+    {id:gid(),day:'Thursday',startTime:'9:30',endTime:'10:00',type:'specials',label:'Art',affectsAll:true},
+  ];
+  sessions=[
+    {id:gid(),day:'Monday',startTime:'9:00',duration:30,studentIds:[sid1],sessionType:'Individual',providerId:pid1},
+    {id:gid(),day:'Wednesday',startTime:'9:00',duration:30,studentIds:[sid1],sessionType:'Individual',providerId:pid1},
+    {id:gid(),day:'Friday',startTime:'9:00',duration:30,studentIds:[sid1],sessionType:'Individual',providerId:pid1},
+    {id:gid(),day:'Tuesday',startTime:'10:00',duration:30,studentIds:[sid2],sessionType:'Individual',providerId:pid1},
+    {id:gid(),day:'Thursday',startTime:'10:00',duration:30,studentIds:[sid2],sessionType:'Individual',providerId:pid1},
+    {id:gid(),day:'Monday',startTime:'9:30',duration:30,studentIds:[sid3],sessionType:'Individual',providerId:pid2},
+    {id:gid(),day:'Tuesday',startTime:'10:00',duration:30,studentIds:[sid3],sessionType:'Individual',providerId:pid2},
+    {id:gid(),day:'Wednesday',startTime:'9:30',duration:30,studentIds:[sid3],sessionType:'Individual',providerId:pid2},
+    {id:gid(),day:'Thursday',startTime:'10:00',duration:30,studentIds:[sid3],sessionType:'Individual',providerId:pid2},
+    {id:gid(),day:'Friday',startTime:'9:30',duration:30,studentIds:[sid3],sessionType:'Individual',providerId:pid2},
+    {id:gid(),day:'Monday',startTime:'13:00',duration:30,studentIds:[sid4],sessionType:'Individual',providerId:pid2},
+    {id:gid(),day:'Wednesday',startTime:'13:00',duration:30,studentIds:[sid4],sessionType:'Individual',providerId:pid2},
+    {id:gid(),day:'Friday',startTime:'13:00',duration:30,studentIds:[sid4],sessionType:'Individual',providerId:pid2},
+    {id:gid(),day:'Monday',startTime:'9:00',duration:30,studentIds:[sid5],sessionType:'Individual',providerId:pid3},
+    {id:gid(),day:'Wednesday',startTime:'9:00',duration:30,studentIds:[sid5],sessionType:'Individual',providerId:pid3},
+  ];
+  blockedSlots=[];
+  iepDays=[];
+  settings={dayStartH:7,dayStartM:30,dayEndH:16,dayEndM:0,defaultDuration:30,yearStart:'2026-08-17',yearEnd:'2027-05-28'};
+  save();
+}
+
+// ===== CSV PARSER =====
+function parseCSV(text){
+  const lines=[];let cur='',inQ=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(c==='"'){if(inQ&&i+1<text.length&&text[i+1]==='"'){cur+='"';i++;}else{inQ=!inQ;}}
+    else if((c===','||c==='\n'||c==='\r')&&!inQ){
+      if(c===','){ lines.length===0?lines.push([cur.trim()]):lines[lines.length-1].push(cur.trim());cur='';}
+      else{
+        if(cur.trim()||lines.length>0){if(lines.length===0)lines.push([cur.trim()]);else lines[lines.length-1].push(cur.trim());}
+        if(c==='\r'&&i+1<text.length&&text[i+1]==='\n')i++;
+        cur='';if(lines[lines.length-1]&&lines[lines.length-1].some(v=>v))lines.push([]);
+      }
+    }else{
+      if(lines.length===0)lines.push([]);
+      cur+=c;
+    }
+  }
+  if(cur.trim()){if(lines.length===0)lines.push([cur.trim()]);else lines[lines.length-1].push(cur.trim());}
+  return lines.filter(r=>r.some(v=>v));
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(tab){
+  activeTab=tab;
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.add('hidden'));
+  document.getElementById('tab-'+tab).classList.remove('hidden');
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.toggle('active',b.dataset.tab===tab);});
+  localStorage.setItem('iep_activeTab',tab);
+  if(tab==='schedule')renderScheduleTab();
+  if(tab==='providers')renderProviders();
+  if(tab==='students')renderStudentsTable();
+  if(tab==='parameters')renderParameters();
+}
+
+// ===== RENDER: SCHEDULE TAB =====
+function renderScheduleTab(){
+  renderProviderFilter();renderSidebar();renderSchedule();
+}
+function renderProviderFilter(){
+  const sel=document.getElementById('provider-filter');
+  sel.innerHTML='<option value="all">All Providers</option>'+providers.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  sel.value=activeProviderId;
+}
+function renderSidebar(){
+  const pid=activeProviderId;
+  const legend=document.getElementById('provider-legend');
+  if(pid==='all'){
+    legend.classList.remove('hidden');
+    legend.className='px-4 py-2 border-b border-bg-200 flex flex-wrap gap-2';
+    legend.innerHTML=providers.map(p=>`<span class="flex items-center gap-1 text-xs"><span class="w-2.5 h-2.5 rounded-full" style="background:${p.color}"></span>${p.name}</span>`).join('');
+  }else{legend.classList.add('hidden');}
+
+  let studs=pid==='all'?students:students.filter(s=>s.providerId===pid);
+  document.getElementById('sidebar-count').textContent=studs.length;
+  const list=document.getElementById('sidebar-students');
+  list.innerHTML='';
+  if(pid==='all'){
+    providers.forEach(prov=>{
+      const pStuds=students.filter(s=>s.providerId===prov.id);
+      if(pStuds.length===0)return;
+      const hdr=document.createElement('div');
+      hdr.className='text-xs font-semibold text-fg-500 mt-2 mb-1 px-1 flex items-center gap-1';
+      hdr.innerHTML=`<span class="w-2 h-2 rounded-full" style="background:${prov.color}"></span>${prov.name}`;
+      list.appendChild(hdr);
+      pStuds.forEach(st=>list.appendChild(createStudentCard(st)));
+    });
+    const unassigned=students.filter(s=>!s.providerId||!providers.find(p=>p.id===s.providerId));
+    if(unassigned.length){
+      const hdr=document.createElement('div');hdr.className='text-xs font-semibold text-fg-400 mt-2 mb-1 px-1';hdr.textContent='Unassigned';
+      list.appendChild(hdr);
+      unassigned.forEach(st=>list.appendChild(createStudentCard(st)));
+    }
+  }else{
+    studs.forEach(st=>list.appendChild(createStudentCard(st)));
+  }
+  renderSidebarMinutes(studs);
+}
+function createStudentCard(st){
+  const sched=getSchedMin(st.id),pct=st.requiredMinutes>0?Math.min(sched/st.requiredMinutes,1):0,sc=statusColor(sched,st.requiredMinutes);
+  const card=document.createElement('div');
+  card.className='student-card-sidebar bg-bg-150 rounded-lg px-2.5 py-2 flex items-start gap-2 relative';
+  card.innerHTML=`
+    <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0 mt-0.5" style="background:${st.color}">${initials(st.name)}</div>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-1"><span class="text-xs font-semibold text-fg-800 truncate">${st.name}</span><span class="text-xs text-fg-400">Gr ${st.grade}</span></div>
+      <div class="text-xs text-fg-400 truncate">${st.serviceType}</div>
+      <div class="mt-1 flex items-center gap-1.5"><div class="flex-1 progress-bar-bg" style="background:${sc.bg}"><div class="progress-bar-fill" style="width:${pct*100}%;background:${sc.fill}"></div></div><span class="text-xs font-medium tabular-nums" style="color:${sc.text}">${sched}/${st.requiredMinutes}</span></div>
+    </div>
+    <button class="del-stu absolute top-1.5 right-1.5 text-fg-300 hover:text-red-500 p-0.5" data-sid="${st.id}" title="Delete">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+    </button>`;
+  card.querySelector('.del-stu').addEventListener('click',e=>{
+    e.stopPropagation();
+    if(!confirm(`Delete "${st.name}"?`))return;
+    sessions=sessions.filter(sess=>{if(sess.studentIds.includes(st.id)){sess.studentIds=sess.studentIds.filter(id=>id!==st.id);return sess.studentIds.length>0;}return true;});
+    students=students.filter(s=>s.id!==st.id);save();renderAll();toast('Student deleted','info');
+  });
+  return card;
+}
+function renderSidebarMinutes(studs){
+  const c=document.getElementById('sidebar-minutes');c.innerHTML='';
+  studs.forEach(st=>{
+    const sched=getSchedMin(st.id),pct=st.requiredMinutes>0?Math.min(sched/st.requiredMinutes,1):0,sc=statusColor(sched,st.requiredMinutes);
+    const r=document.createElement('div');
+    r.innerHTML=`<div class="flex items-center justify-between mb-0.5"><span class="text-xs font-medium text-fg-700 truncate">${st.name}</span><span class="text-xs tabular-nums font-medium" style="color:${sc.text}">${sched}/${st.requiredMinutes}</span></div><div class="progress-bar-bg" style="background:${sc.bg}"><div class="progress-bar-fill" style="width:${pct*100}%;background:${sc.fill}"></div></div>`;
+    c.appendChild(r);
+  });
+}
+
+// ===== RENDER: SCHEDULE GRID =====
+function renderSchedule(){
+  const body=document.getElementById('schedule-body');body.innerHTML='';
+  const TIME_SLOTS=getTimeSlots();
+  const pid=activeProviderId;
+  const occupied={};
+  sessions.forEach(s=>{
+    if(pid!=='all'&&s.providerId!==pid)return;
+    if(s.duration===60){const i=TIME_SLOTS.indexOf(s.startTime);if(i>=0&&i+1<TIME_SLOTS.length)occupied[s.day+'_'+TIME_SLOTS[i+1]+'_'+s.providerId]=s.id;}
+  });
+
+  TIME_SLOTS.forEach((time,ri)=>{
+    const tr=document.createElement('tr');
+    const tdT=document.createElement('td');
+    tdT.className='text-xs text-fg-400 font-medium py-0 pl-1 pr-0.5 align-top pt-1 tabular-nums';
+    tdT.textContent=fmt12(time);tr.appendChild(tdT);
+
+    DAYS.forEach(day=>{
+      const cKey=day+'_'+time;
+      // Check constraint
+      const constraint=getConstraintAt(day,time);
+      // Check blocked
+      const provBlocked=pid!=='all'?isBlocked(day,time,pid):false;
+
+      // For "all" view, check if this cell is occupied by a 60-min session
+      if(pid!=='all'){
+        if(occupied[cKey+'_'+pid])return;
+      }
+
+      const td=document.createElement('td');
+      td.className='schedule-cell border border-bg-200/60 p-0.5 align-top';
+      if(blockMode)td.classList.add('block-mode');
+      td.dataset.day=day;td.dataset.time=time;
+
+      if(constraint){
+        td.classList.add('is-constraint');
+        td.innerHTML=`<div class="${constraintClass(constraint.type)} w-full min-h-[36px] rounded flex items-center justify-center"><span class="text-xs italic text-fg-500 px-1">${constraint.label}</span></div>`;
+        td.title='Protected time — edit in Parameters';
+      }else if(provBlocked){
+        td.classList.add('is-blocked');
+        td.innerHTML=`<div class="blocked-pattern w-full min-h-[36px] rounded flex items-center justify-center"><span class="text-xs italic text-fg-400">Blocked</span></div>`;
+      }else{
+        let sessHere;
+        if(pid==='all'){
+          sessHere=sessions.filter(s=>s.day===day&&s.startTime===time);
+        }else{
+          sessHere=sessions.filter(s=>s.day===day&&s.startTime===time&&s.providerId===pid);
+        }
+        if(sessHere.length>0){
+          td.classList.add('has-session');
+          let html='';
+          if(sessHere.length>1){
+            // Multiple sessions in same slot (all providers view)
+            html='<div class="flex gap-0.5">';
+            sessHere.forEach(sess=>{
+              const prov=providers.find(p=>p.id===sess.providerId);
+              const studs=sess.studentIds.map(id=>students.find(s=>s.id===id)).filter(Boolean);
+              const color=prov?prov.color:(studs.length?studs[0].color:'#6b7280');
+              const names=studs.map(s=>s.name).join(', ');
+              html+=`<div class="session-card flex-1" style="background:${color}" data-sessid="${sess.id}"><div class="font-semibold truncate" style="font-size:9px">${names}</div><div class="opacity-70" style="font-size:8px">${sess.duration}m</div></div>`;
+            });
+            html+='</div>';
+          }else{
+            const sess=sessHere[0];
+            const prov=providers.find(p=>p.id===sess.providerId);
+            const studs=sess.studentIds.map(id=>students.find(s=>s.id===id)).filter(Boolean);
+            const color=prov?prov.color:(studs.length?studs[0].color:'#6b7280');
+            const names=studs.map(s=>s.name).join(', ');
+            const isGroup=sess.sessionType==='Group'||studs.length>1;
+            if(sess.duration===60){
+              td.setAttribute('rowspan','2');
+              const nextKey=day+'_'+TIME_SLOTS[ri+1]+'_'+(pid==='all'?sess.providerId:pid);
+              occupied[nextKey]=sess.id;
+            }
+            html=`<div class="session-card ${sess.duration===60?'min-h-[76px]':''}" style="background:${color}" data-sessid="${sess.id}"><div class="font-semibold truncate flex items-center gap-0.5">${isGroup?'👥':''} ${names}</div><div class="opacity-80 truncate" style="font-size:9px">${studs.length?studs[0].serviceType:''}</div><div class="opacity-70" style="font-size:9px">${sess.duration}m</div></div>`;
+          }
+          td.innerHTML=html;
+        }else{
+          td.innerHTML='<div class="w-full min-h-[36px] flex items-center justify-center cell-plus text-fg-300 text-base select-none">＋</div>';
+        }
+      }
+      tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+
+  // Attach click handlers
+  body.querySelectorAll('.schedule-cell').forEach(td=>{
+    td.addEventListener('click',e=>{
+      const day=td.dataset.day,time=td.dataset.time;
+      const sessCard=e.target.closest('.session-card');
+      if(sessCard){showSessionPopover(sessCard.dataset.sessid,td);return;}
+      if(td.classList.contains('is-constraint'))return;
+      if(td.classList.contains('is-blocked')){
+        if(confirm(`Unblock ${day} at ${fmt12(time)}?`)){
+          blockedSlots=blockedSlots.filter(b=>!(b.day===day&&b.startTime===time));
+          save();renderAll();
+        }
+        return;
+      }
+      if(td.classList.contains('has-session'))return;
+      if(blockMode){openBlockModal(day,time);}
+      else{openSessionModal(day,time);}
+    });
+  });
+}
+
+// ===== SESSION POPOVER =====
+function showSessionPopover(sessId,anchor){
+  hidePopover();
+  const sess=sessions.find(s=>s.id===sessId);if(!sess)return;
+  const studs=sess.studentIds.map(id=>students.find(s=>s.id===id)).filter(Boolean);
+  const prov=providers.find(p=>p.id===sess.providerId);
+  const pop=document.getElementById('session-popover');
+  document.getElementById('popover-content').innerHTML=`
+    <div class="text-sm font-semibold text-fg-900">${studs.map(s=>s.name).join(', ')}</div>
+    <div class="text-xs text-fg-400 mt-0.5">${prov?prov.name:'Unassigned'}</div>
+    <div class="text-xs text-fg-600 mt-1">${sess.day} · ${fmt12(sess.startTime)} · ${sess.duration} min</div>
+    <div class="text-xs text-fg-400 mt-0.5">${sess.sessionType==='Group'||studs.length>1?'👥 Group':'👤 Individual'}</div>`;
+  pop.classList.remove('hidden');
+  const rect=anchor.getBoundingClientRect();
+  let left=rect.right+8,top=rect.top;
+  if(left+260>window.innerWidth)left=rect.left-268;
+  if(left<0)left=8;if(top+200>window.innerHeight)top=window.innerHeight-210;
+  pop.style.left=left+'px';pop.style.top=top+'px';
+  pop.dataset.sessid=sessId;
+}
+function hidePopover(){document.getElementById('session-popover').classList.add('hidden');}
+
+// ===== MODALS =====
+// -- Provider Modal --
+function openProviderModal(provId){
+  editingProviderId=provId||null;
+  document.getElementById('provider-modal-title').textContent=provId?'Edit Provider':'Add Provider';
+  document.getElementById('p-role').innerHTML=ROLES.map(r=>`<option>${r}</option>`).join('');
+  document.getElementById('p-grade').innerHTML=GRADE_LEVELS.map(g=>`<option>${g}</option>`).join('');
+  const cc=document.getElementById('p-colors');cc.innerHTML='';
+  selectedColor=PRESET_COLORS[0];
+  PRESET_COLORS.forEach(c=>{
+    const btn=document.createElement('button');btn.className='color-pick'+(selectedColor===c?' selected':'');btn.style.background=c;btn.dataset.color=c;
+    btn.addEventListener('click',()=>{selectedColor=c;cc.querySelectorAll('.color-pick').forEach(b=>b.classList.toggle('selected',b.dataset.color===c));});
+    cc.appendChild(btn);
+  });
+  // Days checkboxes
+  const daysDiv=document.getElementById('p-days');daysDiv.innerHTML='';
+  DAYS.forEach((d,i)=>{
+    const lbl=document.createElement('label');lbl.className='flex items-center gap-1 text-sm cursor-pointer';
+    lbl.innerHTML=`<input type="checkbox" class="accent-pri-500 p-day-cb" value="${d}" checked> ${DAY_SHORTS[i]}`;
+    daysDiv.appendChild(lbl);
+  });
+  renderPullTimes();
+
+  if(provId){
+    const prov=providers.find(p=>p.id===provId);
+    if(prov){
+      document.getElementById('p-name').value=prov.name;
+      document.getElementById('p-role').value=prov.role;
+      document.getElementById('p-grade').value=prov.gradeLevel;
+      selectedColor=prov.color;
+      cc.querySelectorAll('.color-pick').forEach(b=>b.classList.toggle('selected',b.dataset.color===prov.color));
+      daysDiv.querySelectorAll('.p-day-cb').forEach(cb=>{cb.checked=prov.availableDays.includes(cb.value);});
+      renderPullTimes(prov.pullTimes);
+    }
+  }else{
+    document.getElementById('p-name').value='';
+  }
+  showModal('provider-modal');
+}
+function renderPullTimes(existing){
+  const c=document.getElementById('p-pull-times');c.innerHTML='';
+  const checkedDays=Array.from(document.querySelectorAll('.p-day-cb:checked')).map(cb=>cb.value);
+  const allTimes=genTimeSlots(7,0,17,0);
+  checkedDays.forEach(day=>{
+    const dayPulls=existing?existing.filter(pt=>pt.day===day):[{day,startTime:'8:00',endTime:'15:00'}];
+    const dayDiv=document.createElement('div');dayDiv.className='bg-bg-150 rounded-lg p-2';
+    dayDiv.innerHTML=`<div class="text-xs font-medium text-fg-600 mb-1">${day}</div>`;
+    const windowsDiv=document.createElement('div');windowsDiv.className='space-y-1 pull-windows';
+    (dayPulls.length?dayPulls:[{day,startTime:'8:00',endTime:'15:00'}]).forEach(pt=>{
+      const row=document.createElement('div');row.className='flex items-center gap-1';
+      row.innerHTML=`<select class="pt-start bg-white border border-bg-300 rounded px-1.5 py-1 text-xs outline-none">${allTimes.map(t=>`<option value="${t}"${t===pt.startTime?' selected':''}>${fmt12(t)}</option>`).join('')}</select>
+        <span class="text-xs text-fg-400">to</span>
+        <select class="pt-end bg-white border border-bg-300 rounded px-1.5 py-1 text-xs outline-none">${allTimes.map(t=>`<option value="${t}"${t===pt.endTime?' selected':''}>${fmt12(t)}</option>`).join('')}</select>
+        <button class="pt-remove text-fg-300 hover:text-red-500 text-xs px-1">×</button>`;
+      row.querySelector('.pt-remove').addEventListener('click',()=>{row.remove();});
+      windowsDiv.appendChild(row);
+    });
+    dayDiv.appendChild(windowsDiv);
+    const addBtn=document.createElement('button');addBtn.className='text-xs text-pri-600 hover:text-pri-700 mt-1';addBtn.textContent='+ Add window';
+    addBtn.addEventListener('click',()=>{
+      const row=document.createElement('div');row.className='flex items-center gap-1';
+      row.innerHTML=`<select class="pt-start bg-white border border-bg-300 rounded px-1.5 py-1 text-xs outline-none">${allTimes.map(t=>`<option value="${t}">${fmt12(t)}</option>`).join('')}</select>
+        <span class="text-xs text-fg-400">to</span>
+        <select class="pt-end bg-white border border-bg-300 rounded px-1.5 py-1 text-xs outline-none">${allTimes.map(t=>`<option value="${t}">${fmt12(t)}</option>`).join('')}</select>
+        <button class="pt-remove text-fg-300 hover:text-red-500 text-xs px-1">×</button>`;
+      row.querySelector('.pt-remove').addEventListener('click',()=>{row.remove();});
+      windowsDiv.appendChild(row);
+    });
+    dayDiv.appendChild(addBtn);
+    c.appendChild(dayDiv);
+  });
+}
+function saveProviderFromModal(){
+  const name=document.getElementById('p-name').value.trim();
+  if(!name){alert('Enter provider name.');return;}
+  const role=document.getElementById('p-role').value;
+  const grade=document.getElementById('p-grade').value;
+  const availDays=Array.from(document.querySelectorAll('.p-day-cb:checked')).map(cb=>cb.value);
+  // Collect pull times
+  const pullTimes=[];
+  document.querySelectorAll('#p-pull-times > div').forEach(dayDiv=>{
+    const dayLabel=dayDiv.querySelector('.text-xs.font-medium').textContent;
+    dayDiv.querySelectorAll('.pull-windows > div').forEach(row=>{
+      pullTimes.push({day:dayLabel,startTime:row.querySelector('.pt-start').value,endTime:row.querySelector('.pt-end').value});
+    });
+  });
+  if(editingProviderId){
+    const p=providers.find(pr=>pr.id===editingProviderId);
+    if(p){Object.assign(p,{name,role,gradeLevel:grade,color:selectedColor,availableDays:availDays,pullTimes});}
+  }else{
+    providers.push({id:gid(),name,role,gradeLevel:grade,color:selectedColor,availableDays:availDays,pullTimes});
+  }
+  save();hideModal('provider-modal');renderAll();toast('Provider saved');
+}
+
+// -- Student Modal --
+function openStudentModal(studentId,defaultProvider){
+  editingStudentId=studentId||null;
+  document.getElementById('student-modal-title').textContent=studentId?'Edit Student':'Add Student';
+  document.getElementById('s-grade').innerHTML=GRADES.map(g=>`<option>${g}</option>`).join('');
+  document.getElementById('s-service').innerHTML=SERVICES.map(s=>`<option>${s}</option>`).join('');
+  document.getElementById('s-provider').innerHTML='<option value="">Unassigned</option>'+providers.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  const cc=document.getElementById('s-colors');cc.innerHTML='';selectedColor=PRESET_COLORS[0];
+  PRESET_COLORS.forEach(c=>{
+    const btn=document.createElement('button');btn.className='color-pick'+(selectedColor===c?' selected':'');btn.style.background=c;btn.dataset.color=c;
+    btn.addEventListener('click',()=>{selectedColor=c;cc.querySelectorAll('.color-pick').forEach(b=>b.classList.toggle('selected',b.dataset.color===c));});
+    cc.appendChild(btn);
+  });
+  if(studentId){
+    const st=students.find(s=>s.id===studentId);
+    if(st){
+      document.getElementById('s-name').value=st.name;
+      document.getElementById('s-grade').value=st.grade;
+      document.getElementById('s-service').value=st.serviceType;
+      document.getElementById('s-provider').value=st.providerId||'';
+      document.getElementById('s-minutes').value=st.requiredMinutes;
+      document.getElementById('s-sessions').value=st.sessionsPerWeek;
+      document.getElementById('s-notes').value=st.notes||'';
+      selectedColor=st.color;
+      cc.querySelectorAll('.color-pick').forEach(b=>b.classList.toggle('selected',b.dataset.color===st.color));
+    }
+  }else{
+    document.getElementById('s-name').value='';
+    document.getElementById('s-minutes').value=30;
+    document.getElementById('s-sessions').value=2;
+    document.getElementById('s-notes').value='';
+    if(defaultProvider&&defaultProvider!=='all')document.getElementById('s-provider').value=defaultProvider;
+  }
+  showModal('student-modal');
+}
+function saveStudentFromModal(){
+  const name=document.getElementById('s-name').value.trim();
+  if(!name){alert('Enter student name.');return;}
+  const data={name,grade:document.getElementById('s-grade').value,serviceType:document.getElementById('s-service').value,providerId:document.getElementById('s-provider').value||null,requiredMinutes:parseInt(document.getElementById('s-minutes').value)||30,sessionsPerWeek:parseInt(document.getElementById('s-sessions').value)||2,color:selectedColor,notes:document.getElementById('s-notes').value.trim()};
+  if(editingStudentId){
+    const st=students.find(s=>s.id===editingStudentId);
+    if(st)Object.assign(st,data);
+  }else{
+    students.push({id:gid(),...data});
+  }
+  save();hideModal('student-modal');renderAll();toast('Student saved');
+}
+
+// -- Session Modal --
+function openSessionModal(day,time,sessId){
+  editingSessionId=sessId||null;
+  document.getElementById('session-modal-title').textContent=sessId?'Edit Session':'Add Session';
+  document.getElementById('sess-provider').innerHTML=providers.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  if(activeProviderId!=='all')document.getElementById('sess-provider').value=activeProviderId;
+  document.getElementById('sess-day').innerHTML=DAYS.map(d=>`<option value="${d}"${d===day?' selected':''}>${d}</option>`).join('');
+  const TIME_SLOTS=getTimeSlots();
+  document.getElementById('sess-time').innerHTML=TIME_SLOTS.map(t=>`<option value="${t}"${t===time?' selected':''}>${fmt12(t)}</option>`).join('');
+  document.querySelectorAll('input[name="sess-dur"]')[0].checked=true;
+  document.querySelectorAll('input[name="sess-type"]')[0].checked=true;
+  document.getElementById('sess-conflict-warn').classList.add('hidden');
+  document.getElementById('sess-pull-warn').classList.add('hidden');
+
+  if(sessId){
+    const sess=sessions.find(s=>s.id===sessId);
+    if(sess){
+      document.getElementById('sess-provider').value=sess.providerId;
+      document.getElementById('sess-day').value=sess.day;
+      document.getElementById('sess-time').value=sess.startTime;
+      document.querySelector(`input[name="sess-dur"][value="${sess.duration}"]`).checked=true;
+      document.querySelector(`input[name="sess-type"][value="${sess.sessionType}"]`).checked=true;
+    }
+  }
+  updateSessionStudentsList();
+  showModal('session-modal');
+}
+function updateSessionStudentsList(){
+  const pid=document.getElementById('sess-provider').value;
+  const c=document.getElementById('sess-students');
+  const studs=students.filter(s=>s.providerId===pid);
+  c.innerHTML='';
+  if(studs.length===0){c.innerHTML='<p class="text-xs text-fg-400 italic">No students for this provider.</p>';return;}
+  const sess=editingSessionId?sessions.find(s=>s.id===editingSessionId):null;
+  studs.forEach(st=>{
+    const lbl=document.createElement('label');lbl.className='flex items-center gap-2 py-0.5 cursor-pointer text-sm text-fg-700';
+    lbl.innerHTML=`<input type="checkbox" class="accent-pri-500 sess-stu-cb" value="${st.id}" ${sess&&sess.studentIds.includes(st.id)?'checked':''}> <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${st.color}"></span> ${st.name}`;
+    c.appendChild(lbl);
+  });
+}
+function saveSessionFromModal(){
+  const pid=document.getElementById('sess-provider').value;
+  const day=document.getElementById('sess-day').value;
+  const time=document.getElementById('sess-time').value;
+  const dur=parseInt(document.querySelector('input[name="sess-dur"]:checked').value);
+  const type=document.querySelector('input[name="sess-type"]:checked').value;
+  const stuIds=Array.from(document.querySelectorAll('.sess-stu-cb:checked')).map(cb=>cb.value);
+  if(stuIds.length===0){alert('Select at least one student.');return;}
+  if(isConstrained(day,time)){alert('This slot is protected.');return;}
+  if(hasConflict(day,time,dur,stuIds,editingSessionId)){if(!confirm('Scheduling conflict detected. Save anyway?'))return;}
+  if(editingSessionId){
+    const sess=sessions.find(s=>s.id===editingSessionId);
+    if(sess)Object.assign(sess,{day,startTime:time,duration:dur,sessionType:type,studentIds:stuIds,providerId:pid});
+  }else{
+    sessions.push({id:gid(),day,startTime:time,duration:dur,sessionType:type,studentIds:stuIds,providerId:pid});
+  }
+  save();hideModal('session-modal');renderAll();toast('Session saved');
+}
+
+// -- Block Modal --
+function openBlockModal(day,time){
+  document.getElementById('block-day-label').textContent=day;
+  document.getElementById('block-time-label').textContent=fmt12(time);
+  document.getElementById('block-reason').value='Lunch';
+  document.getElementById('block-custom').value='';
+  document.getElementById('block-custom-row').classList.add('hidden');
+  document.getElementById('block-all-days').checked=false;
+  document.getElementById('block-modal').dataset.day=day;
+  document.getElementById('block-modal').dataset.time=time;
+  showModal('block-modal');
+}
+function saveBlockFromModal(){
+  const m=document.getElementById('block-modal');
+  const day=m.dataset.day,time=m.dataset.time;
+  let reason=document.getElementById('block-reason').value;
+  if(reason==='Other')reason=document.getElementById('block-custom').value.trim()||'Blocked';
+  const allDays=document.getElementById('block-all-days').checked;
+  const pid=activeProviderId==='all'?null:activeProviderId;
+  (allDays?DAYS:[day]).forEach(d=>{
+    if(!blockedSlots.some(b=>b.day===d&&b.startTime===time&&b.providerId===pid)){
+      blockedSlots.push({id:gid(),day:d,startTime:time,reason,providerId:pid});
+    }
+  });
+  save();hideModal('block-modal');renderAll();toast('Time blocked');
+}
+
+// ===== RENDER: PROVIDERS TAB =====
+function renderProviders(){
+  const grid=document.getElementById('providers-grid');grid.innerHTML='';
+  providers.forEach(prov=>{
+    const studs=students.filter(s=>s.providerId===prov.id);
+    const totalReq=studs.reduce((a,s)=>a+s.requiredMinutes,0);
+    const totalSched=studs.reduce((a,s)=>a+getSchedMin(s.id),0);
+    const sessCount=sessions.filter(s=>s.providerId===prov.id).length;
+    const pct=totalReq>0?Math.min(totalSched/totalReq,1):0;
+    const sc=statusColor(totalSched,totalReq);
+
+    const card=document.createElement('div');card.className='prov-card bg-white rounded-xl p-4 shadow-sm border border-bg-200 relative';
+    card.innerHTML=`
+      <div class="prov-actions absolute top-3 right-3 flex gap-1">
+        <button class="prov-edit text-fg-300 hover:text-pri-600 p-1" data-pid="${prov.id}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button class="prov-del text-fg-300 hover:text-red-500 p-1" data-pid="${prov.id}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+      </div>
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0" style="background:${prov.color}">${initials(prov.name)}</div>
+        <div>
+          <div class="font-bold text-fg-900 text-base">${prov.name}</div>
+          <span class="inline-block text-xs font-medium bg-bg-200 text-fg-600 px-2 py-0.5 rounded-full mt-0.5">${prov.role}</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 mb-2"><span class="text-xs bg-pri-50 text-pri-700 px-2 py-0.5 rounded-full font-medium">${prov.gradeLevel}</span></div>
+      <div class="flex gap-3 text-xs text-fg-500 mb-2">
+        <span><strong class="text-fg-800">${studs.length}</strong> students</span>
+        <span><strong class="text-fg-800">${totalReq}</strong> min/wk req</span>
+        <span><strong class="text-fg-800">${sessCount}</strong> sessions</span>
+      </div>
+      <div class="flex gap-1 mb-2">${DAYS.map((d,i)=>`<span class="day-circle ${prov.availableDays.includes(d)?'active':'inactive'}">${'MTWRF'[i]}</span>`).join('')}</div>
+      ${prov.pullTimes&&prov.pullTimes.length?`<div class="text-xs text-fg-400 mb-2">${[...new Set(prov.pullTimes.map(pt=>pt.day))].map(d=>{
+        const ws=prov.pullTimes.filter(pt=>pt.day===d);
+        return `<div>${d.slice(0,3)}: ${ws.map(w=>fmt12(w.startTime)+'–'+fmt12(w.endTime)).join(', ')}</div>`;
+      }).join('')}</div>`:''}
+      <div class="flex items-center gap-2">
+        <div class="flex-1 progress-bar-bg" style="background:${sc.bg}"><div class="progress-bar-fill" style="width:${pct*100}%;background:${sc.fill}"></div></div>
+        <span class="text-xs font-medium tabular-nums" style="color:${sc.text}">${Math.round(pct*100)}%</span>
+      </div>
+    `;
+    card.querySelector('.prov-edit').addEventListener('click',()=>openProviderModal(prov.id));
+    card.querySelector('.prov-del').addEventListener('click',()=>{
+      if(!confirm(`Delete "${prov.name}"?`))return;
+      sessions=sessions.filter(s=>s.providerId!==prov.id);
+      students.forEach(s=>{if(s.providerId===prov.id)s.providerId=null;});
+      providers=providers.filter(p=>p.id!==prov.id);
+      save();renderAll();toast('Provider deleted','info');
+    });
+    grid.appendChild(card);
+  });
+}
+
+// ===== RENDER: STUDENTS TAB =====
+function renderStudentsTable(){
+  // Populate filters
+  document.getElementById('filter-provider').innerHTML='<option value="">All Providers</option>'+providers.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  document.getElementById('filter-grade').innerHTML='<option value="">All Grades</option>'+GRADES.map(g=>`<option value="${g}">Grade ${g}</option>`).join('');
+  document.getElementById('filter-service').innerHTML='<option value="">All Services</option>'+SERVICES.map(s=>`<option value="${s}">${s}</option>`).join('');
+  filterStudentsTable();
+}
+function filterStudentsTable(){
+  const fprov=document.getElementById('filter-provider').value;
+  const fgrade=document.getElementById('filter-grade').value;
+  const fsvc=document.getElementById('filter-service').value;
+  const fsearch=document.getElementById('filter-search').value.toLowerCase();
+  let filtered=students.slice();
+  if(fprov)filtered=filtered.filter(s=>s.providerId===fprov);
+  if(fgrade)filtered=filtered.filter(s=>s.grade===fgrade);
+  if(fsvc)filtered=filtered.filter(s=>s.serviceType===fsvc);
+  if(fsearch)filtered=filtered.filter(s=>s.name.toLowerCase().includes(fsearch));
+
+  const body=document.getElementById('students-table-body');body.innerHTML='';
+  filtered.forEach(st=>{
+    const sched=getSchedMin(st.id),pct=st.requiredMinutes>0?Math.min(sched/st.requiredMinutes,1):0,sc=statusColor(sched,st.requiredMinutes);
+    const prov=providers.find(p=>p.id===st.providerId);
+    const tr=document.createElement('tr');tr.className='even:bg-bg-50 hover:bg-bg-100 transition-colors';
+    tr.innerHTML=`
+      <td class="px-4 py-2.5 text-sm font-medium text-fg-800 flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${st.color}"></span>${st.name}</td>
+      <td class="px-4 py-2.5 text-sm text-fg-600">${st.grade}</td>
+      <td class="px-4 py-2.5 text-sm text-fg-600">${st.serviceType}</td>
+      <td class="px-4 py-2.5 text-sm text-fg-600">${prov?prov.name:'—'}</td>
+      <td class="px-4 py-2.5 text-sm text-fg-700 text-right tabular-nums">${st.requiredMinutes}</td>
+      <td class="px-4 py-2.5 text-sm text-fg-700 text-right tabular-nums">${sched}</td>
+      <td class="px-4 py-2.5 w-24"><div class="progress-bar-bg" style="background:${sc.bg}"><div class="progress-bar-fill" style="width:${pct*100}%;background:${sc.fill}"></div></div></td>
+      <td class="px-4 py-2.5 text-xs text-fg-400 max-w-[120px] truncate" title="${st.notes||''}">${st.notes||'—'}</td>
+      <td class="px-4 py-2.5 text-center">
+        <div class="flex justify-center gap-1">
+          <button class="stu-edit text-fg-400 hover:text-pri-600 p-1" data-sid="${st.id}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="stu-del text-fg-400 hover:text-red-500 p-1" data-sid="${st.id}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div>
+      </td>`;
+    tr.querySelector('.stu-edit').addEventListener('click',()=>openStudentModal(st.id));
+    tr.querySelector('.stu-del').addEventListener('click',()=>{
+      if(!confirm(`Delete "${st.name}"?`))return;
+      sessions=sessions.filter(sess=>{if(sess.studentIds.includes(st.id)){sess.studentIds=sess.studentIds.filter(id=>id!==st.id);return sess.studentIds.length>0;}return true;});
+      students=students.filter(s=>s.id!==st.id);save();renderAll();toast('Student deleted','info');
+    });
+    body.appendChild(tr);
+  });
+}
+
+// ===== RENDER: PARAMETERS TAB =====
+function renderParameters(){
+  renderConstraintsTable();renderIEPDays();renderSettingsForm();
+}
+function renderConstraintsTable(){
+  const body=document.getElementById('constraints-table');body.innerHTML='';
+  masterConstraints.forEach(mc=>{
+    const tr=document.createElement('tr');tr.className='even:bg-bg-50';
+    tr.innerHTML=`
+      <td class="px-4 py-2 text-fg-700">${mc.day}</td>
+      <td class="px-4 py-2 text-fg-600 tabular-nums">${fmt12(mc.startTime)} – ${fmt12(mc.endTime)}</td>
+      <td class="px-4 py-2"><span class="text-xs font-medium px-2 py-0.5 rounded-full ${mc.type==='lunch'?'bg-yel-100 text-yel-700':mc.type==='specials'||mc.type==='assembly'?'bg-ora-100 text-ora-600':mc.type==='testing'?'bg-red-100 text-red-700':'bg-bg-200 text-fg-600'}">${mc.type}</span></td>
+      <td class="px-4 py-2 text-fg-700">${mc.label}</td>
+      <td class="px-4 py-2 text-center"><button class="del-constraint text-fg-400 hover:text-red-500" data-cid="${mc.id}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>`;
+    tr.querySelector('.del-constraint').addEventListener('click',()=>{
+      masterConstraints=masterConstraints.filter(c=>c.id!==mc.id);save();renderParameters();toast('Constraint removed','info');
+    });
+    body.appendChild(tr);
+  });
+}
+function renderIEPDays(){
+  const c=document.getElementById('iep-days-list');c.innerHTML='';
+  if(iepDays.length===0){c.innerHTML='<p class="text-sm text-fg-400 italic">No IEP days added yet.</p>';return;}
+  iepDays.forEach(d=>{
+    const stu=d.studentId?students.find(s=>s.id===d.studentId):null;
+    const div=document.createElement('div');div.className='bg-white rounded-lg p-3 shadow-sm border border-bg-200 flex items-center justify-between';
+    div.innerHTML=`<div><span class="text-sm font-medium text-fg-800">${d.label}</span><span class="text-xs text-fg-400 ml-2">${d.date}</span>${stu?`<span class="text-xs text-pur-600 ml-2">• ${stu.name}</span>`:''}</div><button class="del-iep text-fg-300 hover:text-red-500" data-iid="${d.id}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>`;
+    div.querySelector('.del-iep').addEventListener('click',()=>{
+      iepDays=iepDays.filter(i=>i.id!==d.id);save();renderParameters();toast('IEP day removed','info');
+    });
+    c.appendChild(div);
+  });
+}
+function renderSettingsForm(){
+  const s=getSettings();
+  document.getElementById('set-year-start').value=s.yearStart;
+  document.getElementById('set-year-end').value=s.yearEnd;
+  const allTimes=genTimeSlots(7,0,17,0);
+  document.getElementById('set-day-start').innerHTML=allTimes.map(t=>`<option value="${t}"${t===`${s.dayStartH}:${s.dayStartM.toString().padStart(2,'0')}`?' selected':''}>${fmt12(t)}</option>`).join('');
+  document.getElementById('set-day-end').innerHTML=allTimes.map(t=>`<option value="${t}"${t===`${s.dayEndH}:${s.dayEndM.toString().padStart(2,'0')}`?' selected':''}>${fmt12(t)}</option>`).join('');
+  const durRadio=document.querySelector(`input[name="def-dur"][value="${s.defaultDuration}"]`);if(durRadio)durRadio.checked=true;
+}
+
+// ===== RENDER: TRACKER =====
+function renderTracker(){
+  const c=document.getElementById('tracker-content');c.innerHTML='';
+  providers.forEach(prov=>{
+    const studs=students.filter(s=>s.providerId===prov.id);
+    if(studs.length===0)return;
+    const section=document.createElement('div');
+    section.innerHTML=`<h3 class="text-base font-semibold text-fg-800 mb-2 flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:${prov.color}"></span>${prov.name}</h3>`;
+    const table=document.createElement('div');table.className='bg-white rounded-xl shadow-sm overflow-hidden mb-4';
+    let html='<div class="overflow-x-auto"><table class="w-full text-left"><thead class="bg-bg-150 text-xs font-medium uppercase tracking-wide text-fg-500"><tr><th class="px-4 py-2">Student</th><th class="px-4 py-2">Grade</th><th class="px-4 py-2">Service</th><th class="px-4 py-2 text-right">Required</th><th class="px-4 py-2 text-right">Scheduled</th><th class="px-4 py-2">Progress</th><th class="px-4 py-2 text-right">Remaining</th><th class="px-4 py-2 text-center">Status</th></tr></thead><tbody class="divide-y divide-bg-200">';
+    let totalReq=0,totalSched=0;
+    studs.forEach(st=>{
+      const sched=getSchedMin(st.id),rem=Math.max(st.requiredMinutes-sched,0),pct=st.requiredMinutes>0?Math.min(sched/st.requiredMinutes,1):0,sc=statusColor(sched,st.requiredMinutes);
+      totalReq+=st.requiredMinutes;totalSched+=sched;
+      let statusLabel,statusCls;
+      if(pct>=1){statusLabel='✅ Met';statusCls='bg-grn-100 text-grn-700';}
+      else if(pct>=.5){statusLabel='⚠️ Partial';statusCls='bg-yel-50 text-yel-700';}
+      else{statusLabel='❌ Unmet';statusCls='bg-red-100 text-red-700';}
+      html+=`<tr class="even:bg-bg-50"><td class="px-4 py-2 text-sm font-medium text-fg-800 flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:${st.color}"></span>${st.name}</td><td class="px-4 py-2 text-sm text-fg-600">${st.grade}</td><td class="px-4 py-2 text-sm text-fg-600">${st.serviceType}</td><td class="px-4 py-2 text-sm text-fg-700 text-right tabular-nums">${st.requiredMinutes}m</td><td class="px-4 py-2 text-sm text-fg-700 text-right tabular-nums">${sched}m</td><td class="px-4 py-2 w-24"><div class="progress-bar-bg" style="background:${sc.bg}"><div class="progress-bar-fill" style="width:${pct*100}%;background:${sc.fill}"></div></div></td><td class="px-4 py-2 text-sm text-right tabular-nums" style="color:${sc.text}">${rem>0?rem+'m':'—'}</td><td class="px-4 py-2 text-center"><span class="text-xs font-medium px-2 py-0.5 rounded-full ${statusCls}">${statusLabel}</span></td></tr>`;
+    });
+    const subPct=totalReq>0?Math.round(totalSched/totalReq*100):0;
+    html+=`<tr class="bg-bg-150 font-semibold"><td class="px-4 py-2 text-sm text-fg-700" colspan="3">Subtotal</td><td class="px-4 py-2 text-sm text-fg-700 text-right tabular-nums">${totalReq}m</td><td class="px-4 py-2 text-sm text-fg-700 text-right tabular-nums">${totalSched}m</td><td class="px-4 py-2 text-sm text-fg-600" colspan="2">${subPct}% scheduled</td><td></td></tr>`;
+    html+='</tbody></table></div>';
+    table.innerHTML=html;
+    section.appendChild(table);c.appendChild(section);
+  });
+}
+
+// ===== RENDER ALL =====
+function renderAll(){
+  if(activeTab==='schedule')renderScheduleTab();
+  if(activeTab==='providers')renderProviders();
+  if(activeTab==='students')renderStudentsTable();
+  if(activeTab==='parameters')renderParameters();
+}
+
+// ===== CSV IMPORT =====
+function openCSVImport(type){
+  csvImportType=type;csvData=[];
+  document.getElementById('csv-modal-title').textContent=type==='students'?'Import Students from CSV':'Import Providers from CSV';
+  document.getElementById('csv-format-hint').textContent=type==='students'?'Format: Name,Grade,ServiceType,ProviderName,RequiredMinutes,SessionsPerWeek,Notes':'Format: Name,Role,GradeLevel,Color,AvailableDays';
+  document.getElementById('csv-preview').classList.add('hidden');
+  document.getElementById('csv-file-input').value='';
+  showModal('csv-modal');
+}
+function processCSVFile(file){
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const rows=parseCSV(e.target.result);
+    if(rows.length<2){toast('CSV has no data rows','error');return;}
+    csvData=rows;
+    const preview=document.getElementById('csv-preview');preview.classList.remove('hidden');
+    const table=document.getElementById('csv-preview-table');
+    table.querySelector('thead').innerHTML='<tr>'+rows[0].map(h=>`<th class="px-2 py-1 bg-bg-150 text-fg-500">${h}</th>`).join('')+'<th class="px-2 py-1 bg-bg-150 text-fg-500">Status</th></tr>';
+    const tbody=table.querySelector('tbody');tbody.innerHTML='';
+    rows.slice(1,11).forEach(row=>{
+      let valid=true,msg='✅';
+      if(csvImportType==='students'){
+        if(!row[0])valid=false;
+        if(row[3]){const p=providers.find(pr=>pr.name.toLowerCase()===row[3].toLowerCase());if(!p)msg='⚠️ Provider not found';}
+      }else{if(!row[0])valid=false;}
+      const tr=document.createElement('tr');
+      tr.innerHTML=row.map(c=>`<td class="px-2 py-1 text-fg-700">${c||'—'}</td>`).join('')+`<td class="px-2 py-1 ${valid?'text-grn-600':'text-red-600'}">${msg}</td>`;
+      tbody.appendChild(tr);
+    });
+    document.getElementById('csv-confirm-import').textContent=`Import ${rows.length-1} ${csvImportType}`;
+  };
+  reader.readAsText(file);
+}
+function confirmCSVImport(){
+  if(csvData.length<2)return;
+  const headers=csvData[0].map(h=>h.toLowerCase().trim());
+  let count=0;
+  if(csvImportType==='students'){
+    csvData.slice(1).forEach(row=>{
+      const name=row[0]?.trim();if(!name)return;
+      const grade=row[1]?.trim()||'K';
+      const svc=row[2]?.trim()||'Other';
+      const provName=row[3]?.trim();
+      const reqMin=parseInt(row[4])||30;
+      const sessWk=parseInt(row[5])||2;
+      const notes=row[6]?.trim()||'';
+      let providerId=null;
+      if(provName){const p=providers.find(pr=>pr.name.toLowerCase()===provName.toLowerCase());if(p)providerId=p.id;}
+      students.push({id:gid(),name,grade,serviceType:svc,requiredMinutes:reqMin,sessionsPerWeek:sessWk,color:PRESET_COLORS[count%PRESET_COLORS.length],providerId,notes});
+      count++;
+    });
+  }else{
+    csvData.slice(1).forEach(row=>{
+      const name=row[0]?.trim();if(!name)return;
+      const role=row[1]?.trim()||'Other';
+      const gradeLevel=row[2]?.trim()||'All Grades';
+      const color=row[3]?.trim()||PRESET_COLORS[count%PRESET_COLORS.length];
+      const days=row[4]?row[4].split(',').map(d=>d.trim()):DAYS.slice();
+      providers.push({id:gid(),name,role,gradeLevel,color,availableDays:days,pullTimes:[]});
+      count++;
+    });
+  }
+  save();hideModal('csv-modal');renderAll();toast(`${count} ${csvImportType} imported`);
+}
+function importMasterCSV(file){
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const rows=parseCSV(e.target.result);
+    if(rows.length<2){toast('No data rows','error');return;}
+    let count=0;
+    rows.slice(1).forEach(row=>{
+      const day=row[0]?.trim();if(!day)return;
+      const startTime=row[1]?.trim();const endTime=row[2]?.trim();
+      const type=row[3]?.trim()?.toLowerCase()||'blocked';
+      const label=row[4]?.trim()||type;
+      if(day==='All'){
+        masterConstraints.push({id:gid(),day:'All',startTime,endTime,type,label,affectsAll:true});
+      }else{
+        masterConstraints.push({id:gid(),day,startTime,endTime,type,label,affectsAll:true});
+      }
+      count++;
+    });
+    save();renderParameters();toast(`${count} constraints imported`);
+  };
+  reader.readAsText(file);
+}
+
+// ===== INIT =====
+load();
+if(providers.length===0&&students.length===0)loadSample();
+
+// Apply active tab
+switchTab(activeTab);
+
+// ===== EVENT LISTENERS =====
+if(typeof lucide!=='undefined'&&typeof lucide.createIcons==='function')lucide.createIcons();
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.dataset.tab)));
+document.querySelectorAll('.mob-tab-btn').forEach(btn=>btn.addEventListener('click',()=>{switchTab(btn.dataset.tab);document.getElementById('mobile-nav-overlay').classList.add('hidden');}));
+
+// Mobile nav
+document.getElementById('mobile-nav-btn').addEventListener('click',()=>document.getElementById('mobile-nav-overlay').classList.remove('hidden'));
+document.getElementById('mobile-nav-close').addEventListener('click',()=>document.getElementById('mobile-nav-overlay').classList.add('hidden'));
+document.getElementById('mobile-nav-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('mobile-nav-overlay'))document.getElementById('mobile-nav-overlay').classList.add('hidden');});
+
+// Provider filter
+document.getElementById('provider-filter').addEventListener('change',function(){activeProviderId=this.value;save();renderSidebar();renderSchedule();});
+
+// Provider modal
+document.getElementById('add-provider-btn').addEventListener('click',()=>openProviderModal(null));
+document.getElementById('save-provider').addEventListener('click',saveProviderFromModal);
+document.getElementById('cancel-provider').addEventListener('click',()=>hideModal('provider-modal'));
+document.getElementById('import-providers-btn').addEventListener('click',()=>openCSVImport('providers'));
+
+// Day checkboxes update pull times in provider modal
+document.getElementById('p-days').addEventListener('change',()=>renderPullTimes());
+
+// Student modal
+document.getElementById('sidebar-add-student').addEventListener('click',()=>openStudentModal(null,activeProviderId));
+document.getElementById('add-student-page-btn').addEventListener('click',()=>openStudentModal(null));
+document.getElementById('save-student').addEventListener('click',saveStudentFromModal);
+document.getElementById('cancel-student').addEventListener('click',()=>hideModal('student-modal'));
+
+// Session modal
+document.getElementById('save-session').addEventListener('click',saveSessionFromModal);
+document.getElementById('cancel-session').addEventListener('click',()=>hideModal('session-modal'));
+document.getElementById('sess-provider').addEventListener('change',updateSessionStudentsList);
+
+// Block modal
+document.getElementById('save-block').addEventListener('click',saveBlockFromModal);
+document.getElementById('cancel-block').addEventListener('click',()=>hideModal('block-modal'));
+document.getElementById('block-reason').addEventListener('change',function(){document.getElementById('block-custom-row').classList.toggle('hidden',this.value!=='Other');});
+
+// Block mode toggle
+document.getElementById('block-toggle').addEventListener('click',function(){
+  blockMode=!blockMode;
+  this.classList.toggle('bg-red-100',blockMode);this.classList.toggle('text-red-700',blockMode);this.classList.toggle('border-red-300',blockMode);
+  document.querySelectorAll('.schedule-cell').forEach(c=>c.classList.toggle('block-mode',blockMode));
+});
+
+// Print
+document.getElementById('print-btn').addEventListener('click',()=>window.print());
+
+// Tracker
+document.getElementById('tracker-btn').addEventListener('click',()=>{renderTracker();document.getElementById('tracker-overlay').classList.remove('hidden');});
+document.getElementById('tracker-back').addEventListener('click',()=>document.getElementById('tracker-overlay').classList.add('hidden'));
+
+// Popover
+document.getElementById('popover-edit').addEventListener('click',()=>{
+  const sid=document.getElementById('session-popover').dataset.sessid;hidePopover();
+  const sess=sessions.find(s=>s.id===sid);if(sess)openSessionModal(sess.day,sess.startTime,sid);
+});
+document.getElementById('popover-delete').addEventListener('click',()=>{
+  const sid=document.getElementById('session-popover').dataset.sessid;
+  if(confirm('Delete this session?')){sessions=sessions.filter(s=>s.id!==sid);save();hidePopover();renderAll();toast('Session deleted','info');}
+});
+document.addEventListener('click',e=>{
+  const pop=document.getElementById('session-popover');
+  if(!pop.classList.contains('hidden')&&!pop.contains(e.target)&&!e.target.closest('.session-card'))hidePopover();
+});
+
+// Constraint modal
+document.getElementById('add-constraint-btn').addEventListener('click',()=>{
+  editingConstraintId=null;
+  document.getElementById('constraint-modal-title').textContent='Add Constraint';
+  const allTimes=getTimeSlots();
+  document.getElementById('c-day').innerHTML='<option value="All">All Days</option>'+DAYS.map(d=>`<option>${d}</option>`).join('');
+  document.getElementById('c-start').innerHTML=allTimes.map(t=>`<option value="${t}">${fmt12(t)}</option>`).join('');
+  document.getElementById('c-end').innerHTML=allTimes.map(t=>`<option value="${t}">${fmt12(t)}</option>`).join('');
+  document.getElementById('c-label').value='';
+  showModal('constraint-modal');
+});
+document.getElementById('save-constraint').addEventListener('click',()=>{
+  const day=document.getElementById('c-day').value;
+  const start=document.getElementById('c-start').value;
+  const end=document.getElementById('c-end').value;
+  const type=document.getElementById('c-type').value;
+  const label=document.getElementById('c-label').value.trim()||type;
+  masterConstraints.push({id:gid(),day,startTime:start,endTime:end,type,label,affectsAll:true});
+  save();hideModal('constraint-modal');renderParameters();toast('Constraint added');
+});
+document.getElementById('cancel-constraint').addEventListener('click',()=>hideModal('constraint-modal'));
+
+// IEP Day modal
+document.getElementById('add-iep-day-btn').addEventListener('click',()=>{
+  document.getElementById('iep-date').value='';
+  document.getElementById('iep-label').value='';
+  document.getElementById('iep-student').innerHTML='<option value="">None</option>'+students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  showModal('iep-day-modal');
+});
+document.getElementById('save-iep-day').addEventListener('click',()=>{
+  const date=document.getElementById('iep-date').value;
+  const label=document.getElementById('iep-label').value.trim()||'IEP Day';
+  const studentId=document.getElementById('iep-student').value||null;
+  if(!date){alert('Select a date.');return;}
+  iepDays.push({id:gid(),date,label,studentId});
+  save();hideModal('iep-day-modal');renderParameters();toast('IEP day added');
+});
+document.getElementById('cancel-iep-day').addEventListener('click',()=>hideModal('iep-day-modal'));
+
+// Students tab filters
+['filter-provider','filter-grade','filter-service'].forEach(id=>document.getElementById(id).addEventListener('change',filterStudentsTable));
+document.getElementById('filter-search').addEventListener('input',filterStudentsTable);
+
+// CSV import
+document.getElementById('import-students-btn').addEventListener('click',()=>openCSVImport('students'));
+document.getElementById('csv-drag-zone').addEventListener('click',()=>document.getElementById('csv-file-input').click());
+document.getElementById('csv-file-input').addEventListener('change',e=>{if(e.target.files[0])processCSVFile(e.target.files[0]);});
+document.getElementById('csv-drag-zone').addEventListener('dragover',e=>{e.preventDefault();document.getElementById('csv-drag-zone').classList.add('dragover');});
+document.getElementById('csv-drag-zone').addEventListener('dragleave',()=>document.getElementById('csv-drag-zone').classList.remove('dragover'));
+document.getElementById('csv-drag-zone').addEventListener('drop',e=>{e.preventDefault();document.getElementById('csv-drag-zone').classList.remove('dragover');if(e.dataTransfer.files[0])processCSVFile(e.dataTransfer.files[0]);});
+document.getElementById('csv-confirm-import').addEventListener('click',confirmCSVImport);
+document.getElementById('cancel-csv').addEventListener('click',()=>hideModal('csv-modal'));
+
+// Master schedule CSV
+document.getElementById('master-drag-zone').addEventListener('click',()=>document.getElementById('master-csv-input').click());
+document.getElementById('master-csv-input').addEventListener('change',e=>{if(e.target.files[0])importMasterCSV(e.target.files[0]);});
+document.getElementById('master-drag-zone').addEventListener('dragover',e=>{e.preventDefault();document.getElementById('master-drag-zone').classList.add('dragover');});
+document.getElementById('master-drag-zone').addEventListener('dragleave',()=>document.getElementById('master-drag-zone').classList.remove('dragover'));
+document.getElementById('master-drag-zone').addEventListener('drop',e=>{e.preventDefault();document.getElementById('master-drag-zone').classList.remove('dragover');if(e.dataTransfer.files[0])importMasterCSV(e.dataTransfer.files[0]);});
+
+// Settings
+document.getElementById('save-settings-btn').addEventListener('click',()=>{
+  const startParts=document.getElementById('set-day-start').value.split(':').map(Number);
+  const endParts=document.getElementById('set-day-end').value.split(':').map(Number);
+  settings.yearStart=document.getElementById('set-year-start').value;
+  settings.yearEnd=document.getElementById('set-year-end').value;
+  settings.dayStartH=startParts[0];settings.dayStartM=startParts[1];
+  settings.dayEndH=endParts[0];settings.dayEndM=endParts[1];
+  settings.defaultDuration=parseInt(document.querySelector('input[name="def-dur"]:checked').value);
+  save();renderAll();toast('Settings saved');
+});
+
+// Export
+document.getElementById('export-data-btn').addEventListener('click',()=>{
+  const data={providers,students,sessions,blockedSlots,masterConstraints,iepDays,settings};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='iep-data-export.json';a.click();
+  URL.revokeObjectURL(url);toast('Data exported');
+});
+
+// Reset
+document.getElementById('reset-data-btn').addEventListener('click',()=>{document.getElementById('reset-confirm-input').value='';showModal('reset-modal');});
+document.getElementById('confirm-reset').addEventListener('click',()=>{
+  if(document.getElementById('reset-confirm-input').value!=='RESET'){alert('Type RESET to confirm.');return;}
+  providers=[];students=[];sessions=[];blockedSlots=[];masterConstraints=[];iepDays=[];settings={};
+  localStorage.removeItem('iep_providers');localStorage.removeItem('iep_students');localStorage.removeItem('iep_sessions');
+  localStorage.removeItem('iep_blocked');localStorage.removeItem('iep_constraints');localStorage.removeItem('iep_iepdays');
+  localStorage.removeItem('iep_settings');localStorage.removeItem('iep_activeProvider');localStorage.removeItem('iep_activeTab');
+  activeProviderId='all';activeTab='schedule';
+  hideModal('reset-modal');loadSample();switchTab('schedule');toast('All data reset','info');
+});
+document.getElementById('cancel-reset').addEventListener('click',()=>hideModal('reset-modal'));
+
+// Close modals on overlay click
+['provider-modal','student-modal','session-modal','block-modal','constraint-modal','iep-day-modal','csv-modal','reset-modal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{if(e.target===document.getElementById(id))hideModal(id);});
+});
+
+// ESC key closes modals
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    ['provider-modal','student-modal','session-modal','block-modal','constraint-modal','iep-day-modal','csv-modal','reset-modal'].forEach(id=>{
+      if(!document.getElementById(id).classList.contains('hidden'))hideModal(id);
+    });
+    hidePopover();
+  }
+});
+</script>
+</body>
+</html>
