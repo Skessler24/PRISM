@@ -3,11 +3,13 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { useHelpAssist } from '../lib/help-assist/help-assist-context'
 import { useTheme } from '../app/theme-context'
 import { useAdminRole } from '../lib/admin/admin-role-context'
+import { useMeetingSession } from '../lib/meeting-session/meeting-session-context'
 
 export function TopBar() {
   const { enabled, toggle } = useHelpAssist()
   const { setThemeStudioOpen } = useTheme()
   const { isAdmin, unlockAdmin, setStaff, role } = useAdminRole()
+  const { openMeetingSession } = useMeetingSession()
   const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
 
@@ -38,6 +40,15 @@ export function TopBar() {
       </NavLink>
 
       <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 md:gap-3">
+        <button
+          type="button"
+          onClick={() => openMeetingSession({ title: 'Team meeting' })}
+          className="touch-manipulation rounded-lg border border-white/30 bg-white/10 px-2.5 py-2 text-[11px] font-semibold text-white transition hover:bg-white/20 sm:px-3 sm:py-1 sm:text-xs"
+          title="Recordable team meeting — timer, agenda, summarize"
+        >
+          <span className="sm:hidden">⏱</span>
+          <span className="hidden sm:inline">⏱ Meeting Timer</span>
+        </button>
         <button
           type="button"
           onClick={toggle}

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useMeetingSession } from '../../lib/meeting-session/meeting-session-context'
 import {
   PROVIDER_LABEL,
   detectProvider,
@@ -39,6 +40,7 @@ function formatWhen(m: VirtualMeeting) {
 }
 
 export function VirtualMeetingsPanel() {
+  const { openMeetingSession } = useMeetingSession()
   const [meetings, setMeetings] = useState<VirtualMeeting[]>(() => loadVirtualMeetings())
   const [teamsHome, setTeamsHome] = useState(() => loadTeamsHomeUrl())
   const [adding, setAdding] = useState(false)
@@ -107,6 +109,19 @@ export function VirtualMeetingsPanel() {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
+            className="rounded-lg bg-[#1E3A5F] px-2.5 py-1.5 text-[10px] font-semibold text-white"
+            onClick={() =>
+              openMeetingSession({
+                title: 'Team meeting',
+                joinUrl: teamsHome,
+                provider: 'Teams',
+              })
+            }
+          >
+            ⏱ Record meeting
+          </button>
+          <button
+            type="button"
             className="rounded-lg bg-[#6264A7] px-2.5 py-1.5 text-[10px] font-semibold text-white"
             onClick={() => openJoinUrl(teamsHome || 'https://teams.microsoft.com/')}
           >
@@ -163,6 +178,19 @@ export function VirtualMeetingsPanel() {
               onClick={() => openJoinUrl(m.joinUrl)}
             >
               Join
+            </button>
+            <button
+              type="button"
+              className="shrink-0 rounded-lg border border-[var(--border)] bg-[var(--card-bg)] px-2.5 py-1.5 text-[10px] font-bold"
+              onClick={() =>
+                openMeetingSession({
+                  title: m.title,
+                  joinUrl: m.joinUrl,
+                  provider: PROVIDER_LABEL[m.provider],
+                })
+              }
+            >
+              Record
             </button>
             <button
               type="button"

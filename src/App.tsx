@@ -5,6 +5,7 @@ import { HelpAssistProvider } from './lib/help-assist/HelpAssistProvider'
 import { DistrictProfileProvider } from './lib/district-profiles/DistrictProfileProvider'
 import { AdminRoleProvider } from './lib/admin/AdminRoleProvider'
 import { StudentsProvider } from './lib/students/StudentsProvider'
+import { MeetingSessionProvider } from './lib/meeting-session/MeetingSessionProvider'
 import { DashboardPage } from './features/dashboard/DashboardPage'
 import { StudentTilesPage } from './features/student-tiles/StudentTilesPage'
 import { CaseloadPage } from './features/caseload/CaseloadPage'
@@ -39,6 +40,7 @@ export default function App() {
         <AdminRoleProvider>
           <DistrictProfileProvider>
             <StudentsProvider>
+              <MeetingSessionProvider>
               <BrowserRouter>
                 <Routes>
                   {/* Fullscreen / pop-out surfaces (no main chrome) */}
@@ -73,6 +75,7 @@ export default function App() {
                   </Route>
                 </Routes>
               </BrowserRouter>
+              </MeetingSessionProvider>
             </StudentsProvider>
           </DistrictProfileProvider>
         </AdminRoleProvider>
