@@ -18,6 +18,14 @@ import {
   PRINT_SIZES,
   type PrintSizeId,
 } from '../../lib/classroom-materials/generateMaterialPdf'
+import { PrismMaterialChrome } from '../../lib/classroom-materials/PrismMaterialChrome'
+import {
+  CORE_VOCAB_DEFAULT,
+  KIND_ACCENT,
+  FIRST_THEN_ACCENT,
+  accentForMaterial,
+  fitzColor,
+} from '../../lib/classroom-materials/prismTemplateTheme'
 import { loadFbaSessions } from '../../lib/fba/store'
 import { resolveIcon } from '../../lib/icons/catalog'
 import { IconGlyph } from '../../lib/icons/IconGlyph'
@@ -37,6 +45,8 @@ function ActionRow({
   onFlash,
   printSize,
   setPrintSize,
+  printBw,
+  setPrintBw,
 }: {
   onSave: () => void
   onPdf: () => void
@@ -44,6 +54,8 @@ function ActionRow({
   onFlash: (m: string) => void
   printSize: PrintSizeId
   setPrintSize: (s: PrintSizeId) => void
+  printBw: boolean
+  setPrintBw: (v: boolean) => void
 }) {
   return (
     <div className="flex flex-wrap items-end gap-2">
@@ -67,6 +79,10 @@ function ActionRow({
             </option>
           ))}
         </select>
+      </label>
+      <label className="flex items-center gap-1.5 text-[10px] font-semibold text-[var(--subtext)]">
+        <input type="checkbox" checked={printBw} onChange={(e) => setPrintBw(e.target.checked)} />
+        B&amp;W ink-friendly
       </label>
       <button
         type="button"
@@ -100,6 +116,7 @@ export function ClassroomMaterialsPanel({ onFlash }: Props) {
   const [matTab, setMatTab] = useState<MatTab>('token')
   const [saved, setSaved] = useState<SavedMaterial[]>(() => loadMaterials())
   const [printSize, setPrintSize] = useState<PrintSizeId>('letter')
+  const [printBw, setPrintBw] = useState(false)
   const [lastId, setLastId] = useState('')
 
   // Token
@@ -122,9 +139,7 @@ export function ClassroomMaterialsPanel({ onFlash }: Props) {
 
   // Comm board
   const [commStudent, setCommStudent] = useState('')
-  const [commWords, setCommWords] = useState(
-    'I want\nmore\nstop\nhelp\ngo\nbathroom\ndrink\neat\nbreak\nall done',
-  )
+  const [commWords, setCommWords] = useState(CORE_VOCAB_DEFAULT)
   const [commPrompt, setCommPrompt] = useState(
     "Make a communication board with this month's vocabulary for today's ILC group",
   )
@@ -183,10 +198,13 @@ Reward: ${reward}`
 
   function saveSchedule() {
     const { id, name } = studentMeta(schedStudent)
-    const steps = activities
+    let steps = activities
       .split('\n')
       .map((l) => l.trim())
       .filter(Boolean)
+    if (schedType === 'First / Then') {
+      steps = [steps[0] || 'First', steps[1] || 'Then']
+    }
     const payload: SchedulePayload = {
       scheduleType: schedType,
       steps,
@@ -196,7 +214,7 @@ Reward: ${reward}`
     const mat: SavedMaterial = {
       id: `mat-${Date.now()}`,
       kind: 'schedule',
-      title: `${schedType} schedule`,
+      title: schedType === 'First / Then' ? 'First / Then board' : `${schedType} schedule`,
       studentId: id,
       studentName: name,
       body: steps.map((l, i) => `${i + 1}. ${l}`).join('\n'),
@@ -332,8 +350,10 @@ Reward: ${reward}`
 
   function pdfFor(m: SavedMaterial) {
     try {
-      downloadMaterialPdf(m, printSize)
-      onFlash(`PDF downloaded (${PRINT_SIZES.find((s) => s.id === printSize)?.label})`)
+      downloadMaterialPdf(m, printSize, { bw: printBw })
+      onFlash(
+        `PDF downloaded (${PRINT_SIZES.find((s) => s.id === printSize)?.label}${printBw ? ' · B&W' : ' · color'})`,
+      )
     } catch (e) {
       onFlash(e instanceof Error ? e.message : 'PDF failed')
     }
@@ -348,9 +368,20 @@ Reward: ${reward}`
     <section className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card">
       <h2 className="font-heading text-sm font-bold">Classroom Materials Studio</h2>
       <p className="mt-1 text-xs text-[var(--subtext)]">
-        Token boards, schedules, behavior charts, social stories, and TouchChat-style communication
-        boards — Save to student tiles, PDF laminate/poster sizes, and interactive Smart TV session
-        mode. Data stays in this browser.
+        All creations follow the <strong>PRISM Templates</strong> pack (Nunito titles, Fitzgerald AAC
+        colors, laminate Color + B&amp;W layouts). Token boards, First/Then, schedules, choice boards,
+        social stories — Save to student tiles, PDF, Smart TV.
+      </p>
+      <p className="mt-2 text-[11px]">
+        <a
+          href="/prism-templates/printable-color-bw.html"
+          target="_blank"
+          rel="noreferrer"
+          className="font-semibold text-[var(--accent)] underline"
+        >
+          Open blank Color + B&amp;W printable pack
+        </a>
+        <span className="text-[var(--subtext)]"> · laminate blanks for velcro icons</span>
       </p>
 
       <div className="mt-3 flex flex-wrap gap-2">
@@ -363,20 +394,27 @@ Reward: ${reward}`
             ['comm', 'Comm board'],
             ['saved', 'Saved / student'],
           ] as const
-        ).map(([id, label]) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setMatTab(id)}
-            className={`rounded-lg border px-3 py-1.5 text-xs font-semibold ${
-              matTab === id
-                ? 'border-[var(--accent)] bg-[var(--accent)] text-white'
-                : 'border-[var(--border)] text-[var(--subtext)]'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+        ).map(([id, label]) => {
+          const accent = KIND_ACCENT[id === 'saved' ? 'token' : id]
+          const active = matTab === id
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setMatTab(id)}
+              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold ${
+                active ? 'text-white' : 'bg-white text-[var(--text)]'
+              }`}
+              style={
+                active
+                  ? { background: accent.c, borderColor: accent.c }
+                  : { borderColor: accent.c, color: accent.title }
+              }
+            >
+              {label}
+            </button>
+          )
+        })}
       </div>
 
       {matTab === 'token' && (
@@ -432,17 +470,50 @@ Reward: ${reward}`
               </select>
             </label>
           </div>
-          <div className="flex flex-wrap gap-2 rounded-xl bg-[var(--slate)] p-4">
-            {Array.from({ length: tokenCount }, (_, i) => (
+          <PrismMaterialChrome accent={KIND_ACCENT.token} bw={printBw}>
+            <div
+              className="mb-3 rounded-2xl border-[3px] p-3"
+              style={{ borderColor: printBw ? '#111' : KIND_ACCENT.token.c }}
+            >
+              <p className="text-sm font-black" style={{ color: printBw ? '#111' : KIND_ACCENT.token.title }}>
+                Name: {students.find((s) => s.id === tokenStudent)?.name || '_______________'}
+              </p>
+              <p className="mt-2 text-sm font-black" style={{ color: printBw ? '#111' : KIND_ACCENT.token.title }}>
+                🎯 Goal: {reward}
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-3 py-2">
+              {Array.from({ length: tokenCount }, (_, i) => (
+                <div
+                  key={i}
+                  className="flex h-[72px] w-[72px] items-end justify-center rounded-full border-4 bg-white"
+                  style={{ borderColor: printBw ? '#111' : KIND_ACCENT.token.c }}
+                >
+                  <span
+                    className="mb-1 text-xs font-black"
+                    style={{ color: printBw ? '#111' : KIND_ACCENT.token.c }}
+                  >
+                    {i + 1}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-2 text-center">
+              <p className="text-sm font-black" style={{ color: printBw ? '#111' : KIND_ACCENT.token.title }}>
+                🏆 Reward
+              </p>
               <div
-                key={i}
-                className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-dashed border-[var(--border)] bg-white text-lg"
+                className="mx-auto mt-2 flex h-24 w-24 items-center justify-center rounded-full border-[5px] bg-white text-4xl"
+                style={{
+                  borderColor: printBw ? '#111' : KIND_ACCENT.token.c,
+                  color: printBw ? '#111' : KIND_ACCENT.token.c,
+                }}
               >
-                {shape.split(' ')[0]}
+                ★
               </div>
-            ))}
-          </div>
-          <p className="text-xs font-semibold">Working for: {reward}</p>
+              <p className="mt-2 text-xs font-semibold">{shape.split(' ')[0]} · {reward}</p>
+            </div>
+          </PrismMaterialChrome>
           <ActionRow
             onSave={saveToken}
             onPdf={() =>
@@ -465,6 +536,8 @@ Reward: ${reward}`
             onFlash={onFlash}
             printSize={printSize}
             setPrintSize={setPrintSize}
+            printBw={printBw}
+            setPrintBw={setPrintBw}
           />
         </div>
       )}
@@ -492,18 +565,26 @@ Reward: ${reward}`
               <select
                 className="mt-1 w-full rounded-lg border border-[var(--border)] px-2 py-2"
                 value={schedType}
-                onChange={(e) => setSchedType(e.target.value)}
+                onChange={(e) => {
+                  const next = e.target.value
+                  setSchedType(next)
+                  if (next === 'First / Then' && !activities.includes('\n')) {
+                    setActivities('Work task\nPreferred break')
+                  }
+                }}
               >
-                {['Full Day', 'Morning Routine', 'Session', 'Transition', 'Check-in'].map((t) => (
-                  <option key={t}>{t}</option>
-                ))}
+                {['First / Then', 'Full Day', 'Morning Routine', 'Session', 'Transition', 'Check-in'].map(
+                  (t) => (
+                    <option key={t}>{t}</option>
+                  ),
+                )}
               </select>
             </label>
             <label className="text-xs font-semibold md:col-span-2">
-              Activities (one per line)
+              {schedType === 'First / Then' ? 'First (line 1) / Then (line 2)' : 'Activities (one per line)'}
               <textarea
                 className="mt-1 w-full rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
-                rows={5}
+                rows={schedType === 'First / Then' ? 3 : 5}
                 value={activities}
                 onChange={(e) => setActivities(e.target.value)}
               />
@@ -513,30 +594,74 @@ Reward: ${reward}`
               Alert on today&apos;s schedule
             </label>
           </div>
-          <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
-            {activities
-              .split('\n')
-              .map((l) => l.trim())
-              .filter(Boolean)
-              .map((l, i) => (
-                <div
-                  key={`${l}-${i}`}
-                  className="rounded-xl border border-[var(--border)] bg-[var(--sky)] px-3 py-4 text-center text-xs font-bold"
-                >
-                  {i + 1}. {l}
-                </div>
-              ))}
-          </div>
+          <PrismMaterialChrome
+            accent={accentForMaterial('schedule', schedType)}
+            bw={printBw}
+          >
+            {schedType === 'First / Then' ? (
+              <div
+                className="grid grid-cols-2 gap-3 rounded-[22px] border-[8px] p-3"
+                style={{ borderColor: printBw ? '#111' : FIRST_THEN_ACCENT.c }}
+              >
+                {['FIRST', 'THEN'].map((label, idx) => {
+                  const step = activities
+                    .split('\n')
+                    .map((l) => l.trim())
+                    .filter(Boolean)[idx]
+                  return (
+                    <div key={label} className="flex flex-col gap-2">
+                      <p
+                        className="text-center text-2xl font-black"
+                        style={{ color: printBw ? '#111' : FIRST_THEN_ACCENT.title }}
+                      >
+                        {label}
+                      </p>
+                      <div className="flex aspect-square items-center justify-center rounded-[14px] border-4 border-black bg-white p-2 text-center text-xs font-bold">
+                        {step || ' '}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {activities
+                  .split('\n')
+                  .map((l) => l.trim())
+                  .filter(Boolean)
+                  .map((l, i) => (
+                    <div
+                      key={`${l}-${i}`}
+                      className="flex items-center gap-3 rounded-2xl border-[2.5px] bg-white px-3 py-2"
+                      style={{ borderColor: printBw ? '#111' : KIND_ACCENT.schedule.c }}
+                    >
+                      <span
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-black text-white"
+                        style={{ background: printBw ? '#111' : KIND_ACCENT.schedule.c }}
+                      >
+                        {i + 1}
+                      </span>
+                      <span className="flex-1 text-xs font-bold">{l}</span>
+                      <span
+                        className="h-7 w-7 shrink-0 rounded-md border-[3px]"
+                        style={{ borderColor: printBw ? '#111' : KIND_ACCENT.schedule.c }}
+                      />
+                    </div>
+                  ))}
+              </div>
+            )}
+          </PrismMaterialChrome>
           <ActionRow
             onSave={saveSchedule}
             onPdf={() =>
               pdfDraft(() => {
                 const { id, name } = studentMeta(schedStudent)
-                const steps = activities.split('\n').map((l) => l.trim()).filter(Boolean)
+                let steps = activities.split('\n').map((l) => l.trim()).filter(Boolean)
+                if (schedType === 'First / Then') steps = [steps[0] || 'First', steps[1] || 'Then']
                 return {
                   id: 'draft',
                   kind: 'schedule',
-                  title: `${schedType} schedule`,
+                  title: schedType === 'First / Then' ? 'First / Then board' : `${schedType} schedule`,
                   studentId: id,
                   studentName: name,
                   body: steps.join('\n'),
@@ -550,6 +675,8 @@ Reward: ${reward}`
             onFlash={onFlash}
             printSize={printSize}
             setPrintSize={setPrintSize}
+            printBw={printBw}
+            setPrintBw={setPrintBw}
           />
         </div>
       )}
@@ -601,6 +728,21 @@ Reward: ${reward}`
               Link to open FBA session (live tallies)
             </label>
           </div>
+          <PrismMaterialChrome accent={KIND_ACCENT.behavior} bw={printBw}>
+            <p className="text-sm font-black" style={{ color: printBw ? '#111' : KIND_ACCENT.behavior.title }}>
+              Target: {behTarget}
+            </p>
+            <p className="mt-1 text-xs font-bold uppercase tracking-wide text-slate-500">{behType}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {Array.from({ length: 12 }, (_, i) => (
+                <span
+                  key={i}
+                  className="h-8 w-8 rounded-md border-[3px]"
+                  style={{ borderColor: printBw ? '#111' : KIND_ACCENT.behavior.c }}
+                />
+              ))}
+            </div>
+          </PrismMaterialChrome>
           <ActionRow
             onSave={saveBehavior}
             onPdf={() =>
@@ -628,6 +770,8 @@ Reward: ${reward}`
             onFlash={onFlash}
             printSize={printSize}
             setPrintSize={setPrintSize}
+            printBw={printBw}
+            setPrintBw={setPrintBw}
           />
         </div>
       )}
@@ -684,9 +828,14 @@ Reward: ${reward}`
               Copy
             </button>
           </div>
-          <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-xl bg-[var(--slate)] p-3 text-xs">
-            {story || 'Generate a draft to preview.'}
-          </pre>
+          <PrismMaterialChrome accent={KIND_ACCENT.social} bw={printBw}>
+            <p className="mb-2 text-sm font-black" style={{ color: printBw ? '#111' : KIND_ACCENT.social.title }}>
+              {topic}
+            </p>
+            <pre className="max-h-56 overflow-auto whitespace-pre-wrap rounded-xl border border-slate-200 bg-white p-3 text-xs leading-relaxed">
+              {story || 'Generate a draft to preview.'}
+            </pre>
+          </PrismMaterialChrome>
           <ActionRow
             onSave={saveStory}
             onPdf={() =>
@@ -710,6 +859,8 @@ Reward: ${reward}`
             onFlash={onFlash}
             printSize={printSize}
             setPrintSize={setPrintSize}
+            printBw={printBw}
+            setPrintBw={setPrintBw}
           />
         </div>
       )}
@@ -757,21 +908,27 @@ Reward: ${reward}`
               onChange={(e) => setCommWords(e.target.value)}
             />
           </label>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {commWords
-              .split('\n')
-              .map((w) => w.trim())
-              .filter(Boolean)
-              .map((w, i) => (
-                <div
-                  key={`${w}-${i}`}
-                  className="flex flex-col items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--sky)] px-2 py-3 text-center text-xs font-bold"
-                >
-                  <IconGlyph icon={resolveIcon(w)} label={w} size={36} />
-                  {w}
-                </div>
-              ))}
-          </div>
+          <PrismMaterialChrome accent={KIND_ACCENT.comm} bw={printBw}>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {commWords
+                .split('\n')
+                .map((w) => w.trim())
+                .filter(Boolean)
+                .slice(0, 9)
+                .map((w, i) => (
+                  <div key={`${w}-${i}`} className="flex flex-col items-center gap-1.5">
+                    <div
+                      className="flex aspect-square w-full flex-col items-center justify-center rounded-[14px] border-[3px] border-black p-2"
+                      style={{ background: printBw ? '#fff' : fitzColor(w) }}
+                    >
+                      <IconGlyph icon={resolveIcon(w)} label={w} size={36} />
+                    </div>
+                    <div className="h-2 w-4/5 border-b-2 border-slate-300" />
+                    <span className="text-[10px] font-black">{w}</span>
+                  </div>
+                ))}
+            </div>
+          </PrismMaterialChrome>
           <ActionRow
             onSave={saveCommBoard}
             onPdf={() =>
@@ -795,6 +952,8 @@ Reward: ${reward}`
             onFlash={onFlash}
             printSize={printSize}
             setPrintSize={setPrintSize}
+            printBw={printBw}
+            setPrintBw={setPrintBw}
           />
           <p className="text-[10px] text-[var(--subtext)]">
             Tip: Save first, then open <strong>Use on Smart TV</strong> for fullscreen tap-to-speak on

@@ -4,12 +4,14 @@ Heart of **Creation Station → Icon Library** (Master Plan Phase 8 / Million Do
 
 ## Current pack
 
-Source: **AAC Icon Library (offline).html** (Samantha upload) — Fitzgerald-color core vocabulary + emotion line/emoji faces.
+Source: **AAC Icon Library (offline).html** + **Core Vocabulary Icon Library Exploration** pack — Fitzgerald-color core vocabulary + emotion line/emoji faces.
 
 - SVG files: `public/icons/aac/*.svg` (56 glyphs)
+- Template pack copy: `public/prism-templates/icons/` (core + emotions + manifest)
 - **Animated twins** (actions + emotions only): `public/icons/aac/animated/*.svg` (34 glyphs)
 - Generated catalogs: `aac-pack.generated.ts`, `aac-animated.generated.ts`
 - Offline HTML archive: `docs/icons/AAC_Icon_Library_offline.html`
+- Printable blanks: `public/prism-templates/printable-color-bw.html`
 
 Animated icons use CSS `@keyframes` inside the SVG and must render **inline** (see `IconGlyph`) so motion plays on digital AAC / Smart TV boards. Static pronouns, nouns, questions, and social tiles are not duplicated.
 

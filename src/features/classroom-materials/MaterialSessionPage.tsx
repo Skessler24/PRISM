@@ -10,15 +10,21 @@ import {
   type SchedulePayload,
   type TokenPayload,
 } from '../../lib/classroom-materials/store'
+import {
+  TEMPLATE_FONT,
+  TEMPLATE_FOOTER,
+  accentForMaterial,
+  fitzColor,
+} from '../../lib/classroom-materials/prismTemplateTheme'
 import { resolveIcon } from '../../lib/icons/catalog'
 import { IconGlyph } from '../../lib/icons/IconGlyph'
 import { applyTally, getFbaSession } from '../../lib/fba/store'
 
+/** Smart TV session — Prism Templates visual language (Nunito, accent borders, Fitzgerald cells). */
 export function MaterialSessionPage() {
   const { id = '' } = useParams()
   const [rev, setRev] = useState(0)
   const material = getMaterial(id) || null
-  // rev forces re-read after persist
   void rev
   const [flash, setFlash] = useState('')
   const [phrase, setPhrase] = useState<string[]>([])
@@ -40,12 +46,21 @@ export function MaterialSessionPage() {
   const behavior = material?.kind === 'behavior' ? (material.payload as BehaviorPayload) : null
 
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  const accent = material
+    ? accentForMaterial(
+        material.kind,
+        material.kind === 'schedule' ? (material.payload as SchedulePayload).scheduleType : undefined,
+      )
+    : null
 
-  if (!material) {
+  if (!material || !accent) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-slate-900 p-6 text-white">
-        <p>Material not found in this browser.</p>
-        <Link to="/templates" className="underline">
+      <div
+        className="flex min-h-screen flex-col items-center justify-center gap-3 bg-slate-100 p-6"
+        style={{ fontFamily: TEMPLATE_FONT }}
+      >
+        <p className="font-bold">Material not found in this browser.</p>
+        <Link to="/creation?panel=templates" className="font-semibold underline" style={{ color: '#2563EB' }}>
           Back to Materials Studio
         </Link>
       </div>
@@ -53,23 +68,37 @@ export function MaterialSessionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white">
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
+    <div
+      className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100 text-slate-900"
+      style={{ fontFamily: TEMPLATE_FONT }}
+    >
+      <header
+        className="flex flex-wrap items-center justify-between gap-3 border-b-4 px-4 py-3"
+        style={{ borderColor: accent.c, background: '#fff' }}
+      >
         <div>
-          <p className="text-xs uppercase tracking-wide text-sky-300">Smart TV / Session mode</p>
-          <h1 className="text-xl font-bold sm:text-3xl">{material.title}</h1>
-          <p className="text-sm text-white/70">{material.studentName || 'Group'}</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
+            Smart TV · PRISM Templates
+          </p>
+          <h1 className="text-2xl font-black tracking-tight sm:text-3xl" style={{ color: accent.title }}>
+            {accent.label}
+          </h1>
+          <p className="text-sm font-semibold text-slate-600">
+            {material.studentName || 'Group'}
+            {material.title !== accent.label ? ` · ${material.title}` : ''}
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
-            to="/templates"
-            className="rounded-lg border border-white/30 px-3 py-2 text-xs font-semibold"
+            to="/creation?panel=templates"
+            className="rounded-xl border-2 border-slate-300 px-3 py-2 text-xs font-bold"
           >
             Exit
           </Link>
           <button
             type="button"
-            className="rounded-lg bg-sky-500 px-3 py-2 text-xs font-semibold"
+            className="rounded-xl px-3 py-2 text-xs font-bold text-white"
+            style={{ background: accent.c }}
             onClick={() => {
               if (document.fullscreenElement) void document.exitFullscreen()
               else void document.documentElement.requestFullscreen?.()
@@ -81,7 +110,10 @@ export function MaterialSessionPage() {
       </header>
 
       {flash && (
-        <div className="mx-4 mt-3 rounded-xl bg-emerald-500 px-4 py-2 text-center text-sm font-bold text-white">
+        <div
+          className="mx-4 mt-3 rounded-xl px-4 py-2 text-center text-sm font-black text-white"
+          style={{ background: accent.c }}
+        >
           {flash}
         </div>
       )}
@@ -89,7 +121,17 @@ export function MaterialSessionPage() {
       <main className="mx-auto max-w-6xl p-4 sm:p-8">
         {token && (
           <section className="text-center">
-            <p className="mb-4 text-2xl font-semibold sm:text-4xl">Working for: {token.reward}</p>
+            <div
+              className="mx-auto mb-6 max-w-xl rounded-2xl border-[3px] bg-white p-4 text-left"
+              style={{ borderColor: accent.c }}
+            >
+              <p className="text-lg font-black" style={{ color: accent.title }}>
+                Name: {material.studentName || '_______________'}
+              </p>
+              <p className="mt-2 text-lg font-black" style={{ color: accent.title }}>
+                🎯 Goal: {token.goalLabel || token.reward}
+              </p>
+            </div>
             <div className="mb-6 flex flex-wrap justify-center gap-3 sm:gap-5">
               {Array.from({ length: token.tokenCount }, (_, i) => {
                 const filled = i < token.filled
@@ -97,29 +139,44 @@ export function MaterialSessionPage() {
                   <button
                     key={i}
                     type="button"
-                    className={`flex h-20 w-20 items-center justify-center rounded-full border-4 text-3xl transition sm:h-28 sm:w-28 sm:text-5xl ${
-                      filled
-                        ? 'scale-105 border-amber-300 bg-amber-400 text-slate-900 shadow-lg shadow-amber-500/40'
-                        : 'border-dashed border-white/40 bg-white/5'
+                    className={`flex h-20 w-20 flex-col items-center justify-end rounded-full border-4 bg-white transition sm:h-28 sm:w-28 ${
+                      filled ? 'scale-105 shadow-lg' : 'border-dashed'
                     }`}
+                    style={{
+                      borderColor: accent.c,
+                      background: filled ? accent.c : '#fff',
+                      color: filled ? '#fff' : accent.c,
+                    }}
                     onClick={() => {
                       const nextFilled = filled ? i : i + 1
                       persist({
                         ...material,
                         payload: { ...token, filled: nextFilled },
                       })
-                      toast(nextFilled >= token.tokenCount ? 'Reward earned! 🎉' : `Token ${nextFilled}`)
+                      toast(nextFilled >= token.tokenCount ? 'Reward earned! ★' : `Token ${nextFilled}`)
                     }}
                   >
-                    {token.shape.split(' ')[0]}
+                    <span className="mb-2 text-sm font-black sm:text-base">{i + 1}</span>
                   </button>
                 )
               })}
             </div>
+            <div className="mb-6">
+              <p className="text-xl font-black" style={{ color: accent.title }}>
+                🏆 Reward
+              </p>
+              <div
+                className="mx-auto mt-2 flex h-28 w-28 items-center justify-center rounded-full border-[5px] bg-white text-5xl"
+                style={{ borderColor: accent.c, color: accent.c }}
+              >
+                ★
+              </div>
+              <p className="mt-2 text-lg font-bold">{token.reward}</p>
+            </div>
             <div className="flex justify-center gap-3">
               <button
                 type="button"
-                className="rounded-xl bg-white/15 px-5 py-3 text-lg font-bold"
+                className="rounded-xl border-2 border-slate-300 bg-white px-5 py-3 text-lg font-black"
                 onClick={() =>
                   persist({
                     ...material,
@@ -131,7 +188,8 @@ export function MaterialSessionPage() {
               </button>
               <button
                 type="button"
-                className="rounded-xl bg-sky-500 px-5 py-3 text-lg font-bold"
+                className="rounded-xl px-5 py-3 text-lg font-black text-white"
+                style={{ background: accent.c }}
                 onClick={() =>
                   persist({
                     ...material,
@@ -146,7 +204,7 @@ export function MaterialSessionPage() {
               </button>
               <button
                 type="button"
-                className="rounded-xl border border-white/30 px-5 py-3 text-lg font-bold"
+                className="rounded-xl border-2 border-slate-300 bg-white px-5 py-3 text-lg font-black"
                 onClick={() => persist({ ...material, payload: { ...token, filled: 0 } })}
               >
                 Reset
@@ -155,9 +213,49 @@ export function MaterialSessionPage() {
           </section>
         )}
 
-        {schedule && (
+        {schedule && schedule.scheduleType === 'First / Then' && (
           <section>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div
+              className="grid grid-cols-1 gap-4 rounded-[26px] border-[10px] bg-white p-4 sm:grid-cols-2 sm:gap-6 sm:p-6"
+              style={{ borderColor: accent.c }}
+            >
+              {['FIRST', 'THEN'].map((label, idx) => {
+                const step = schedule.steps[idx] || ''
+                const active = schedule.activeStep === idx
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    className="flex flex-col gap-3 text-left"
+                    onClick={() => {
+                      persist({ ...material, payload: { ...schedule, activeStep: idx } })
+                      if (step) speakLocal(step)
+                    }}
+                  >
+                    <span
+                      className="text-center text-4xl font-black tracking-wide sm:text-5xl"
+                      style={{ color: accent.title }}
+                    >
+                      {label}
+                    </span>
+                    <div
+                      className={`flex min-h-[180px] flex-1 items-center justify-center rounded-[14px] border-4 border-black p-4 text-center text-2xl font-black sm:min-h-[240px] sm:text-3xl ${
+                        active ? 'ring-4 ring-offset-2' : ''
+                      }`}
+                      style={active ? ({ ['--tw-ring-color' as string]: accent.c } as object) : undefined}
+                    >
+                      {step || '—'}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </section>
+        )}
+
+        {schedule && schedule.scheduleType !== 'First / Then' && (
+          <section>
+            <div className="flex flex-col gap-3">
               {schedule.steps.map((step, i) => {
                 const active = i === schedule.activeStep
                 const done = i < schedule.activeStep
@@ -165,20 +263,29 @@ export function MaterialSessionPage() {
                   <button
                     key={`${step}-${i}`}
                     type="button"
-                    className={`rounded-2xl border-4 p-6 text-left text-xl font-bold transition sm:text-2xl ${
-                      active
-                        ? 'scale-[1.02] border-sky-300 bg-sky-500 shadow-xl'
-                        : done
-                          ? 'border-emerald-400/50 bg-emerald-900/40 opacity-80'
-                          : 'border-white/20 bg-white/5'
+                    className={`flex items-center gap-4 rounded-2xl border-[3px] bg-white px-4 py-4 text-left transition sm:px-5 sm:py-5 ${
+                      active ? 'scale-[1.01] shadow-lg' : done ? 'opacity-70' : ''
                     }`}
+                    style={{ borderColor: accent.c }}
                     onClick={() => {
                       persist({ ...material, payload: { ...schedule, activeStep: i } })
                       speakLocal(step)
                     }}
                   >
-                    <span className="block text-sm font-semibold opacity-80">Step {i + 1}</span>
-                    {step}
+                    <span
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-black text-white sm:h-12 sm:w-12 sm:text-xl"
+                      style={{ background: accent.c }}
+                    >
+                      {i + 1}
+                    </span>
+                    <span className="flex-1 text-xl font-black sm:text-2xl">{step}</span>
+                    <span
+                      className="h-9 w-9 shrink-0 rounded-lg border-[3px]"
+                      style={{
+                        borderColor: accent.c,
+                        background: done ? accent.c : 'transparent',
+                      }}
+                    />
                   </button>
                 )
               })}
@@ -186,7 +293,7 @@ export function MaterialSessionPage() {
             <div className="mt-6 flex justify-center gap-3">
               <button
                 type="button"
-                className="rounded-xl bg-white/15 px-5 py-3 font-bold"
+                className="rounded-xl border-2 border-slate-300 bg-white px-5 py-3 font-black"
                 onClick={() =>
                   persist({
                     ...material,
@@ -201,7 +308,8 @@ export function MaterialSessionPage() {
               </button>
               <button
                 type="button"
-                className="rounded-xl bg-sky-500 px-5 py-3 font-bold"
+                className="rounded-xl px-5 py-3 font-black text-white"
+                style={{ background: accent.c }}
                 onClick={() =>
                   persist({
                     ...material,
@@ -220,37 +328,42 @@ export function MaterialSessionPage() {
 
         {comm && (
           <section>
-            <div className="mb-4 min-h-[3rem] rounded-2xl bg-white/10 px-4 py-3 text-center text-2xl font-bold tracking-wide">
+            <div
+              className="mb-4 min-h-[3.5rem] rounded-2xl border-[3px] bg-white px-4 py-3 text-center text-2xl font-black tracking-wide"
+              style={{ borderColor: accent.c, color: accent.title }}
+            >
               {phrase.length ? phrase.join(' ') : 'Tap cells to build a message'}
             </div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
               {comm.cells.map((word) => {
                 const icon = resolveIcon(word)
                 return (
-                <button
-                  key={word}
-                  type="button"
-                  className="flex min-h-[5.5rem] flex-col items-center justify-center gap-1 rounded-2xl border-4 border-sky-300/40 bg-sky-600/80 px-2 py-4 text-xl font-bold shadow-lg transition active:scale-95 sm:min-h-[7rem] sm:text-2xl"
-                  onClick={() => {
-                    setPhrase((p) => [...p, word])
-                    speakLocal(word)
-                    const taps = [...(comm.taps || []), { word, at: new Date().toISOString() }].slice(
-                      0,
-                      200,
-                    )
-                    persist({ ...material, payload: { ...comm, taps } })
-                  }}
-                >
-                  <IconGlyph icon={icon} label={word} size={48} />
-                  <span>{word}</span>
-                </button>
+                  <button
+                    key={word}
+                    type="button"
+                    className="flex min-h-[5.5rem] flex-col items-center justify-center gap-1 rounded-[14px] border-[3px] border-black px-2 py-4 text-xl font-black shadow-md transition active:scale-95 sm:min-h-[7rem] sm:text-2xl"
+                    style={{ background: fitzColor(word) }}
+                    onClick={() => {
+                      setPhrase((p) => [...p, word])
+                      speakLocal(word)
+                      const taps = [...(comm.taps || []), { word, at: new Date().toISOString() }].slice(
+                        0,
+                        200,
+                      )
+                      persist({ ...material, payload: { ...comm, taps } })
+                    }}
+                  >
+                    <IconGlyph icon={icon} label={word} size={48} />
+                    <span>{word}</span>
+                  </button>
                 )
               })}
             </div>
             <div className="mt-4 flex flex-wrap justify-center gap-3">
               <button
                 type="button"
-                className="rounded-xl bg-emerald-500 px-5 py-3 font-bold"
+                className="rounded-xl px-5 py-3 font-black text-white"
+                style={{ background: accent.c }}
                 onClick={() => {
                   const msg = phrase.join(' ')
                   if (msg) speakLocal(msg)
@@ -261,36 +374,37 @@ export function MaterialSessionPage() {
               </button>
               <button
                 type="button"
-                className="rounded-xl bg-white/15 px-5 py-3 font-bold"
+                className="rounded-xl border-2 border-slate-300 bg-white px-5 py-3 font-black"
                 onClick={() => setPhrase((p) => p.slice(0, -1))}
               >
                 Backspace
               </button>
               <button
                 type="button"
-                className="rounded-xl border border-white/30 px-5 py-3 font-bold"
+                className="rounded-xl border-2 border-slate-300 bg-white px-5 py-3 font-black"
                 onClick={() => setPhrase([])}
               >
                 Clear
               </button>
             </div>
-            <p className="mt-4 text-center text-xs text-white/50">
-              TouchChat-style board · browser speech for Smart TV · taps stored on this student material
-            </p>
           </section>
         )}
 
         {behavior && (
           <section className="text-center">
-            <p className="mb-2 text-lg text-white/70">{behavior.chartType} chart</p>
-            <h2 className="mb-6 text-3xl font-bold sm:text-5xl">{behavior.targetBehavior}</h2>
-            <p className="mb-6 font-mono text-6xl font-black text-amber-300 sm:text-8xl">
+            <p className="mb-2 text-sm font-bold uppercase tracking-wide text-slate-500">
+              {behavior.chartType} chart
+            </p>
+            <h2 className="mb-6 text-3xl font-black sm:text-5xl" style={{ color: accent.title }}>
+              {behavior.targetBehavior}
+            </h2>
+            <p className="mb-6 font-mono text-6xl font-black sm:text-8xl" style={{ color: accent.c }}>
               {behavior.dailyCounts[today] || 0}
             </p>
             <div className="flex justify-center gap-4">
               <button
                 type="button"
-                className="h-24 w-24 rounded-full bg-rose-500 text-5xl font-black shadow-xl"
+                className="h-24 w-24 rounded-full bg-rose-500 text-5xl font-black text-white shadow-xl"
                 onClick={() => {
                   const n = Math.max(0, (behavior.dailyCounts[today] || 0) - 1)
                   persist({
@@ -311,7 +425,8 @@ export function MaterialSessionPage() {
               </button>
               <button
                 type="button"
-                className="h-24 w-24 rounded-full bg-emerald-500 text-5xl font-black shadow-xl"
+                className="h-24 w-24 rounded-full text-5xl font-black text-white shadow-xl"
+                style={{ background: accent.c }}
                 onClick={() => {
                   const n = (behavior.dailyCounts[today] || 0) + 1
                   persist({
@@ -336,11 +451,18 @@ export function MaterialSessionPage() {
         )}
 
         {material.kind === 'social' && (
-          <pre className="whitespace-pre-wrap rounded-2xl bg-white/10 p-6 text-lg leading-relaxed sm:text-2xl">
+          <pre
+            className="whitespace-pre-wrap rounded-2xl border-[3px] bg-white p-6 text-lg leading-relaxed sm:text-2xl"
+            style={{ borderColor: accent.c, fontFamily: TEMPLATE_FONT }}
+          >
             {(material.payload as { story: string }).story || material.body}
           </pre>
         )}
       </main>
+
+      <footer className="py-6 text-center text-[11px] font-bold tracking-[3px] text-slate-400">
+        {TEMPLATE_FOOTER}
+      </footer>
     </div>
   )
 }
