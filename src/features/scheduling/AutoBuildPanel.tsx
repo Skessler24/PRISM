@@ -2,15 +2,13 @@ import { useMemo, useRef, useState } from 'react'
 import { useStudents } from '../../lib/students/useStudents'
 import { autoBuildSchedule, primaryProviderId, syncSessionsToLiveGroups } from '../../lib/scheduling/autoSchedule'
 import { importCaseloadIntoTeam } from '../../lib/scheduling/caseloadBridge'
-import {
-  downloadSampleSchoolSchedule,
-  parseCSV,
-  parseMasterScheduleRows,
-} from '../../lib/scheduling/csv'
+import { downloadSampleSchoolSchedule } from '../../lib/scheduling/csv'
+import { constraintsFromScheduleFile } from '../../lib/scheduling/xlsxImport'
 import {
   getSchedMin,
   loadTeamSchedule,
   saveTeamSchedule,
+  type MasterConstraint,
   type TeamScheduleState,
 } from '../../lib/scheduling/teamStore'
 import { loadSchedule, saveSchedule } from '../../lib/scheduling/store'
@@ -29,10 +27,9 @@ export function AutoBuildPanel({ onFlash }: Props) {
     unmet: { name: string; needed: number; got: number }[]
     skippedNoProvider: number
   } | null>(null)
-  const [csvPreview, setCsvPreview] = useState<{
-    count: number
-    errors: string[]
-    raw: string
+  const [pendingConstraints, setPendingConstraints] = useState<{
+    constraints: MasterConstraint[]
+    label: string
   } | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -49,46 +46,45 @@ export function AutoBuildPanel({ onFlash }: Props) {
     )
   }
 
-  function onCsvFile(file: File) {
-    const reader = new FileReader()
-    reader.onload = () => {
-      const text = String(reader.result || '')
-      const rows = parseCSV(text)
-      const { constraints, errors } = parseMasterScheduleRows(rows)
+  async function onScheduleFile(file: File) {
+    try {
+      const { constraints, sheetSummaries } = await constraintsFromScheduleFile(file)
       if (!constraints.length) {
-        setCsvPreview(null)
-        onFlash('No valid schedule rows found in CSV')
+        setPendingConstraints(null)
+        onFlash(
+          'No protected times found — need Day/Start/End columns, or lunch/specials/recess periods',
+        )
         return
       }
-      setCsvPreview({
-        count: constraints.length,
-        errors: errors.slice(0, 5),
-        raw: text,
-      })
-      onFlash(`Parsed ${constraints.length} protected times (confirm to apply)`)
+      setPendingConstraints({ constraints, label: file.name })
+      const sheets = sheetSummaries
+        .filter((s) => s.count)
+        .map((s) => `${s.name}: ${s.count}`)
+        .join(', ')
+      onFlash(
+        `Parsed ${constraints.length} protected times from ${file.name}${sheets ? ` (${sheets})` : ''} — confirm to apply`,
+      )
+    } catch (err) {
+      onFlash(err instanceof Error ? err.message : 'Could not read schedule file')
     }
-    reader.readAsText(file)
   }
 
-  function applyCsv() {
-    if (!csvPreview) return
-    const rows = parseCSV(csvPreview.raw)
-    const { constraints } = parseMasterScheduleRows(rows)
+  function applyPending(mode: 'append' | 'replace') {
+    if (!pendingConstraints) return
+    const { constraints } = pendingConstraints
     persist({
       ...state,
-      masterConstraints: [...state.masterConstraints, ...constraints],
+      masterConstraints:
+        mode === 'replace'
+          ? constraints
+          : [...state.masterConstraints, ...constraints],
     })
-    setCsvPreview(null)
-    onFlash(`Added ${constraints.length} school schedule constraints`)
-  }
-
-  function replaceCsv() {
-    if (!csvPreview) return
-    const rows = parseCSV(csvPreview.raw)
-    const { constraints } = parseMasterScheduleRows(rows)
-    persist({ ...state, masterConstraints: constraints })
-    setCsvPreview(null)
-    onFlash(`Replaced constraints with ${constraints.length} from school schedule`)
+    setPendingConstraints(null)
+    onFlash(
+      mode === 'replace'
+        ? `Replaced constraints with ${constraints.length} from school schedule`
+        : `Added ${constraints.length} school schedule constraints`,
+    )
   }
 
   function runBuild() {
@@ -177,11 +173,12 @@ export function AutoBuildPanel({ onFlash }: Props) {
 
       <section className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card">
         <h3 className="text-xs font-bold uppercase tracking-wide text-[var(--subtext)]">
-          2 · School schedule CSV
+          2 · School schedule (Excel or CSV)
         </h3>
         <p className="mt-1 text-xs text-[var(--subtext)]">
-          Format: <code className="text-[10px]">Day, StartTime, EndTime, Type, Label</code> — Day
-          can be Monday…Friday or All. Times like 10:00 or 10:00 AM.
+          Upload <strong>FINAL 26-27 ARR Instructional Schedule.xlsx</strong> (or CSV). We pull
+          lunch / specials / recess / protected blocks. CSV format:{' '}
+          <code className="text-[10px]">Day, StartTime, EndTime, Type, Label</code>
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <button
@@ -189,16 +186,16 @@ export function AutoBuildPanel({ onFlash }: Props) {
             className="rounded-lg border border-dashed border-[var(--accent)] bg-sky-50 px-4 py-3 text-xs font-semibold text-[var(--accent)]"
             onClick={() => fileRef.current?.click()}
           >
-            Upload school schedule CSV
+            Upload school schedule (.xlsx / .csv)
           </button>
           <input
             ref={fileRef}
             type="file"
-            accept=".csv,text/csv"
+            accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0]
-              if (f) onCsvFile(f)
+              if (f) void onScheduleFile(f)
               e.target.value = ''
             }}
           />
@@ -213,37 +210,41 @@ export function AutoBuildPanel({ onFlash }: Props) {
             {state.masterConstraints.length} constraints currently loaded
           </span>
         </div>
-        {csvPreview && (
+        {pendingConstraints && (
           <div className="mt-3 rounded-xl border border-[var(--border)] bg-[var(--slate)] p-3">
             <p className="text-xs font-semibold">
-              Ready: {csvPreview.count} protected time rows
+              Ready: {pendingConstraints.constraints.length} protected times from{' '}
+              {pendingConstraints.label}
             </p>
-            {csvPreview.errors.length > 0 && (
-              <ul className="mt-1 text-[10px] text-amber-800">
-                {csvPreview.errors.map((e) => (
-                  <li key={e}>{e}</li>
-                ))}
-              </ul>
-            )}
+            <ul className="mt-1 max-h-28 overflow-y-auto text-[10px] text-[var(--subtext)]">
+              {pendingConstraints.constraints.slice(0, 8).map((c) => (
+                <li key={c.id}>
+                  {c.day} {c.startTime}–{c.endTime} · {c.label} ({c.type})
+                </li>
+              ))}
+              {pendingConstraints.constraints.length > 8 && (
+                <li>…and {pendingConstraints.constraints.length - 8} more</li>
+              )}
+            </ul>
             <div className="mt-2 flex flex-wrap gap-2">
               <button
                 type="button"
                 className="rounded-lg bg-[var(--accent)] px-3 py-1.5 text-xs font-semibold text-white"
-                onClick={applyCsv}
+                onClick={() => applyPending('append')}
               >
                 Add to existing
               </button>
               <button
                 type="button"
                 className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-semibold"
-                onClick={replaceCsv}
+                onClick={() => applyPending('replace')}
               >
                 Replace all constraints
               </button>
               <button
                 type="button"
                 className="text-xs text-[var(--subtext)]"
-                onClick={() => setCsvPreview(null)}
+                onClick={() => setPendingConstraints(null)}
               >
                 Cancel
               </button>

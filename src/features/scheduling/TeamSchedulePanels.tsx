@@ -33,9 +33,8 @@ import {
 } from '../../lib/scheduling/teamStore'
 import {
   downloadSampleSchoolSchedule,
-  parseCSV,
-  parseMasterScheduleRows,
 } from '../../lib/scheduling/csv'
+import { constraintsFromScheduleFile } from '../../lib/scheduling/xlsxImport'
 
 type Props = {
   onFlash: (msg: string) => void
@@ -1207,28 +1206,34 @@ export function TeamParametersPanel({ onFlash }: Props) {
   const fileRef = useRef<HTMLInputElement>(null)
   const slots = useMemo(() => getTimeSlots(settings), [settings])
 
-  function ingestMasterCsv(file: File, mode: 'append' | 'replace') {
-    const reader = new FileReader()
-    reader.onload = () => {
-      const rows = parseCSV(String(reader.result || ''))
-      const { constraints, skipped } = parseMasterScheduleRows(rows)
-      if (!constraints.length) {
-        onFlash('No valid rows in school schedule CSV')
-        return
-      }
-      patch(
-        {
-          masterConstraints:
-            mode === 'replace'
-              ? constraints
-              : [...state.masterConstraints, ...constraints],
-        },
-        mode === 'replace'
-          ? `Replaced with ${constraints.length} constraints${skipped ? ` (${skipped} skipped)` : ''}`
-          : `Imported ${constraints.length} constraints${skipped ? ` (${skipped} skipped)` : ''}`,
-      )
-    }
-    reader.readAsText(file)
+  function ingestMasterFile(file: File, mode: 'append' | 'replace') {
+    void constraintsFromScheduleFile(file)
+      .then(({ constraints, sheetSummaries }) => {
+        if (!constraints.length) {
+          onFlash(
+            'No protected times found in file — need lunch/specials/recess or Day/Start/End columns',
+          )
+          return
+        }
+        patch(
+          {
+            masterConstraints:
+              mode === 'replace'
+                ? constraints
+                : [...state.masterConstraints, ...constraints],
+          },
+          mode === 'replace'
+            ? `Replaced with ${constraints.length} from ${file.name}`
+            : `Imported ${constraints.length} from ${file.name}${
+                sheetSummaries.length > 1
+                  ? ` (${sheetSummaries.filter((s) => s.count).map((s) => s.name).join(', ')})`
+                  : ''
+              }`,
+        )
+      })
+      .catch((err: unknown) => {
+        onFlash(err instanceof Error ? err.message : 'Could not read schedule file')
+      })
   }
 
   return (
@@ -1236,8 +1241,9 @@ export function TeamParametersPanel({ onFlash }: Props) {
       <section>
         <h2 className="font-heading text-lg font-bold">Master School Schedule</h2>
         <p className="mb-3 text-xs text-[var(--subtext)]">
-          Upload your school&apos;s master schedule CSV to set global protected times for all
-          providers. Format: Day, StartTime, EndTime, Type, Label.
+          Upload your school&apos;s master / instructional schedule (.xlsx or .csv) to set global
+          protected times (lunch, specials, recess). CSV columns: Day, StartTime, EndTime, Type,
+          Label — or Excel period tables from ARR Instructional Schedule.
         </p>
         <div
           className={`mb-3 cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition ${
@@ -1254,7 +1260,7 @@ export function TeamParametersPanel({ onFlash }: Props) {
             e.preventDefault()
             setDragOver(false)
             const f = e.dataTransfer.files?.[0]
-            if (f) ingestMasterCsv(f, 'append')
+            if (f) ingestMasterFile(f, 'append')
           }}
           onClick={() => fileRef.current?.click()}
           role="button"
@@ -1263,18 +1269,18 @@ export function TeamParametersPanel({ onFlash }: Props) {
             if (e.key === 'Enter' || e.key === ' ') fileRef.current?.click()
           }}
         >
-          <p className="text-sm text-[var(--subtext)]">Drop a CSV here or click to upload</p>
+          <p className="text-sm text-[var(--subtext)]">Drop Excel/CSV here or click to upload</p>
           <p className="mt-1 text-[10px] text-[var(--subtext)]">
-            Expected: Day, StartTime, EndTime, Type, Label
+            ARR Instructional Schedule.xlsx · or Day, StartTime, EndTime, Type, Label
           </p>
           <input
             ref={fileRef}
             type="file"
-            accept=".csv,text/csv"
+            accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0]
-              if (f) ingestMasterCsv(f, 'append')
+              if (f) ingestMasterFile(f, 'append')
               e.target.value = ''
             }}
           />

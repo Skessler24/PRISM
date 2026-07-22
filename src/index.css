@@ -236,3 +236,97 @@ h3,
 .countdown-badge {
   animation: countdown-pop 0.45s ease-out;
 }
+
+/* Dashboard centered date / live clock / break countdown */
+.dashboard-clock {
+  position: relative;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(251, 191, 36, 0.22), transparent 55%),
+    linear-gradient(180deg, #fffbeb 0%, #fff7ed 45%, #ffffff 100%);
+}
+
+.dashboard-clock-glow {
+  pointer-events: none;
+  position: absolute;
+  inset: -20% -10% auto;
+  height: 70%;
+  background: radial-gradient(circle at 50% 40%, rgba(251, 146, 60, 0.18), transparent 60%);
+  animation: clock-glow 6s ease-in-out infinite alternate;
+}
+
+.dashboard-clock-date {
+  position: relative;
+  animation: clock-fade-up 0.7s ease-out both;
+}
+
+.dashboard-clock-time {
+  position: relative;
+  animation: clock-fade-up 0.7s ease-out 0.12s both;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.countdown-badge-hero {
+  position: relative;
+  animation:
+    countdown-pop 0.55s ease-out 0.25s both,
+    countdown-pulse 2.8s ease-in-out 0.9s infinite;
+}
+
+.countdown-emoji {
+  display: inline-block;
+  animation: countdown-wiggle 2.4s ease-in-out infinite;
+}
+
+@keyframes clock-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes clock-glow {
+  from {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes countdown-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(251, 146, 60, 0.35);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(251, 146, 60, 0);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes countdown-wiggle {
+  0%,
+  100% {
+    transform: rotate(-6deg) scale(1);
+  }
+  50% {
+    transform: rotate(8deg) scale(1.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-clock-glow,
+  .dashboard-clock-date,
+  .dashboard-clock-time,
+  .countdown-badge-hero,
+  .countdown-emoji {
+    animation: none !important;
+  }
+}

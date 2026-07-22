@@ -39,6 +39,8 @@ local-data/
 **/*BIP*CCSD*
 **/Enrich_Snapshots*
 **/Enrich*Snapshot*
+**/*Instructional*Schedule*
+**/*ARR*Schedule*.xlsx
 uploads/**
 *.caseload.json
 **/enrich-students*.json
