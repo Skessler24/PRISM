@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import {
+  AAC_ANIMATED_PACK,
   downloadIconPngStub,
   ICON_CATALOG,
   ICON_CATEGORY_ORDER,
@@ -10,6 +11,8 @@ import { IconGlyph } from '../../lib/icons/IconGlyph'
 
 const FAV_KEY = 'prism_icon_favorites_v1'
 const RECENT_KEY = 'prism_icon_recent_v1'
+
+type MotionFilter = 'all' | 'static' | 'animated'
 
 function readIds(key: string): string[] {
   try {
@@ -29,6 +32,7 @@ function writeIds(key: string, ids: string[]) {
 /** Full Icon Library — Master Plan Phase 8 / Million Dollar Idea. */
 export function IconLibraryPanel() {
   const [cat, setCat] = useState<IconCategory | 'all' | 'favorites' | 'recent'>('all')
+  const [motion, setMotion] = useState<MotionFilter>('all')
   const [q, setQ] = useState('')
   const [favorites, setFavorites] = useState(() => readIds(FAV_KEY))
   const [recent, setRecent] = useState(() => readIds(RECENT_KEY))
@@ -50,12 +54,19 @@ export function IconLibraryPanel() {
         .filter(Boolean) as PrismIcon[]
     else if (cat !== 'all') base = ICON_CATALOG.filter((i) => i.category === cat)
 
+    if (motion === 'animated') base = base.filter((i) => i.animated)
+    else if (motion === 'static') base = base.filter((i) => !i.animated)
+
     const needle = q.trim().toLowerCase()
     if (!needle) return base
     return base.filter(
-      (i) => i.label.toLowerCase().includes(needle) || i.id.includes(needle) || i.category.includes(needle),
+      (i) =>
+        i.label.toLowerCase().includes(needle) ||
+        i.id.includes(needle) ||
+        i.category.includes(needle) ||
+        (i.motion || '').includes(needle),
     )
-  }, [cat, q, favorites, recent])
+  }, [cat, motion, q, favorites, recent])
 
   function flash(msg: string) {
     setToast(msg)
@@ -64,7 +75,7 @@ export function IconLibraryPanel() {
 
   function tap(icon: PrismIcon) {
     setSelected(icon)
-    setCustomLabel(icon.label)
+    setCustomLabel(icon.label.replace(/ ✦$/, ''))
     const next = [icon.id, ...recent.filter((id) => id !== icon.id)].slice(0, 24)
     setRecent(next)
     writeIds(RECENT_KEY, next)
@@ -85,13 +96,18 @@ export function IconLibraryPanel() {
         <div>
           <h2 className="font-heading text-sm font-bold">🔣 Icon Library</h2>
           <p className="mt-0.5 text-xs text-[var(--subtext)]">
-            Your board soul — Fitzgerald AAC pack + emotion faces from the offline Icon Library.
-            Search, favorites, recently used, download. Phase 2 tiles fill gaps.
+            Fitzgerald AAC pack + animated actions/emotions for digital boards &amp; Smart TV
+            sessions. Same theme colors — motion only where it helps meaning.
           </p>
         </div>
-        <span className="rounded-full tint-lav px-2 py-0.5 text-[10px] font-bold">
-          {ICON_CATALOG.length} icons
-        </span>
+        <div className="flex flex-col items-end gap-1">
+          <span className="rounded-full tint-lav px-2 py-0.5 text-[10px] font-bold">
+            {ICON_CATALOG.length} icons
+          </span>
+          <span className="rounded-full tint-mint px-2 py-0.5 text-[10px] font-bold">
+            {AAC_ANIMATED_PACK.length} animated
+          </span>
+        </div>
       </div>
 
       {toast && (
@@ -128,6 +144,27 @@ export function IconLibraryPanel() {
       </div>
 
       <div className="mt-2 flex flex-wrap gap-1">
+        {(
+          [
+            ['all', 'All motion'],
+            ['static', 'Static'],
+            ['animated', '✦ Animated'],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${
+              motion === id ? 'bg-[#1E3A5F] text-white' : 'border border-[var(--border)]'
+            }`}
+            onClick={() => setMotion(id)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-2 flex flex-wrap gap-1">
         <button
           type="button"
           className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${
@@ -151,19 +188,23 @@ export function IconLibraryPanel() {
         ))}
       </div>
 
-      {/* Ribbon strip — drag-ready feel */}
       <div className="mt-3 flex gap-2 overflow-x-auto rounded-xl tint-sky p-2">
         {list.slice(0, 16).map((icon) => (
           <button
             key={`rib-${icon.id}`}
             type="button"
             title={icon.label}
-            className="shrink-0 rounded-lg border border-[var(--border)] bg-[var(--card-bg)] p-1.5 hover:border-[var(--accent)]"
+            className="relative shrink-0 rounded-lg border border-[var(--border)] bg-[var(--card-bg)] p-1.5 hover:border-[var(--accent)]"
             onClick={() => tap(icon)}
             draggable
             onDragStart={(e) => e.dataTransfer.setData('text/prism-icon', icon.id)}
           >
             <IconGlyph icon={icon} label={icon.label} size={40} />
+            {icon.animated ? (
+              <span className="absolute -right-1 -top-1 rounded-full bg-[#1E3A5F] px-1 text-[8px] font-bold text-white">
+                ✦
+              </span>
+            ) : null}
           </button>
         ))}
       </div>
@@ -175,7 +216,7 @@ export function IconLibraryPanel() {
               key={icon.id}
               type="button"
               onClick={() => tap(icon)}
-              className={`flex flex-col items-center gap-1 rounded-xl border p-2 text-center transition ${
+              className={`relative flex flex-col items-center gap-1 rounded-xl border p-2 text-center transition ${
                 selected?.id === icon.id
                   ? 'border-[var(--accent)] tint-lav'
                   : 'border-[var(--border)] tint-sky hover:border-[var(--accent)]'
@@ -183,18 +224,26 @@ export function IconLibraryPanel() {
             >
               <IconGlyph icon={icon} label={icon.label} size={48} className="h-12 w-12" />
               <span className="text-[10px] font-semibold leading-tight">{icon.label}</span>
-              {favorites.includes(icon.id) && <span className="text-[9px] text-amber-600">★</span>}
+              {icon.animated ? (
+                <span className="text-[8px] font-bold uppercase tracking-wide text-[var(--subtext)]">
+                  {icon.motion || 'motion'}
+                </span>
+              ) : null}
+              {favorites.includes(icon.id) ? (
+                <span className="text-[9px] text-amber-600">★</span>
+              ) : null}
             </button>
           ))}
-          {!list.length && (
+          {!list.length ? (
             <p className="col-span-full text-center text-xs text-[var(--subtext)]">No icons match.</p>
-          )}
+          ) : null}
         </div>
 
         <aside className="rounded-xl border border-[var(--border)] tint-mint p-3">
           {!selected ? (
             <p className="text-xs text-[var(--subtext)]">
-              Tap an icon to favorite, rename for boards, or download SVG (transparent-friendly).
+              Tap an icon to favorite, rename for boards, or download SVG. Animated tiles are ready
+              for interactive AAC / Smart TV boards.
             </p>
           ) : (
             <div className="space-y-2">
@@ -211,6 +260,9 @@ export function IconLibraryPanel() {
               </label>
               <p className="text-[10px] text-[var(--subtext)]">
                 Category: <strong>{selected.category}</strong> · id: {selected.id}
+                {selected.animated
+                  ? ` · ✦ ${selected.motion || 'animated'} (inline for TV boards)`
+                  : ' · static'}
               </p>
               <button
                 type="button"
