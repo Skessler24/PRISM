@@ -143,3 +143,19 @@ export function emptyGroup(day: 0 | 1 | 2 | 3 | 4 = 0): ScheduleGroup {
     notes: '',
   }
 }
+
+/** Copy all groups from one weekday onto another (new ids). */
+export function copyGroupsToDay(
+  state: ScheduleState,
+  fromDay: 0 | 1 | 2 | 3 | 4,
+  toDay: 0 | 1 | 2 | 3 | 4,
+): ScheduleState {
+  if (fromDay === toDay) return state
+  const copies = groupsForDay(state, fromDay).map((g) => ({
+    ...g,
+    id: `g-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    day: toDay,
+  }))
+  const kept = state.groups.filter((g) => g.day !== toDay)
+  return { ...state, groups: [...kept, ...copies] }
+}

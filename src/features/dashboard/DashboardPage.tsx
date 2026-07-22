@@ -18,6 +18,10 @@ import {
   buildWeekMeetings,
   weekRangeLabel,
 } from '../../lib/dashboard/weekAtAGlance'
+import {
+  formatCountdownBadge,
+  nextCountdown,
+} from '../../lib/scheduling/calendarCountdown'
 import { loadSchedule, todaysGroups } from '../../lib/scheduling/store'
 import { TeamChatDock } from './TeamChatPanel'
 import { VirtualMeetingsPanel } from './VirtualMeetingsPanel'
@@ -54,6 +58,7 @@ export function DashboardPage() {
   )
 
   const todayGroups = todaysGroups(loadSchedule())
+  const breakCountdown = useMemo(() => nextCountdown(), [])
   const weekMeetings = useMemo(
     () =>
       buildWeekMeetings({
@@ -124,7 +129,17 @@ export function DashboardPage() {
       title="🏠 Main Dashboard"
       description={`This week’s meetings and dues for ${profile.name}. Core modules live in the top tabs. Team Chat is the bubble in the corner.`}
     >
-      <p className="mb-3 text-sm font-semibold text-[var(--text)]">{today}</p>
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <p className="text-sm font-semibold text-[var(--text)]">{today}</p>
+        {breakCountdown && (
+          <span
+            className="countdown-badge inline-flex items-center rounded-full border border-amber-300 bg-gradient-to-r from-amber-100 to-orange-100 px-3 py-1 text-xs font-bold text-amber-950 shadow-sm"
+            title={`${breakCountdown.title} · ${breakCountdown.start}${breakCountdown.end !== breakCountdown.start ? ` → ${breakCountdown.end}` : ''}`}
+          >
+            {formatCountdownBadge(breakCountdown)}
+          </span>
+        )}
+      </div>
 
       <section
         className="mb-3 rounded-2xl border border-[var(--border)] p-4 shadow-card tint-mint"

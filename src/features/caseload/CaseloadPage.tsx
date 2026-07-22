@@ -19,13 +19,23 @@ import {
 
 type Tab = 'table' | 'soap' | 'progress'
 
+function initialTabFromUrl(): Tab {
+  const sp = new URLSearchParams(window.location.search)
+  const t = sp.get('tab')
+  if (t === 'soap' || t === 'progress' || t === 'table') return t
+  if (sp.get('student')) return 'soap'
+  return 'table'
+}
+
 export function CaseloadPage() {
   const { students, addStudent, updateStudent, removeStudent } = useStudents()
   const { profile } = useDistrictProfile()
   const [provider, setProvider] = useState('All')
-  const [tab, setTab] = useState<Tab>('table')
+  const [tab, setTab] = useState<Tab>(() => initialTabFromUrl())
   const [sessionDate, setSessionDate] = useState(() => new Date().toISOString().slice(0, 10))
-  const [soapStudentId, setSoapStudentId] = useState('')
+  const [soapStudentId, setSoapStudentId] = useState(
+    () => new URLSearchParams(window.location.search).get('student') || '',
+  )
   const [subjective, setSubjective] = useState('')
   const [objective, setObjective] = useState('')
   const [assessment, setAssessment] = useState('')
