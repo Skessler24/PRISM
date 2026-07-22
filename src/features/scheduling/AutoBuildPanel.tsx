@@ -47,12 +47,18 @@ export function AutoBuildPanel({ onFlash }: Props) {
   }
 
   async function onScheduleFile(file: File) {
+    if (!/\.(csv|xlsx|xls)$/i.test(file.name)) {
+      onFlash(
+        `Schedule upload failed — expected .xlsx or .csv, got “${file.name}” (file issue, not AI)`,
+      )
+      return
+    }
     try {
       const { constraints, sheetSummaries } = await constraintsFromScheduleFile(file)
       if (!constraints.length) {
         setPendingConstraints(null)
         onFlash(
-          'No protected times found — need Day/Start/End columns, or lunch/specials/recess periods',
+          `No protected times in “${file.name}” — need Day/Start/End columns, or lunch/specials/recess periods (file parse miss, not AI)`,
         )
         return
       }
@@ -62,10 +68,12 @@ export function AutoBuildPanel({ onFlash }: Props) {
         .map((s) => `${s.name}: ${s.count}`)
         .join(', ')
       onFlash(
-        `Parsed ${constraints.length} protected times from ${file.name}${sheets ? ` (${sheets})` : ''} — confirm to apply`,
+        `Schedule OK — parsed ${constraints.length} protected times from “${file.name}”${sheets ? ` (${sheets})` : ''} — confirm to apply`,
       )
     } catch (err) {
-      onFlash(err instanceof Error ? err.message : 'Could not read schedule file')
+      onFlash(
+        `Schedule upload failed: ${err instanceof Error ? err.message : 'Could not read file'} (file issue, not AI)`,
+      )
     }
   }
 

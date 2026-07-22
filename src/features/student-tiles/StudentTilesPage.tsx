@@ -122,6 +122,8 @@ function StudentCard({
   )
 }
 
+type ToastKind = 'ok' | 'err' | 'info'
+
 export function StudentTilesPage() {
   const { students, restoreDemo, setStudents } = useStudents()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -129,16 +131,20 @@ export function StudentTilesPage() {
   const [filter, setFilter] = useState<string>('All')
   const [search, setSearch] = useState('')
   const [toast, setToast] = useState('')
+  const [toastKind, setToastKind] = useState<ToastKind>('info')
   const [importBusy, setImportBusy] = useState(false)
   const [, bump] = useState(0)
   const csvRef = useRef<HTMLInputElement>(null)
   const enrichRef = useRef<HTMLInputElement>(null)
+  const toastTimer = useRef<number | null>(null)
 
   const selectedId = searchParams.get('id')
 
-  function flash(msg: string) {
+  function flash(msg: string, kind: ToastKind = 'info') {
+    if (toastTimer.current) window.clearTimeout(toastTimer.current)
+    setToastKind(kind)
     setToast(msg)
-    window.setTimeout(() => setToast(''), 4000)
+    toastTimer.current = window.setTimeout(() => setToast(''), kind === 'err' ? 7000 : 5000)
   }
 
   function openStudent(id: string) {
@@ -151,27 +157,48 @@ export function StudentTilesPage() {
   }
 
   async function onArrCsv(file: File) {
+    if (!/\.csv$/i.test(file.name) && !/csv/i.test(file.type)) {
+      flash(`Expected a .csv file — got “${file.name}”`, 'err')
+      return
+    }
     try {
       const text = await file.text()
+      if (!text.trim()) {
+        flash('CSV file is empty — pick the ARR Special Pops export', 'err')
+        return
+      }
       const imported = studentsFromArrCsv(text)
       setStudents(imported)
-      flash(`Imported ${imported.length} students from ARR CSV (this browser only)`)
+      flash(
+        `ARR CSV OK — imported ${imported.length} students from “${file.name}” (this browser only, not uploaded to Azure)`,
+        'ok',
+      )
     } catch (err) {
-      flash(err instanceof Error ? err.message : 'CSV import failed')
+      flash(
+        `ARR CSV failed: ${err instanceof Error ? err.message : 'Could not parse file'} — check header row has Name, Case Manager, Grade`,
+        'err',
+      )
     }
   }
 
   async function onEnrichPdfs(files: FileList | File[]) {
     const list = [...files].filter((f) => /\.pdf$/i.test(f.name))
+    const skipped = [...files].length - list.length
     if (!list.length) {
-      flash('Select Enrich Snapshot PDF file(s)')
+      flash(
+        'Enrich import needs PDF Snapshot file(s) — other file types were skipped',
+        'err',
+      )
       return
     }
     setImportBusy(true)
     try {
       const parsed = await parseEnrichSnapshotFiles(list)
       if (!parsed.length) {
-        flash('No student profiles found in those PDFs')
+        flash(
+          `No student profiles found in ${list.length} PDF(s)${skipped ? ` (${skipped} non-PDF skipped)` : ''} — use Enrich Snapshot exports`,
+          'err',
+        )
         return
       }
       const mergeMode =
@@ -186,10 +213,14 @@ export function StudentTilesPage() {
       )
       setStudents(result.students)
       flash(
-        `Enrich snapshots: ${result.parsed} profiles · +${result.added} added · ${result.updated} updated (browser only)`,
+        `Enrich PDFs OK — ${result.parsed} profiles · +${result.added} added · ${result.updated} updated (browser only)${skipped ? ` · ${skipped} non-PDF skipped` : ''}`,
+        'ok',
       )
     } catch (err) {
-      flash(err instanceof Error ? err.message : 'Enrich PDF import failed')
+      flash(
+        `Enrich PDF failed: ${err instanceof Error ? err.message : 'Could not read PDF'} — file issue, not AI`,
+        'err',
+      )
     } finally {
       setImportBusy(false)
     }
@@ -223,7 +254,16 @@ export function StudentTilesPage() {
       description="Individual student data walls — import ARR CSV + Enrich Snapshot PDFs (browser only), materials, and start FBA sessions. Real caseloads never leave this browser (FERPA)."
     >
       {toast && (
-        <div className="mb-3 rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white">
+        <div
+          role="status"
+          className={`mb-3 rounded-lg px-3 py-2 text-xs font-semibold ${
+            toastKind === 'ok'
+              ? 'bg-emerald-600 text-white'
+              : toastKind === 'err'
+                ? 'bg-rose-700 text-white'
+                : 'bg-[var(--accent)] text-white'
+          }`}
+        >
           {toast}
         </div>
       )}
@@ -334,142 +374,337 @@ export function StudentTilesPage() {
       )}
 
       {selected && (
-        <div className="fixed inset-0 z-40 flex justify-end bg-black/40" onClick={closeStudent}>
+        <div
+          className="fixed inset-0 z-[1100] flex justify-end bg-black/40"
+          onClick={closeStudent}
+          role="presentation"
+        >
           <aside
-            className="h-full w-full max-w-md overflow-y-auto bg-[var(--card-bg)] p-4 shadow-2xl"
+            className="flex h-full w-full max-w-md flex-col bg-[var(--card-bg)] shadow-2xl"
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="student-tile-title"
           >
-            <div className="mb-3 flex items-start justify-between gap-2">
-              <div>
-                <h2 className="font-heading text-lg font-bold">{selected.name}</h2>
-                <p className="text-xs text-[var(--subtext)]">
-                  {selected.grade} · {selected.disability}
-                </p>
+            <div className="flex shrink-0 items-start justify-between gap-2 border-b border-[var(--border)] px-4 py-3">
+              <div className="flex min-w-0 items-start gap-3">
+                <div
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold text-slate-800"
+                  style={{ background: selected.color }}
+                >
+                  {studentInitials(selected.name)}
+                </div>
+                <div className="min-w-0">
+                  <h2 id="student-tile-title" className="font-heading text-lg font-bold leading-tight">
+                    {selected.name}
+                  </h2>
+                  <p className="text-xs text-[var(--subtext)]">
+                    {selected.grade || 'Grade —'}
+                    {selected.teacher ? ` · ${selected.teacher}` : ''}
+                    {selected.caseManager ? ` · CM ${selected.caseManager}` : ''}
+                  </p>
+                  <div className="mt-1.5 flex flex-wrap gap-1">
+                    {selected.hasIEP && (
+                      <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-800">
+                        IEP
+                      </span>
+                    )}
+                    {selected.has504 && (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
+                        504
+                      </span>
+                    )}
+                    {selected.hasMLL && (
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-800">
+                        MLL
+                      </span>
+                    )}
+                    {selected.hasBip && (
+                      <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-semibold text-rose-900">
+                        BIP
+                      </span>
+                    )}
+                    {selected.discipline.map((d) => (
+                      <span
+                        key={d}
+                        className="rounded-full bg-[var(--sky)] px-2 py-0.5 text-[10px] font-semibold text-slate-700"
+                      >
+                        {d}
+                      </span>
+                    ))}
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusBadgeClass(selected.status)}`}
+                    >
+                      {selected.status}
+                    </span>
+                  </div>
+                </div>
               </div>
               <button
                 type="button"
-                className="rounded-lg border border-[var(--border)] px-2 py-1 text-xs"
+                className="shrink-0 rounded-lg border border-[var(--border)] px-2 py-1 text-xs font-semibold"
                 onClick={closeStudent}
               >
                 Close
               </button>
             </div>
 
-            <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--subtext)]">
-              Materials shelf
-            </p>
-            {!shelf.length && (
-              <p className="mb-3 text-xs text-[var(--subtext)]">
-                No materials yet.{' '}
-                <Link to="/templates" className="font-semibold text-[var(--accent)]">
-                  Create in Materials Studio →
-                </Link>
-              </p>
-            )}
-            <ul className="mb-4 space-y-2">
-              {shelf.map((m) => (
-                <li key={m.id} className="rounded-xl border border-[var(--border)] p-3 text-xs">
-                  <strong>
-                    {m.title} · {m.kind}
-                  </strong>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <Link
-                      to={`/materials/session/${m.id}`}
-                      className="rounded bg-emerald-600 px-2 py-1 font-semibold text-white"
-                    >
-                      Smart TV
-                    </Link>
-                    <button
-                      type="button"
-                      className="rounded border border-[var(--border)] px-2 py-1 font-semibold"
-                      onClick={() => downloadMaterialPdf(m, 'letter')}
-                    >
-                      PDF
-                    </button>
+            <div className="flex-1 overflow-y-auto px-4 py-3">
+              <section className="mb-4">
+                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--subtext)]">
+                  Profile
+                </p>
+                <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+                  <div>
+                    <dt className="text-[10px] font-semibold uppercase text-[var(--subtext)]">
+                      Disability
+                    </dt>
+                    <dd className="font-medium text-[var(--text)]">
+                      {selected.disability && selected.disability !== '—'
+                        ? selected.disability
+                        : '—'}
+                    </dd>
                   </div>
-                </li>
-              ))}
-            </ul>
+                  <div>
+                    <dt className="text-[10px] font-semibold uppercase text-[var(--subtext)]">
+                      Provider
+                    </dt>
+                    <dd className="font-medium text-[var(--text)]">{selected.provider || '—'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] font-semibold uppercase text-[var(--subtext)]">
+                      IEP due
+                    </dt>
+                    <dd className="font-medium text-[var(--text)]">
+                      {selected.iepDue || '—'}
+                      {selected.hasIEP && selected.iepDue
+                        ? ` (${daysUntil(selected.iepDue) ?? '—'}d)`
+                        : ''}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] font-semibold uppercase text-[var(--subtext)]">
+                      Re-eval
+                    </dt>
+                    <dd className="font-medium text-[var(--text)]">{selected.reevalDue || '—'}</dd>
+                  </div>
+                  {selected.has504 && (
+                    <div>
+                      <dt className="text-[10px] font-semibold uppercase text-[var(--subtext)]">
+                        504 review
+                      </dt>
+                      <dd className="font-medium text-[var(--text)]">
+                        {selected.section504Due || '—'}
+                      </dd>
+                    </div>
+                  )}
+                  {selected.meetingDate && (
+                    <div>
+                      <dt className="text-[10px] font-semibold uppercase text-[var(--subtext)]">
+                        Meeting
+                      </dt>
+                      <dd className="font-medium text-[var(--text)]">{selected.meetingDate}</dd>
+                    </div>
+                  )}
+                  {selected.lasid && (
+                    <div>
+                      <dt className="text-[10px] font-semibold uppercase text-[var(--subtext)]">
+                        LASID
+                      </dt>
+                      <dd className="font-mono text-[11px] text-[var(--text)]">{selected.lasid}</dd>
+                    </div>
+                  )}
+                  {selected.homeLanguage && (
+                    <div>
+                      <dt className="text-[10px] font-semibold uppercase text-[var(--subtext)]">
+                        Home language
+                      </dt>
+                      <dd className="font-medium text-[var(--text)]">
+                        {selected.homeLanguage}
+                        {selected.interpreterNeeded ? ' · interpreter' : ''}
+                      </dd>
+                    </div>
+                  )}
+                  <div className="col-span-2">
+                    <dt className="text-[10px] font-semibold uppercase text-[var(--subtext)]">
+                      Source
+                    </dt>
+                    <dd className="font-medium text-[var(--text)]">{selected.source}</dd>
+                  </div>
+                </dl>
+                {(selected.interests || selected.triggers || selected.calming) && (
+                  <div className="mt-3 space-y-1.5 rounded-xl border border-[var(--border)] bg-[var(--slate)] p-3 text-xs">
+                    {selected.interests ? (
+                      <p>
+                        <strong>Interests:</strong> {selected.interests}
+                      </p>
+                    ) : null}
+                    {selected.triggers ? (
+                      <p>
+                        <strong>Triggers:</strong> {selected.triggers}
+                      </p>
+                    ) : null}
+                    {selected.calming ? (
+                      <p>
+                        <strong>Calming:</strong> {selected.calming}
+                      </p>
+                    ) : null}
+                  </div>
+                )}
+              </section>
 
-            <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--subtext)]">
-              FBA / behavior
-            </p>
-            {fbaOpen ? (
-              <div className="mb-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs">
-                <p className="font-semibold">Open FBA session</p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <Link
-                    to={`/fba?session=${loadFbaSessions().find((f) => f.studentId === selected.id && f.open)?.id || ''}`}
-                    className="font-semibold text-[var(--accent)]"
-                  >
-                    Open FBA sheet →
-                  </Link>
-                  <button
-                    type="button"
-                    className="rounded bg-emerald-600 px-2 py-1 font-semibold text-white"
-                    onClick={() => {
-                      const sid = loadFbaSessions().find(
-                        (f) => f.studentId === selected.id && f.open,
-                      )?.id
-                      if (sid)
-                        window.open(`/fba/tally/${sid}`, 'prism-fba-tally', 'width=420,height=640')
-                    }}
-                  >
-                    +/- tally pop-out
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="mb-3 rounded-xl border border-[var(--border)] bg-[var(--slate)] p-3 text-xs">
-                <p className="mb-2 text-[var(--subtext)]">No open FBA for this student yet.</p>
-                <button
-                  type="button"
-                  className="rounded-lg bg-rose-600 px-3 py-1.5 font-semibold text-white"
-                  onClick={() => {
-                    const sess = startFbaForStudent(selected.id, selected.name)
-                    bump((n) => n + 1)
-                    navigate(`/fba?session=${sess.id}`)
-                  }}
-                >
-                  Start FBA for {selected.name.split(' ')[0]}
-                </button>
-              </div>
-            )}
-
-            {(selected.goals.length > 0 || selected.accommodations.length > 0) && (
-              <div className="mb-3 space-y-2 text-[10px] text-[var(--subtext)]">
-                {selected.disability && selected.disability !== '—' && (
-                  <p>
-                    <strong className="text-[var(--text)]">Disability:</strong> {selected.disability}
+              <section className="mb-4">
+                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--subtext)]">
+                  Materials shelf
+                </p>
+                {!shelf.length && (
+                  <p className="mb-3 text-xs text-[var(--subtext)]">
+                    No materials yet.{' '}
+                    <Link to="/templates" className="font-semibold text-[var(--accent)]">
+                      Create in Materials Studio →
+                    </Link>
                   </p>
                 )}
-                {selected.goals.length > 0 && (
-                  <div>
-                    <strong className="text-[var(--text)]">Goals</strong>
-                    <ul className="mt-1 list-disc space-y-1 pl-4">
-                      {selected.goals.slice(0, 4).map((g) => (
-                        <li key={g.slice(0, 40)}>{g}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {selected.accommodations.length > 0 && (
-                  <div>
-                    <strong className="text-[var(--text)]">Accommodations</strong>
-                    <ul className="mt-1 list-disc space-y-1 pl-4">
-                      {selected.accommodations.slice(0, 5).map((a) => (
-                        <li key={a.slice(0, 40)}>{a}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
+                <ul className="mb-1 space-y-2">
+                  {shelf.map((m) => (
+                    <li key={m.id} className="rounded-xl border border-[var(--border)] p-3 text-xs">
+                      <strong>
+                        {m.title} · {m.kind}
+                      </strong>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <Link
+                          to={`/materials/session/${m.id}`}
+                          className="rounded bg-emerald-600 px-2 py-1 font-semibold text-white"
+                        >
+                          Smart TV
+                        </Link>
+                        <button
+                          type="button"
+                          className="rounded border border-[var(--border)] px-2 py-1 font-semibold"
+                          onClick={() => downloadMaterialPdf(m, 'letter')}
+                        >
+                          PDF
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
 
-            <p className="text-[10px] text-[var(--subtext)]">
-              Goals: {selected.goals.length ? `${selected.goals.length} on file` : '—'}
-              {selected.lasid ? ` · LASID ${selected.lasid}` : ''}
-            </p>
+              <section className="mb-4">
+                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--subtext)]">
+                  FBA / behavior
+                </p>
+                {fbaOpen ? (
+                  <div className="mb-1 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs">
+                    <p className="font-semibold">Open FBA session</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <Link
+                        to={`/fba?session=${loadFbaSessions().find((f) => f.studentId === selected.id && f.open)?.id || ''}`}
+                        className="font-semibold text-[var(--accent)]"
+                      >
+                        Open FBA sheet →
+                      </Link>
+                      <button
+                        type="button"
+                        className="rounded bg-emerald-600 px-2 py-1 font-semibold text-white"
+                        onClick={() => {
+                          const sid = loadFbaSessions().find(
+                            (f) => f.studentId === selected.id && f.open,
+                          )?.id
+                          if (sid)
+                            window.open(
+                              `/fba/tally/${sid}`,
+                              'prism-fba-tally',
+                              'width=420,height=640',
+                            )
+                        }}
+                      >
+                        +/- tally pop-out
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mb-1 rounded-xl border border-[var(--border)] bg-[var(--slate)] p-3 text-xs">
+                    <p className="mb-2 text-[var(--subtext)]">No open FBA for this student yet.</p>
+                    <button
+                      type="button"
+                      className="rounded-lg bg-rose-600 px-3 py-1.5 font-semibold text-white"
+                      onClick={() => {
+                        const sess = startFbaForStudent(selected.id, selected.name)
+                        bump((n) => n + 1)
+                        navigate(`/fba?session=${sess.id}`)
+                      }}
+                    >
+                      Start FBA for {selected.name.split(' ')[0]}
+                    </button>
+                  </div>
+                )}
+              </section>
+
+              <section className="mb-4">
+                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--subtext)]">
+                  Goals &amp; accommodations
+                </p>
+                {selected.goals.length > 0 ? (
+                  <div className="mb-3">
+                    <p className="text-[10px] font-semibold text-[var(--text)]">
+                      Goals ({selected.goals.length})
+                    </p>
+                    <ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-[var(--subtext)]">
+                      {selected.goals.slice(0, 8).map((g) => (
+                        <li key={g.slice(0, 48)}>{g}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <p className="mb-3 text-xs text-[var(--subtext)]">
+                    Goals: — not on this record yet. Import Enrich Snapshot PDFs to pull goals into
+                    the tile (ARR CSV alone usually has dates/services, not goal text).
+                  </p>
+                )}
+                {selected.accommodations.length > 0 ? (
+                  <div>
+                    <p className="text-[10px] font-semibold text-[var(--text)]">
+                      Accommodations ({selected.accommodations.length})
+                    </p>
+                    <ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-[var(--subtext)]">
+                      {selected.accommodations.slice(0, 8).map((a) => (
+                        <li key={a.slice(0, 48)}>{a}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <p className="text-xs text-[var(--subtext)]">Accommodations: —</p>
+                )}
+              </section>
+
+              <section className="mb-2">
+                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--subtext)]">
+                  Jump to
+                </p>
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <Link
+                    to={`/caseload?tab=soap&student=${encodeURIComponent(selected.id)}`}
+                    className="rounded-lg border border-[var(--border)] px-2.5 py-1.5 font-semibold"
+                  >
+                    Caseload / SOAP
+                  </Link>
+                  <Link
+                    to="/scheduling"
+                    className="rounded-lg border border-[var(--border)] px-2.5 py-1.5 font-semibold"
+                  >
+                    Scheduling
+                  </Link>
+                  <Link
+                    to="/progress"
+                    className="rounded-lg border border-[var(--border)] px-2.5 py-1.5 font-semibold"
+                  >
+                    Progress
+                  </Link>
+                </div>
+              </section>
+            </div>
           </aside>
         </div>
       )}

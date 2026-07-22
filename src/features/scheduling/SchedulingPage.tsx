@@ -20,13 +20,43 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'parameters', label: 'Parameters' },
 ]
 
+type ToastKind = 'ok' | 'err' | 'info'
+
+function classifyToast(msg: string): ToastKind {
+  const m = msg.toLowerCase()
+  if (
+    m.includes('fail') ||
+    m.includes('could not') ||
+    m.includes('no protected') ||
+    m.includes('error') ||
+    m.includes('need ')
+  ) {
+    return 'err'
+  }
+  if (
+    m.includes('ok') ||
+    m.includes('imported') ||
+    m.includes('parsed') ||
+    m.includes('built') ||
+    m.includes('replaced') ||
+    m.includes('added') ||
+    m.includes('synced') ||
+    m.includes('ready')
+  ) {
+    return 'ok'
+  }
+  return 'info'
+}
+
 export function SchedulingPage() {
   const [tab, setTab] = useState<Tab>('autobuild')
   const [toast, setToast] = useState('')
+  const [toastKind, setToastKind] = useState<ToastKind>('info')
 
   function flash(msg: string) {
+    setToastKind(classifyToast(msg))
     setToast(msg)
-    window.setTimeout(() => setToast(''), 2800)
+    window.setTimeout(() => setToast(''), 5500)
   }
 
   return (
@@ -35,7 +65,16 @@ export function SchedulingPage() {
       description="Upload your school schedule, sync caseload, and auto-build the week — plus Live Groups, Team Week Grid, providers, minutes tracker, and parameters."
     >
       {toast && (
-        <div className="mb-3 rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white">
+        <div
+          role="status"
+          className={`mb-3 rounded-lg px-3 py-2 text-xs font-semibold ${
+            toastKind === 'ok'
+              ? 'bg-emerald-600 text-white'
+              : toastKind === 'err'
+                ? 'bg-rose-700 text-white'
+                : 'bg-[var(--accent)] text-white'
+          }`}
+        >
           {toast}
         </div>
       )}
