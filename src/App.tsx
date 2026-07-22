@@ -28,6 +28,7 @@ import { MaterialSessionPage } from './features/classroom-materials/MaterialSess
 import { FbaTallyPopoutPage } from './features/fba-bip/FbaTallyPopoutPage'
 import { WeeklyPlannerPage } from './features/weekly-planner/WeeklyPlannerPage'
 import { MeetingPrepPage } from './features/meeting-prep/MeetingPrepPage'
+import { PrivateSchoolPage } from './features/private-school/PrivateSchoolPage'
 
 export default function App() {
   return (
@@ -57,6 +58,7 @@ export default function App() {
                     <Route path="fba" element={<FbaBipPage />} />
                     <Route path="section504" element={<Section504Page />} />
                     <Route path="mll" element={<MllPage />} />
+                    <Route path="private-school" element={<PrivateSchoolPage />} />
                     <Route path="accessibility" element={<AccessibilityPage />} />
                     <Route path="templates" element={<TemplatesPage />} />
                     <Route path="generation" element={<GenerationPage />} />

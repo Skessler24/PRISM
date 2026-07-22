@@ -1,0 +1,26 @@
+{
+  "name": "PRISM — SPED Command Center",
+  "short_name": "PRISM",
+  "description": "District-agnostic SPED workflow platform. Reflect the Whole Human.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f2744",
+  "theme_color": "#1e4078",
+  "orientation": "any",
+  "lang": "en-US",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/prism-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
