@@ -1207,11 +1207,17 @@ export function TeamParametersPanel({ onFlash }: Props) {
   const slots = useMemo(() => getTimeSlots(settings), [settings])
 
   function ingestMasterFile(file: File, mode: 'append' | 'replace') {
+    if (!/\.(csv|xlsx|xls)$/i.test(file.name)) {
+      onFlash(
+        `Schedule upload failed — expected .xlsx or .csv, got “${file.name}” (file issue, not AI)`,
+      )
+      return
+    }
     void constraintsFromScheduleFile(file)
       .then(({ constraints, sheetSummaries }) => {
         if (!constraints.length) {
           onFlash(
-            'No protected times found in file — need lunch/specials/recess or Day/Start/End columns',
+            `No protected times in “${file.name}” — need lunch/specials/recess or Day/Start/End columns (file parse miss, not AI)`,
           )
           return
         }
@@ -1223,8 +1229,8 @@ export function TeamParametersPanel({ onFlash }: Props) {
                 : [...state.masterConstraints, ...constraints],
           },
           mode === 'replace'
-            ? `Replaced with ${constraints.length} from ${file.name}`
-            : `Imported ${constraints.length} from ${file.name}${
+            ? `Schedule OK — replaced with ${constraints.length} from “${file.name}”`
+            : `Schedule OK — imported ${constraints.length} from “${file.name}”${
                 sheetSummaries.length > 1
                   ? ` (${sheetSummaries.filter((s) => s.count).map((s) => s.name).join(', ')})`
                   : ''
@@ -1232,7 +1238,9 @@ export function TeamParametersPanel({ onFlash }: Props) {
         )
       })
       .catch((err: unknown) => {
-        onFlash(err instanceof Error ? err.message : 'Could not read schedule file')
+        onFlash(
+          `Schedule upload failed: ${err instanceof Error ? err.message : 'Could not read file'} (file issue, not AI)`,
+        )
       })
   }
 
