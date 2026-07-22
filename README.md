@@ -4,34 +4,28 @@
 
 ## What’s live on Azure right now
 
-The live site deploys the **full working Phase 3 HTML app** from `/deploy` (all tabs, student tiles, caseload, MTSS, eval tracker, templates, district profile, etc.).
+The live site deploys the **Vite + React app** (`npm run build` → `dist/`).
 
 🔗 https://gentle-coast-08903c010.7.azurestaticapps.net
 
-That file came from your latest complete build (`archive/index.prototype.html` / the index you and Copilot built). It was never deleted — it was archived while we scaffolded a Vite/React rewrite. The React shell only had empty page placeholders, which is why Azure looked “half gone” after that deploy.
+The Phase 3 HTML app remains in `deploy/` as a **rollback** artifact (see cutover docs). API attach / AI keys may still be pending Azure SWA recovery.
 
 ## Repo layout
 
 | Path | What it is |
 |---|---|
-| `deploy/` | **What Azure publishes** — full working app |
+| `src/` → `dist/` | **What Azure publishes** — Vite/React build |
+| `deploy/` | Rollback HTML app (not published while cutover is active) |
 | `api/` | Azure Functions AI proxy (`/api/ai-chat`, `/api/ai-speak`) — keys stay server-side |
 | `archive/index.prototype.html` | Backup of the full HTML build |
-| `src/` | Vite + React rewrite (Prompts 1–7 on `main`) |
 | `district-profiles/` | CCSD Enrich + DAT rules (used by React District Profile) |
 | `docs/` | Enrich guide, handoff, design refs, intake catalogs |
 | `docs/ops/AZURE_RECOVERY_CHECKLIST.md` | **When Azure is healthy** — API attach, secrets, smoke tests |
-| `docs/ops/REACT_DIST_CUTOVER.md` | Flip Azure from `deploy/` HTML → React `dist/` (prepared, not flipped) |
+| `docs/ops/REACT_DIST_CUTOVER.md` | Cutover status, smoke checks, rollback |
 
 ## Run locally
 
-**Full current app (matches Azure):**
-Open `deploy/index.html` in a browser, or:
-```bash
-npx --yes serve deploy
-```
-
-**React scaffold (migration work-in-progress):**
+**React app (matches Azure):**
 ```bash
 npm install
 npm run dev
@@ -47,13 +41,13 @@ npm run api:start   # http://localhost:7071 — Vite proxies /api
 
 ## Deploy
 
-GitHub Actions on push to `main` uploads the `deploy/` folder to Azure Static Web Apps (with `api/` as the Functions backend when Azure recovers).
+GitHub Actions on push to `main` runs `npm ci && npm run build`, then uploads `dist/` to Azure Static Web Apps (`api/` as Functions backend when attached).
 
-**Azure is currently struggling** (cannot add/configure the API in Portal yet). Track everything to finish when it recovers in:
+**Azure may still be struggling** for API attach / Portal. Track recovery in:
 
 → [`docs/ops/AZURE_RECOVERY_CHECKLIST.md`](docs/ops/AZURE_RECOVERY_CHECKLIST.md)
 
-When you are ready to publish React instead of `deploy/`:
+Cutover / rollback:
 
 → [`docs/ops/REACT_DIST_CUTOVER.md`](docs/ops/REACT_DIST_CUTOVER.md)
 

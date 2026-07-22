@@ -3,7 +3,7 @@
 **Status:** Azure Static Web Apps is struggling (GatewayTimeout / content-server issues on SWA **PRISM** in `kessler-design-labs_group`). You **cannot add/configure the API** yet. Code for the Functions backend already lives in the repo (`api/`).
 
 **Live site:** https://gentle-coast-08903c010.7.azurestaticapps.net  
-**What ships today:** `deploy/` HTML app (React `src/` is the migration track; not what Azure publishes yet).
+**What ships today:** React Vite `dist/` (cutover flipped — see [`REACT_DIST_CUTOVER.md`](./REACT_DIST_CUTOVER.md)). `deploy/` HTML kept for rollback.
 
 Update this file whenever new Azure-blocked work appears.
 
@@ -16,7 +16,7 @@ Do these in order once SWA portal / GitHub deploy jobs succeed again.
 ### 1. Confirm SWA deploy works again
 - [ ] Open Azure Portal → Static Web App **PRISM** → Overview loads without timeout
 - [ ] Push or re-run **Azure Static Web Apps CI/CD** on `main` succeeds (no GatewayTimeout on List Static Site Secrets)
-- [ ] Spot-check live site still serves `deploy/` (tabs load)
+- [ ] Spot-check live site serves React `dist/` (TopBar / tab pills load)
 
 ### 2. Attach / deploy the Functions API (`api/`)
 Code is ready: `api/src/functions/ai-chat.js`, `api/src/functions/ai-speak.js`, `api/src/functions/team-chat.js`.  
@@ -45,13 +45,13 @@ In SWA / linked Function App → Configuration / Application settings:
 - [ ] Save settings and restart / wait for Functions to pick them up
 - [ ] Smoke-test Generation Studio / AI polish **locally** first (`npm run api:start`), then on live site once API is up
 - [ ] Smoke-test Dashboard Team Chat → **Connect cloud room** (invite code) against `/api/team-chat`
-- [ ] Confirm `deploy/` AppSDK AI features (meeting summary, gen studio, etc.) hit `/api/ai-*` instead of failing silently
+- [ ] Confirm React AI features (Generation Studio / polish / Team Chat cloud) hit `/api/ai-*` instead of failing silently
 
 ### 4. Optional later Azure / cloud items (not blocked on “API add”, but need healthy Azure)
 - [ ] **Graph / OneDrive:** wire MSAL + app registration when ready (`VITE_STORAGE_BACKEND=graph` is stubbed to localStorage today)
 - [ ] **TTS:** choose vendor and replace `/api/ai-speak` 501 stub
 - [ ] **Team Chat durability:** move in-memory rooms to Azure Table/Blob / SignalR for multi-instance
-- [ ] **Publish React `dist/` instead of `deploy/`** when ready — follow [`REACT_DIST_CUTOVER.md`](./REACT_DIST_CUTOVER.md) (workflow flip prepared; not enabled yet)
+- [x] **Publish React `dist/` instead of `deploy/`** — done; see [`REACT_DIST_CUTOVER.md`](./REACT_DIST_CUTOVER.md)
 - [ ] Re-try any failed empty/retry deploys from the outage window if the live site looks stale
 
 ---
@@ -79,4 +79,4 @@ In SWA / linked Function App → Configuration / Application settings:
 
 ---
 
-*Last updated: 2026-07-22 — React `dist/` cutover recipe in REACT_DIST_CUTOVER.md. Azure attach still pending. Offline features do **not** require Azure.*
+*Last updated: 2026-07-22 — React `dist/` cutover flipped. Azure API attach still pending. Offline features do **not** require Azure.*
