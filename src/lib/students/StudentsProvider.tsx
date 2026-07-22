@@ -57,6 +57,35 @@ export function StudentsProvider({ children }: { children: ReactNode }) {
     void storage.saveStudents(normalized)
   }, [])
 
+  const addStudent = useCallback(
+    (student: Student) => {
+      setStudentsState((prev) => {
+        const next = [...prev.filter((s) => s.id !== student.id), normalizeStudent(student)]
+        void storage.saveStudents(next)
+        return next
+      })
+    },
+    [],
+  )
+
+  const updateStudent = useCallback((id: string, patch: Partial<Student> | Student) => {
+    setStudentsState((prev) => {
+      const next = prev.map((s) =>
+        s.id === id ? normalizeStudent({ ...s, ...patch, id }) : s,
+      )
+      void storage.saveStudents(next)
+      return next
+    })
+  }, [])
+
+  const removeStudent = useCallback((id: string) => {
+    setStudentsState((prev) => {
+      const next = prev.filter((s) => s.id !== id)
+      void storage.saveStudents(next)
+      return next
+    })
+  }, [])
+
   const restoreDemo = useCallback(() => {
     const demo = demoList()
     setStudentsState(demo)
@@ -64,8 +93,16 @@ export function StudentsProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const value = useMemo(
-    () => ({ students, setStudents, restoreDemo, ready }),
-    [students, setStudents, restoreDemo, ready],
+    () => ({
+      students,
+      setStudents,
+      addStudent,
+      updateStudent,
+      removeStudent,
+      restoreDemo,
+      ready,
+    }),
+    [students, setStudents, addStudent, updateStudent, removeStudent, restoreDemo, ready],
   )
 
   return <StudentsContext.Provider value={value}>{children}</StudentsContext.Provider>

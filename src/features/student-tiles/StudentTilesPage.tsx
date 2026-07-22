@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { PageShell } from '../../components/PageShell'
 import { useStudents } from '../../lib/students/useStudents'
 import { daysUntil, statusBadgeClass } from '../../lib/students/normalizeStudent'
@@ -115,10 +115,21 @@ function StudentCard({
 
 export function StudentTilesPage() {
   const { students, restoreDemo } = useStudents()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [filter, setFilter] = useState<string>('All')
   const [search, setSearch] = useState('')
-  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [, bump] = useState(0)
+
+  const selectedId = searchParams.get('id')
+
+  function openStudent(id: string) {
+    bump((n) => n + 1)
+    setSearchParams({ id }, { replace: true })
+  }
+
+  function closeStudent() {
+    setSearchParams({}, { replace: true })
+  }
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -144,8 +155,16 @@ export function StudentTilesPage() {
   return (
     <PageShell
       title="🧩 Student Tiles"
-      description="Individual student data walls — materials (token / schedule / comm / behavior), open FBA sessions, and program flags. Demo data is fictional; real caseloads stay in browser localStorage only (FERPA)."
+      description="Individual student data walls — materials (token / schedule / comm / behavior), open FBA sessions, and program flags. Open from Caseload via /students?id=…. Demo data is fictional; real caseloads stay in browser localStorage only (FERPA)."
     >
+      {selectedId && !selected ? (
+        <div className="mb-3 rounded-lg tint-sun px-3 py-2 text-xs font-semibold">
+          No student found for id <code>{selectedId}</code>.{' '}
+          <button type="button" className="text-[var(--accent)] underline" onClick={closeStudent}>
+            Clear
+          </button>
+        </div>
+      ) : null}
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-[var(--subtext)]">
           {filtered.length} of {students.length} students
@@ -197,17 +216,14 @@ export function StudentTilesPage() {
               student={s}
               materials={materialsForStudent(s.id)}
               openFba={openFbaIds.has(s.id)}
-              onOpen={() => {
-                setSelectedId(s.id)
-                bump((n) => n + 1)
-              }}
+              onOpen={() => openStudent(s.id)}
             />
           ))}
         </div>
       )}
 
       {selected && (
-        <div className="fixed inset-0 z-40 flex justify-end bg-black/40" onClick={() => setSelectedId(null)}>
+        <div className="fixed inset-0 z-40 flex justify-end bg-black/40" onClick={closeStudent}>
           <aside
             className="h-full w-full max-w-md overflow-y-auto bg-[var(--card-bg)] p-4 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
@@ -222,7 +238,7 @@ export function StudentTilesPage() {
               <button
                 type="button"
                 className="rounded-lg border border-[var(--border)] px-2 py-1 text-xs"
-                onClick={() => setSelectedId(null)}
+                onClick={closeStudent}
               >
                 Close
               </button>
