@@ -1,0 +1,508 @@
+PRISM Master Plan (aka: SPED Command CENTER)
+Master Platform Plan — A Complete Blueprint for the Ultimate SPED Team Platform
+Prepared by: Samantha Kessler Organization: Cherry Creek School District(or Personal) Date: July 19, 2026
+Status: Working Document — Living Plan Version: 1.0
+⚠ COMPLIANCE NOTICE
+This platform is 100% HIPAA and FERPA compliant across every feature. All policy banners auto-update when district, state, or federal regulations change. All AI-generated content is reviewed by a qualified human professional before use. No student data is used without authorization.
+Table of Contents
+Section
+Title
+1
+Platform Overview & Core Principles
+2
+Platform Architecture — The 8 Tabs
+3
+Navigation Design
+4
+Build Phases (Phases 1–10)
+5
+Data Flow Map
+6
+Compliance and Security Notes
+7
+Integration Connections
+8
+Glossary
+Section 1: Platform Overview
+The SPED Command Center is a fully integrated, HIPAA and FERPA compliant platform built exclusively for special education teams. It operates as a living hive mind: every piece of data entered once is used everywhere — across all tabs, calendars, student tiles, logs, and reports. The platform serves both the full SPED team and individual providers, and is always updated to reflect new changes in district, state, and federal policies and regulations.
+Core Principles
+Principle
+Description
+100% Compliance — Always
+HIPAA and FERPA compliant throughout; auto-updated for policy changes at district, state, and federal levels.
+Enter Once, Use Everywhere
+Every student data point entered once flows automatically to all connected tabs, logs, calendars, and reports.
+Student Tile as Source of Truth
+Every form, template, and material is stored in the student tile folder — nothing is siloed.
+Print & Download Ready
+Everything is printable and downloadable as a PDF at any time.
+Dual Cloud Storage
+OneDrive + Google Drive (full dual support); no data is stored only locally.
+Key Integrations
+Microsoft Outlook Calendar, SharePoint, Enrich IEP system, MyCherry Creek, PandaDocs, Microsoft Teams.
+AI Is Assistive, Not Authoritative
+AI assists and drafts; all AI-generated output is reviewed by a human professional before use or distribution.
+Auto-Updating Policy Banners
+Mandate and regulation banners update automatically when laws or district policies change.
+Section 2: Platform Architecture — The 8 Tabs
+The SPED Command Center is organized into 8 primary tabs, each serving a distinct function while remaining fully interconnected. All tabs share a common data backbone rooted in the Student Tiles system.
+Tab #
+Tab Name
+Status
+Core Purpose
+1
+🏠 Main Dashboard
+Expand Existing
+AI SPED Secretary HQ — the nerve center of the entire platform; all activity radiates from here.
+2
+🧩 Student Tiles
+NEW
+Individual student data walls, history, materials, continuum profiles — the data spine of the platform.
+3
+👤 My Caseload
+NEW
+Personal caseload management, session tracking, and SOAP note generation per provider.
+4
+📋 MTSS Hub
+NEW
+RTI tracking, intervention toolkit, MTSS calendar, and handoff to special education pipeline.
+5
+📊 Evaluation Tracker
+NEW
+Compliance timelines, evaluation checklists, deadlines, and district assessment team coordination.
+6
+♿ Accessibility Studio
+NEW
+Audio forms, multilingual recordings, high-contrast templates, and Braille-ready file exports.
+7
+🎨 Templates & Forms
+Expand + Merge
+All template creation merged with form tracking and distribution; icon library and communication boards.
+8
+📚 Resource Hub
+NEW
+Evidence-based research search, district information, and community resources — accessible mid-meeting.
+Section 3: Navigation Design
+The navigation system is designed for speed, clarity, and accessibility across the entire platform.
+Top Navigation Bar: Displays the first 5 tabs by name, always visible.
+Hamburger Menu (☰): Located on the right side of the top bar; reveals the remaining tabs in a slide-out drawer.
+Active Tab Highlight: The currently active tab is always visually highlighted.
+Breadcrumb Trails: Appear on all sub-pages so providers always know where they are.
+Universal Access: All 8 tabs are accessible from any location within the app — no dead ends.
+💡 DESIGN NOTE
+The navigation structure is intentionally minimal so that even providers who rarely use the platform can navigate it without training. The hamburger drawer keeps the interface clean while keeping every tab one click away.
+Section 4: Build Phases
+The SPED Command Center is built in 10 sequential phases, each delivering a fully functional layer of the platform. Phases build on one another, with Phase 1 establishing the data backbone that all subsequent phases depend on.
+PHASE 1 — Navigation Shell + All 8 Tab Skeletons (Build All at Once)
+All 8 tabs are built simultaneously as working skeletons. Each tab will contain correct section headers, layout, placeholder widgets, empty states with descriptive labels, and proper routing between tabs. The student data structure — the backbone that everything else feeds from — is fully established in this phase.
+Correct section headers and layout for all 8 tabs
+Placeholder widgets with descriptive labels (no blank or unlabeled empty states)
+Full routing and navigation between all tabs confirmed working
+Student data schema fully designed and implemented — every field, every relationship
+OneDrive and Google Drive dual-storage connections established
+HIPAA/FERPA compliance framework in place before any student data is accepted
+PHASE 2 — Main Dashboard: Full Build
+The Main Dashboard is the AI SPED Secretary. It is the nerve center of the entire platform — everything radiates from here. Below are all components built in this phase.
+📅 Floating Header Bar (Always Visible While Scrolling)
+Day, full date, and live clock — large, prominent, always floating
+Countdown display: "Next Day Off: Fall Break in 23 days" — driven by uploadable district calendar
+Meeting timer button: click to activate → pop-out agenda recorder (see Meeting Timer section below)
+🔗 Quick-Link Tiles
+Team Scheduling App
+Email
+Enrich (IEP system)
+MyCherry Creek
+SharePoint / OneDrive
+Add Favorites / Bookmarks — user-customizable tiles for any frequently visited link or tool
+📈 Weekly / Monthly Toggle Widget
+Toggle between weekly and monthly views instantly
+Meetings this week/month
+Important due dates and district deadlines
+Live to-do list: check off items or mark "already did this"
+Checked items stop appearing as reminders on the dashboard automatically
+📢 Mandate Alert Banner
+Scrolling or pinned banner displaying updated district, state, and federal mandates and regulations affecting SPED
+Auto-updated — no manual intervention required when policies change
+👥 Team Caseload Overview
+The entire team's caseload displayed in a filterable, interactive view
+Designed for reference during team meetings
+Run simple to complex reports from this view
+AI-generated report scripts available on demand
+📅 SPED Calendar (Outlook-Connected or Enhanced)
+Live sync — pulls events from district emails per provider
+Any provider can create, edit, or update events live during meetings
+NOM and Consent for Evaluation template upload → AI fills → encrypted email send OR PDF download for case manager
+NOM automatically logged to parent contact record in the student tile
+Connects to evaluation timelines in Evaluation Tracker
+Checkbox system: "Sent NOM" → comment field → date logged (e.g., "Sent parent notice of meeting on 8-15")
+Connects live to each provider's personal caseload dashboard
+Case study calendar actions also connected
+💬 Live Teams Chat Widget
+Pop-up symbol (non-intrusive by default) OR pin to dashboard — provider's choice
+Save and toggle between channels (e.g., "Team Meeting Sept 8 2026," "SPED Team 26-27")
+Print meeting transcripts directly from the widget
+Compatible with Scribe extension for accessibility
+⏱ Meeting Timer + Live Agenda Pop-Out
+Click timer → pop-out opens with a blinking recording icon
+Live team agenda with shareable link — all providers can edit live before and during meetings
+Agenda fields: date, time, meeting length, agenda items organized by discipline (SLP, OT, Mental Health, etc.)
+Agenda items linkable to specific student tiles and evaluation timelines
+Check off agenda items as completed or flag as "needs review"
+Add agenda items directly to individual provider to-do lists
+If a task can be completed by AI → AI completes it, notifies the provider, and logs the action to all connected tabs
+When timer stops → auto-generates a meeting summary PDF
+PDF emailed to the entire team and stored in SharePoint/Drive automatically
+Summary includes: what was discussed, decisions made, team to-do list, and all changes logged (e.g., "Jayden S.'s meeting changed from 9-24-26 to 10-4-26 at 8am")
+All changes auto-logged to affected student tiles, parent contact logs, and caseload data
+Monthly newsletter generated from accumulated meeting summaries for admin and team
+👤 "Who Are You Seeing Today?" Widget (Personalized Per Provider)
+Daily schedule listed by groups (e.g., "1st Grade Articulation — 4 students")
+Each group is a clickable link → pop-out displays: student names/initials, grade, time, classroom, goals being worked on, latest token/communication boards
+Pop-out is expandable and printable
+Download daily schedule as a sub-friendly PDF: student groups, times, classrooms, goals, and a SOAP notes template pre-filled with date, time, and goal per student (sub fills in data; provider uploads later)
+PHASE 3 — Student Tiles: Full Build
+The Student Tiles tab is the data spine of the entire platform. Every other tab feeds from and returns data to this hub. Nothing about a student is stored anywhere else without being connected back here.
+🏥 Student Card View
+Filter and sort by: grade, discipline, schedule grouping, goals, IEP due date, alphabetical
+Each card displays: photo / placeholder avatar, grade, teacher, providers, clickable links to parent info and demographics
+📄 Inside Each Student Tile — Student History Section
+Parent Contact Log (printable)
+Student Snapshot Template
+Service Log (printable)
+Prepare → Present Levels: AI drafts present levels from SOAP notes + goals + contact log
+Prepare → Progress Reports: AI draft with goals and progress data, signed by provider
+Prepare → Reevaluation Prep
+Prepare → Initial Evaluation
+Upload own district templates → AI fills in numbers and data automatically
+🌍 Student Data Wall (Identity Graph — Feeds Generation Studio)
+Strengths and interests list
+Favorite colors, toys, characters, and games
+Sensory needs, triggers, and calming strategies
+Assistive technology and classroom accommodations (headphones, AAC device, etc.)
+Communication style and behavioral notes
+Goals and current progress data
+Full accommodation list
+📋 Student Continuum Profile (Printable Report — Pulls From Everything)
+Current academic and behavioral summary: reading level, math level, writing level
+Behavior summary, strengths, needs, accommodations, and assistive technology
+Growth graphs and attendance patterns
+Year-to-year continuity: "View Last Year's Summary" button
+Teacher-entered gradebook-style data: reading levels, math mastery, writing rubric scores, behavior frequency
+Auto-updated from SOAP notes, session logs, and uploaded assessments
+"Export All Materials as ZIP" button for student transfers and school changes
+📁 Material History Folder (Inside Every Student Tile)
+Every worksheet, adapted form, social story, audio file, BIP, toolkit, template, PDF, visual support, multilingual version — everything ever made for that student
+Filterable by type, date, and provider
+ZIP export button for transfers
+PHASE 4 — My Caseload: Full Build
+👥 Caseload Dashboard (My Students Only)
+Filter by: provider, service type, goal type, alphabetical, IEP due date, discipline
+📅 Schedule Widget
+Live, editable schedule with clickable group links
+Click a group → pop-out shows: student names/initials, grade, time, goals, latest token/comm boards
+Connects live to the Team Scheduling App — syncs both ways (bidirectional)
+Also fully stand-alone editable for providers who do not have the scheduling app
+📋 Session Tracking + Automated SOAP Notes
+Choose a day → all students scheduled for that day appear automatically
+Check off "I saw this student" → system auto-generates SOAP note template pre-filled with date, time, and goal worked on
+Provider inputs observations and data → ready to copy into Enrich or Medicaid
+Full session log: filterable by entire caseload or individual student
+Downloadable PDF blank templates available for providers who prefer handwriting
+PHASE 5 — MTSS Hub: Full Build
+📈 MTSS Student Tracking Dashboard
+Live view of Tier 1, Tier 2, and Tier 3 students
+Students in active interventions
+Students being considered for initial evaluation
+Progress check flags and alerts
+Teachers can enter: intervention data, probes, notes, goals, accommodations, and behavior data
+System automatically: graphs progress, summarizes trends, flags concerns, generates reports, and prepares eligibility evidence
+🔧 MTSS Toolkit Sub-Tab
+Forms, templates, goal banks, and intervention menus
+Progress monitoring sheets
+Meeting templates and parent communication letters
+SLP-specific RTI guide (upload existing guide from Samantha)
+Behavior RTI and Academic RTI templates
+Teachers generate all of these directly — no more emailing the SPED team for materials
+📅 MTSS Calendar
+6-week intervention cycle tracking with automatic alerts: "Intervention ending soon for [student]"
+MTSS meeting dates, progress check dates, and parent communication reminders
+Separate calendar that lives inside the MTSS Hub but syncs with the main SPED calendar and student tiles
+🏛 District Assessment Team Sub-Tab
+Track students being tested by the district assessment team
+Track: invitations sent, meeting planning, forms, reports, timelines, and communication
+Store all district assessment team documents in one place
+📋 Eligibility Prep Generator
+Pulls: MTSS data, SOAP notes, teacher-entered data, student tile data, behavior notes, and academic summaries
+Produces: full eligibility packet, team summary, and draft evaluation report
+PHASE 6 — Evaluation Tracker: Full Build
+📈 Live Evaluation Dashboard
+All students currently being evaluated
+Students needing reevaluations
+Students needing annual reviews
+Upcoming deadlines view
+Missing forms flags — visible at a glance
+☑ Per-Student Evaluation Checklist (Click Any Row to Open)
+Consent received checkbox + date
+60-day timeline countdown
+Who is testing each area + which sections are done vs. missing
+Who needs signatures
+Parent forms status
+Health update needed flag
+Teacher input needed flag
+Observations, rating scales, meetings, and report uploads
+Click any row → create individual checklist snapshot for a provider OR add items directly to their to-do list
+📋 Evaluation Types Covered
+All evaluation types are legally compliant and tracked within the Evaluation Tracker:
+Initial Evaluations
+Annual Reviews
+Reevaluations
+🏛 District Assessment Team Workflow (Sub-Tab)
+Invitations, meeting planning, all forms, timelines, reports, and communication tracking in one place
+📅 Evaluation Calendar
+Consent dates, 60-day deadlines, meeting dates, and report deadlines
+Reevaluation cycles, annual cycles, and district team schedules
+Syncs with MTSS calendar, main SPED calendar, and student tiles
+PHASE 7 — Accessibility Studio: Full Build
+🔊 Audio Form Generation
+Upload any document → system generates an audio version that reads it to the student
+Options: read all questions, questions + answer choices, questions only
+Multiple voice options: child-friendly, calm, energetic
+Batch-generate audio for multiple students at once
+🌐 Multilingual Audio
+Translate → simplify → add visuals → generate audio in the student or family's native language
+Languages include: Spanish, Amharic, Korean, Vietnamese, and others
+Batch print and batch export available
+👁 High-Contrast Template Generation
+Increased contrast ratios and bold outlines
+Dyslexia-friendly fonts
+Large icons and colorblind-safe palettes
+Tactile-friendly layouts and reduced visual clutter
+⚡ Braille-Ready File Export
+Convert any text document into BRF or TXT format for the district Braille team
+Maintain document structure; package visuals separately
+Store Braille-ready files directly in the student history folder
+📸 Visual Retooling
+Simplified forms with added visual supports
+Forms retooled with simple explanations and visuals so students can understand them
+Teacher and para "How to Use This Resource" explainer generation for any material created
+PHASE 8 — Templates
+&
+Forms: Full Build (Merged Tab)
+This tab merges template creation with form tracking and distribution into a single unified workspace.
+📄 Forms Section — Fillable Forms Library
+Teacher input forms (for meetings and evaluations)
+Parent information questionnaires
+Health information forms
+District-connected forms (linked where possible)
+BIP generation forms
+FBA data tracking forms
+📋 Form Status Tracking
+Status per form: Not Opened / In Progress / Finished
+Notifications pop up on the main dashboard when a form changes status
+Status connected to the caseload tracker and evaluation tracker
+All student-related forms automatically stored in that student's tile folder
+Every email, uploaded PDF, resource, and generated item related to a student is stored in their folder
+🎨 Template Creation Section — 4 Style Choices
+Style
+Description
+Format
+Kid / Student
+Fun, colorful, character-friendly — pulls from student tile interests
+PDF + HTML
+Formal
+Professional and clean — for parent and admin communication
+PDF + HTML
+Minimal
+Bare-bones, no frills — fast to generate and print
+PDF only
+AI Created
+AI generates style and content based on a provider-entered prompt
+PDF + HTML
+🔢 Template System Features
+Preview before print or download — always
+Favorites bar and recently used bar
+"Generate ALL Templates" button to batch-generate all template types at once
+Upload student schedule → system auto-creates visual schedule
+Templates pull from student tile data to pre-suggest icons, colors, interests, and characters
+Paras and teachers receive "How to Use This Resource" instruction pages for any template
+🏭 Icon Library
+Custom icon library built and uploaded by Samantha's team
+Icons are fully customizable: colors, labels, text
+Download icons as transparent-background PNG files
+Drag-and-drop ribbon available across all template categories
+Search bar, recently used toggle, and favorites toggle
+🎉 Token Boards
+3-spot, 4-spot, and 5-spot versions
+Consistent template design per board size
+Blank reward spot on each board
+Individual downloadable editable PDFs for each size (3, 4, and 5 spot)
+📅 Visual Schedules — Full Dropdown Customization
+Numbered tasks or times?
+Number of tasks: 1–10
+Starting and ending time: 7:30am to 4:00pm in 30-minute or 1-hour increments, or custom times
+First/Then board option: attach to top or bottom of schedule
+Token spot placement: front or back of board (for double-sided printing or clipboard use)
+"Needs" icons option: yes / no / help / water / bathroom, etc.
+💬 Communication Boards
+Template version OR fully customized version
+Custom size: up to 3ft x 4ft
+Number of rows and columns customizable
+Drag-and-drop icons with search bar
+Banner/Poster print size — print center ready for laminated poster format (major feature)
+Live interactive communication boards for use on tablets and computers during sessions (TouchChat/LAMP style)
+Clinician can customize boards on the fly during sessions
+Voice prompt example: "I'm doing a lesson on the life cycle of pumpkins — take the vocab from my uploaded lesson and make a live communication board with the vocabulary and a story file for my smartboard. Include the student schedule for this group."
+Download board as PDF for paper use during sessions
+📚 Social Stories — 4 Styles
+Style
+Description
+Basic Minimalist
+Old school, simple text and images — classic format
+Customized Colored
+Personalized with student colors, characters, and interests
+B&W Coloring Book
+Black and white outline style — student can color the story
+Animated
+For use on tablets, phones, and live on the smartboard during sessions
+All social stories are personalized from student tile data: favorite character, sensory needs, triggers, calming strategies, preferred communication style, motivators, schedule, goals, and behavioral notes.
+🎉 Tokens — AI-Generated + Pre-Made Library
+AI generates custom tokens from student strengths and interests via a prompt
+Pre-made library categories:
+Category
+Examples
+Sports
+Soccer, football, baseball, golf, volleyball, tennis, and more
+Toys
+General toy-themed token designs
+Animals
+Unicorns, horses, dogs, cats, birds, reptiles, sea animals, farm animals, space animals
+Upload a Picture
+Provider uploads any image to create a custom token
+PHASE 9 — Resource Hub: Full Build
+Evidence-based research search bar: peer-reviewed articles, dissertations, and research studies — valid, science-backed information with citations
+Example queries: "latest research on phonemic awareness," "oral motor exercise efficacy," "AAC research for autism"
+Save articles and resources directly to SharePoint or Google Drive from within the Hub
+District info section: regulations, parental rights, and community resources
+Accessible mid-meeting: open during IEP meetings, case study meetings, or team meetings to find a resource, template, or article immediately
+Save, download, and print any resource directly from the Hub
+PHASE 10 — Generation Studio AI Layer (Woven Across All Tabs)
+The Generation Studio is the AI engine that powers personalized generation throughout the entire platform. It pulls from the Student Data Wall (Identity Graph) in every student tile to generate content that is deeply personalized to each individual child.
+💡 Content the Generation Studio Produces
+Personalized social stories (pulls favorite character, colors, sensory needs, triggers, calming strategies, goals, and behavioral notes automatically)
+Behavior Intervention Plans (BIPs)
+FBA forms and data tracking
+Behavior scripts and visual supports
+Teacher summary one-pagers
+Parent-friendly summaries
+Present level drafts
+Progress report drafts
+Reevaluation prep packets
+Initial evaluation prep packets
+Classroom accommodation sheets
+Monthly team newsletters (generated from accumulated meeting summaries)
+AI report scripts for caseload and team reports
+Batch printing for all of the above
+✅ AI Task Completion Workflow
+When the AI completes any action (e.g., "Send Notice of Meeting to parents of S.Ka."), the following steps occur automatically and in sequence:
+Sends the document via encrypted email OR generates a PDF for the case manager
+Notifies the assigned provider within the platform
+Logs the action to the parent contact log in the student tile
+Updates the Evaluation Tracker checklist
+Updates the SPED Calendar with the event
+Updates the Main Dashboard to reflect the completed action
+⚠ AI REVIEW REQUIREMENT
+All AI-generated output — including drafts, summaries, communications, and reports — must be reviewed and approved by a qualified human professional before distribution or use. The AI assists; the professional decides.
+Section 5: Data Flow Map
+The table below maps which tabs feed data to which other tabs. Because the Student Tile is the data spine, it is both a source and a destination for virtually all platform activity.
+Source Tab
+Feeds Data To
+Student Tiles
+All tabs — every tab pulls student data from here. This is the universal source of truth.
+My Caseload
+Main Dashboard (who I'm seeing today), Student Tiles (SOAP notes, logs), Evaluation Tracker (session data)
+MTSS Hub
+Evaluation Tracker (eligibility prep), Student Tiles (intervention history), Main Dashboard (calendar events)
+Evaluation Tracker
+Main Dashboard (deadline alerts, to-do), Student Tiles (eval checklist status), MTSS Hub (eligibility handoff)
+Templates & Forms
+Student Tiles (all generated materials stored here), My Caseload (session materials), Main Dashboard (form status notifications)
+Main Dashboard Calendar
+All tabs — NOM logged, meetings updated, timeline alerts sent everywhere when calendar events are created or changed
+Accessibility Studio
+Student Tiles (materials stored in history folder), My Caseload (session-ready accessible materials)
+Resource Hub
+Any tab — resources saved directly to a student tile or SharePoint from within any tab in the platform
+Section 6: Compliance and Security Notes
+🔒 COMPLIANCE IS NON-NEGOTIABLE
+HIPAA and FERPA compliance is built into every feature of the SPED Command Center — not added as an afterthought. There are no features, workarounds, or shortcuts that bypass compliance requirements.
+Compliance Area
+Implementation
+HIPAA & FERPA Compliance
+Non-negotiable across every feature; policy banners auto-update when district, state, or federal regulations change.
+Encrypted Communications
+Encrypted email for all sensitive document delivery: NOMs, Consent for Evaluation, and all parent communications.
+Electronic Signatures
+PandaDocs integration for signature collection on all required documents.
+Secure Storage
+All student data stored exclusively in secured SharePoint and/or Google Drive — no local-only storage.
+Provider-Level Access Controls
+Each provider sees only their own caseload; the team lead sees the full team view. Role-based permissions enforced throughout.
+AI Output Review
+All AI-generated content is reviewed and approved by a qualified human professional before use or distribution.
+Section 7: Integration Connections
+Service / Tool
+How It Connects
+Microsoft Outlook Calendar
+Live sync with the SPED calendar; pulls events and updates live during meetings.
+SharePoint / OneDrive
+Primary storage for all files, meeting summaries, student materials, and resources. Documents auto-save here.
+Google Drive
+Secondary storage option with full dual support alongside OneDrive — provider's choice.
+Enrich (IEP System)
+SOAP notes and session data formatted for Enrich input; direct links from student tiles to Enrich records.
+MyCherry Creek
+Quick-link tile on the main dashboard; connects providers to Cherry Creek district systems instantly.
+PandaDocs
+Signature collection for NOMs, Consent for Evaluation, and all parent-facing documents.
+Microsoft Teams
+Live chat widget on main dashboard; meeting transcripts; full Scribe extension compatibility.
+Team Scheduling App
+Live bidirectional sync with the My Caseload schedule widget — changes in either location update both.
+District Print Center
+Communication boards and visual schedules exportable in banner/poster sizes ready for lamination at the print center.
+Section 8: Glossary
+The following terms are used throughout this document and throughout the SPED Command Center platform.
+Term
+Definition
+NOM
+Notice of Meeting — the IEP meeting notification sent to parents/guardians prior to any IEP meeting.
+SOAP Notes
+Subjective, Objective, Assessment, Plan — the standard documentation format for each therapy or service session.
+BIP
+Behavior Intervention Plan — a written plan that identifies target behaviors and outlines strategies for behavior support.
+FBA
+Functional Behavior Assessment — an evaluation process to determine the cause or function of a student's challenging behavior.
+MTSS
+Multi-Tiered System of Supports — a framework of evidence-based practices provided across tiers of increasing intensity.
+RTI
+Response to Intervention — a specific MTSS approach focused on academic and behavioral progress monitoring and tiered intervention.
+IEP
+Individualized Education Program — the legally binding document that outlines special education services, goals, and accommodations for an eligible student.
+AAC
+Augmentative and Alternative Communication — tools and strategies that supplement or replace natural speech and writing.
+LAMP
+Language Acquisition through Motor Planning — a research-based AAC communication system using consistent motor patterns to build language.
+SLP
+Speech-Language Pathologist — a licensed specialist who evaluates and treats communication, language, and swallowing disorders.
+OT
+Occupational Therapist — a licensed specialist who addresses fine motor, sensory processing, and daily living skill needs.
+FERPA
+Family Educational Rights and Privacy Act — the federal law that protects the privacy of student education records.
+HIPAA
+Health Insurance Portability and Accountability Act — the federal law that protects sensitive health information from being disclosed without patient consent.
+📚 DOCUMENT STATUS
+This is a living document. It will be updated as the platform evolves through each build phase, as new features are added, and as district, state, or federal policy changes occur. All updates are version-controlled in SharePoint.
+Prepared by: Samantha Kessler, SPED Team Lead Organization: Cherry Creek School District — Aurora, CO Document Date: July 19, 2026 Document Title: SPED Command Center — Master Platform Plan v1.0
+Authorized By:
+Samantha Kessler
+SPED Team Lead — Cherry Creek School District
