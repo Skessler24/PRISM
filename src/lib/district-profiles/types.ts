@@ -5,6 +5,9 @@
  */
 
 export type FeatureName =
+  | 'students'
+  | 'caseload'
+  | 'scheduling'
   | 'mtss'
   | 'section504'
   | 'mll'
@@ -29,6 +32,9 @@ export type FeatureName =
 
 /** Display labels for Admin / District Profile toggles. */
 export const FEATURE_LABELS: Record<FeatureName, string> = {
+  students: 'Student Tiles',
+  caseload: 'My Caseload',
+  scheduling: 'Scheduling',
   mtss: 'MTSS/RTI Module',
   section504: '504 Plans',
   mll: 'Multilingual Learners',

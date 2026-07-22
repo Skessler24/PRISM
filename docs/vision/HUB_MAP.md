@@ -11,15 +11,22 @@ Sources (also in this folder): `Master_Platform_Plan.txt`, `Million_Dollar_Idea.
 
 | Hub (where it lives) | Master Plan / Million Dollar Idea | Status |
 |----------------------|-----------------------------------|--------|
-| **🏠 Dashboard** | AI SPED Secretary HQ: date, who-am-I-seeing groups, Quick Links+favorites, this week / dues, team chat dock, compliance watch, gen quick chips | Partial — calendar / Outlook / live shared agenda / newsletter still later |
+| **🏠 Dashboard** | AI SPED Secretary HQ: date, who-am-I-seeing, stats pills, this week / scrollable dues, to-do, team chat dock | Partial — calendar / Outlook / live shared agenda / newsletter still later |
 | **🧩 Student Tiles** | Data wall, continuum profile, material history ZIP, prepare→ drafts | Partial — tiles strong; continuum report + material history folder deepen next |
 | **👤 Caseload** | My students, session check-off → SOAP, schedule widget | Partial — SOAP exists; group check-off from Scheduling deepen |
 | **📅 Scheduling** | Live groups, clickable pop-outs, sub packet, stand-alone + Team Scheduling link | Restored (groups + sub packet); bidirectional Team Scheduling app later |
 | **📋 MTSS** | Tiers, toolkit, 6-week calendar, eligibility prep, DAT | Partial |
 | **📊 Evals** | Live tracker, checklists, DAT workflow, 60-day | Partial |
+| **📈 Progress** | Goal graphs / probes | Partial — in primary strip |
 | **🎨 Creation Station** | Templates & Forms **merged** with Icon Library, token boards, visual schedules, comm boards, social stories + **Accessibility** + **Generation** | Hub exists; Icon Library expanded; boards live under Templates panel |
 | **📚 Resource Hub** | Evidence AI search + citations vibe, family rights, community, mid-meeting | Research + family restored; SharePoint save later |
-| **☰ drawer** | Everything else (Progress, Print, Contacts, Reminders, FBA, 504, MLL, Tools, Admin) | After Evals |
+| **☰ drawer** | Print, Planner, Meetings, Contacts, Reminders, FBA, 504, MLL, Tools, Admin | Extra apps (not core strip) |
+
+### Primary nav (top pills — district Admin toggles)
+
+Dashboard · Students · Caseload · Evals · MTSS · Scheduling · Progress · Creation Station · Resource Hub
+
+Quick Links tile + Generation Studio quick access + Compliance watch were removed (stats pills + top tabs cover them).
 
 ### Why Creation Station combines three “wings”
 
