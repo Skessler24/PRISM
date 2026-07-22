@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { PageShell } from '../../components/PageShell'
+import { AutoBuildPanel } from './AutoBuildPanel'
 import { LiveGroupsPanel } from './LiveGroupsPanel'
 import {
   TeamParametersPanel,
@@ -8,9 +9,10 @@ import {
   TeamWeekPanel,
 } from './TeamSchedulePanels'
 
-type Tab = 'live' | 'week' | 'providers' | 'tracker' | 'parameters'
+type Tab = 'autobuild' | 'live' | 'week' | 'providers' | 'tracker' | 'parameters'
 
 const TABS: { id: Tab; label: string }[] = [
+  { id: 'autobuild', label: 'Auto-Build' },
   { id: 'live', label: 'Live Groups' },
   { id: 'week', label: 'Week Grid' },
   { id: 'providers', label: 'Providers' },
@@ -19,18 +21,18 @@ const TABS: { id: Tab; label: string }[] = [
 ]
 
 export function SchedulingPage() {
-  const [tab, setTab] = useState<Tab>('live')
+  const [tab, setTab] = useState<Tab>('autobuild')
   const [toast, setToast] = useState('')
 
   function flash(msg: string) {
     setToast(msg)
-    window.setTimeout(() => setToast(''), 2200)
+    window.setTimeout(() => setToast(''), 2800)
   }
 
   return (
     <PageShell
       title="📅 Scheduling"
-      description="Live caseload groups plus the Team IEP weekly grid — providers, blocked times, minutes tracker, and school parameters. Seeded from your Phase 2 groups and the Copilot Team Scheduler."
+      description="Upload your school schedule, sync caseload, and auto-build the week — plus Live Groups, Team Week Grid, providers, minutes tracker, and parameters."
     >
       {toast && (
         <div className="mb-3 rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white">
@@ -63,6 +65,7 @@ export function SchedulingPage() {
         </a>
       </div>
 
+      {tab === 'autobuild' && <AutoBuildPanel onFlash={flash} />}
       {tab === 'live' && <LiveGroupsPanel onFlash={flash} />}
       {tab === 'week' && <TeamWeekPanel onFlash={flash} />}
       {tab === 'providers' && <TeamProvidersPanel onFlash={flash} />}
