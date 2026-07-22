@@ -85,8 +85,8 @@ export function IconLibraryPanel() {
         <div>
           <h2 className="font-heading text-sm font-bold">🔣 Icon Library</h2>
           <p className="mt-0.5 text-xs text-[var(--subtext)]">
-            Your board soul — search, favorites, recently used, download. Drop Claude’s SVG pack in{' '}
-            <code className="text-[10px]">public/icons/aac/</code> to replace emoji tiles.
+            Your board soul — Fitzgerald AAC pack + emotion faces from the offline Icon Library.
+            Search, favorites, recently used, download. Phase 2 tiles fill gaps.
           </p>
         </div>
         <span className="rounded-full tint-lav px-2 py-0.5 text-[10px] font-bold">

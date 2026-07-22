@@ -2,16 +2,20 @@
 
 Heart of **Creation Station → Icon Library** (Master Plan Phase 8 / Million Dollar Idea).
 
-## How to add icons
+## Current pack
 
-1. Add SVG files under `public/icons/aac/` named by stable id, e.g. `want.svg`, `help.svg`.
-2. Register (or update) entries in `src/lib/icons/catalog.ts`:
-   - `id` — slug used by boards
-   - `label` — spoken / cell text
-   - `category` — communication | emotions | school | animals | sports | needs | …
-   - `svg` — inline fallback (keeps boards offline)
-   - `file` — optional `/icons/aac/{id}.svg`
-   - `emojiFallback` — last resort
+Source: **AAC Icon Library (offline).html** (Samantha upload) — Fitzgerald-color core vocabulary + emotion line/emoji faces.
+
+- SVG files: `public/icons/aac/*.svg` (56 glyphs)
+- Generated catalog: `src/lib/icons/aac-pack.generated.ts`
+- Offline HTML archive: `docs/icons/AAC_Icon_Library_offline.html`
+
+## How to add / refresh icons
+
+1. Drop SVG files under `public/icons/aac/` named by stable id, e.g. `want.svg`.
+2. Prefer `viewBox="0 0 64 64"`, high-contrast, no student PHI in filenames.
+3. Re-run the extract script (or edit `catalog.ts` / regenerate `aac-pack.generated.ts`).
+4. Phase 2 emoji categories fill gaps only when an id is not in the AAC pack.
 
 ## UI features
 
@@ -21,9 +25,5 @@ Heart of **Creation Station → Icon Library** (Master Plan Phase 8 / Million Do
 
 ## Contract
 
-- Prefer **simple, high-contrast** symbols for Smart TV / laminate.
-- Keep `viewBox="0 0 64 64"` (or update `IconGlyph` if you change).
-- Do **not** put student PHI in filenames or labels.
 - Materials resolve words → icons via `resolveIcon()` / `iconsForVocab()`.
-
-Until Claude’s full pack lands, Phase 2 emoji categories + AAC core seed the library.
+- Boards should prefer AAC pack glyphs over emoji tiles when both exist.
