@@ -11,7 +11,7 @@ Sources (also in this folder): `Master_Platform_Plan.txt`, `Million_Dollar_Idea.
 
 | Hub (where it lives) | Master Plan / Million Dollar Idea | Status |
 |----------------------|-----------------------------------|--------|
-| **🏠 Dashboard** | AI SPED Secretary HQ: date, who-am-I-seeing, stats pills, this week / scrollable dues, to-do, team chat dock | Partial — calendar / Outlook / live shared agenda / newsletter still later |
+| **🏠 Dashboard** | AI SPED Secretary HQ: date, who-am-I-seeing, stats pills, this week / scrollable dues, **Virtual meetings** (Teams/Zoom join), to-do, team chat dock | Partial — Graph calendar / Outlook auto-sync later |
 | **🧩 Student Tiles** | Data wall, continuum profile, material history ZIP, prepare→ drafts | Partial — tiles strong; continuum report + material history folder deepen next |
 | **👤 Caseload** | My students, session check-off → SOAP, schedule widget | Partial — SOAP exists; group check-off from Scheduling deepen |
 | **📅 Scheduling** | Live groups, clickable pop-outs, sub packet, stand-alone + Team Scheduling link | Restored (groups + sub packet); bidirectional Team Scheduling app later |

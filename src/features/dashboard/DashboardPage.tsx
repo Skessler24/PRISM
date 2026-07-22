@@ -20,6 +20,7 @@ import {
 } from '../../lib/dashboard/weekAtAGlance'
 import { loadSchedule, todaysGroups } from '../../lib/scheduling/store'
 import { TeamChatDock } from './TeamChatPanel'
+import { VirtualMeetingsPanel } from './VirtualMeetingsPanel'
 
 const STAT_TINTS = [
   'tint-sky',
@@ -273,55 +274,57 @@ export function DashboardPage() {
           </div>
         </section>
 
-        <section
-          className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
-          style={{ borderTop: '4px solid var(--accent)' }}
-        >
-          <h2 className="font-heading text-sm font-bold">My to-do</h2>
-          <div className="mt-2 flex gap-2">
-            <input
-              className="flex-1 rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
-              placeholder="Add a task…"
-              value={todoDraft}
-              onChange={(e) => setTodoDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') addTodo()
-              }}
-            />
-            <button
-              type="button"
-              className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white"
-              onClick={addTodo}
-            >
-              Add
-            </button>
-          </div>
-          <ul className="mt-3 space-y-2">
-            {!todos.length && (
-              <li className="text-xs text-[var(--subtext)]">No tasks yet — add NOM, probes, or calls.</li>
-            )}
-            {todos.map((t) => (
-              <li key={t.id} className="flex items-center gap-2 text-xs">
-                <input
-                  type="checkbox"
-                  checked={t.done}
-                  onChange={() =>
-                    persistTodos(todos.map((x) => (x.id === t.id ? { ...x, done: !x.done } : x)))
-                  }
-                />
-                <span className={t.done ? 'text-[var(--subtext)] line-through' : ''}>{t.text}</span>
-                <button
-                  type="button"
-                  className="ml-auto text-[10px] text-red-600"
-                  onClick={() => persistTodos(todos.filter((x) => x.id !== t.id))}
-                >
-                  ×
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <VirtualMeetingsPanel />
       </div>
+
+      <section
+        className="mb-3 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
+        style={{ borderTop: '4px solid var(--accent)' }}
+      >
+        <h2 className="font-heading text-sm font-bold">My to-do</h2>
+        <div className="mt-2 flex max-w-xl gap-2">
+          <input
+            className="flex-1 rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
+            placeholder="Add a task…"
+            value={todoDraft}
+            onChange={(e) => setTodoDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') addTodo()
+            }}
+          />
+          <button
+            type="button"
+            className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white"
+            onClick={addTodo}
+          >
+            Add
+          </button>
+        </div>
+        <ul className="mt-3 max-w-xl space-y-2">
+          {!todos.length && (
+            <li className="text-xs text-[var(--subtext)]">No tasks yet — add NOM, probes, or calls.</li>
+          )}
+          {todos.map((t) => (
+            <li key={t.id} className="flex items-center gap-2 text-xs">
+              <input
+                type="checkbox"
+                checked={t.done}
+                onChange={() =>
+                  persistTodos(todos.map((x) => (x.id === t.id ? { ...x, done: !x.done } : x)))
+                }
+              />
+              <span className={t.done ? 'text-[var(--subtext)] line-through' : ''}>{t.text}</span>
+              <button
+                type="button"
+                className="ml-auto text-[10px] text-red-600"
+                onClick={() => persistTodos(todos.filter((x) => x.id !== t.id))}
+              >
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section
         className="overflow-x-auto rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
