@@ -187,6 +187,9 @@
     }
   ],
   "features": {
+    "students": true,
+    "caseload": true,
+    "scheduling": true,
     "mtss": true,
     "section504": false,
     "mll": false,

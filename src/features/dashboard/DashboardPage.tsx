@@ -19,8 +19,8 @@ import {
   weekRangeLabel,
 } from '../../lib/dashboard/weekAtAGlance'
 import { loadSchedule, todaysGroups } from '../../lib/scheduling/store'
-import { QuickLinksBar } from '../../components/QuickLinksBar'
 import { TeamChatDock } from './TeamChatPanel'
+import { VirtualMeetingsPanel } from './VirtualMeetingsPanel'
 
 const STAT_TINTS = [
   'tint-sky',
@@ -31,6 +31,9 @@ const STAT_TINTS = [
   'tint-lav',
   'tint-mint',
 ] as const
+
+/** ~5 rows visible, then scroll */
+const DUE_LIST_MAX_H = 'max-h-[13.5rem]'
 
 export function DashboardPage() {
   const { students } = useStudents()
@@ -119,7 +122,7 @@ export function DashboardPage() {
   return (
     <PageShell
       title="🏠 Main Dashboard"
-      description={`This week’s meetings and dues for ${profile.name} — plus quick jumps. Team Chat is the bubble in the corner.`}
+      description={`This week’s meetings and dues for ${profile.name}. Core modules live in the top tabs. Team Chat is the bubble in the corner.`}
     >
       <p className="mb-3 text-sm font-semibold text-[var(--text)]">{today}</p>
 
@@ -135,8 +138,7 @@ export function DashboardPage() {
         </div>
         {todayGroups.length === 0 ? (
           <p className="mt-2 text-xs text-[var(--subtext)]">
-            No groups on today&apos;s schedule yet — add them in Scheduling (seeded demo groups load on
-            first visit).
+            No groups on today&apos;s schedule yet — add them in Scheduling.
           </p>
         ) : (
           <ul className="mt-3 space-y-2">
@@ -168,40 +170,6 @@ export function DashboardPage() {
             ))}
           </ul>
         )}
-      </section>
-
-      <QuickLinksBar />
-
-      <section
-        className="mb-3 rounded-2xl border border-[var(--border)] p-4 shadow-card tint-lav"
-        style={{ borderTop: '4px solid #7C3AED' }}
-      >
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="font-heading text-sm font-bold">✨ Generation Studio — Quick Access</h2>
-          <Link to="/creation?panel=generate" className="text-xs font-semibold text-[var(--accent)]">
-            Creation Station →
-          </Link>
-        </div>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {[
-            'BIP Draft',
-            'FBA Summary',
-            'Progress Report',
-            'Social Story',
-            'NOM Letter',
-            'Eligibility Packet',
-            'Present Levels',
-            'Parent Summary',
-          ].map((t) => (
-            <Link
-              key={t}
-              to="/creation?panel=generate"
-              className="rounded-full border border-[var(--border)] bg-[var(--card-bg)] px-3 py-1.5 text-[10px] font-bold hover:border-[var(--accent)]"
-            >
-              {t}
-            </Link>
-          ))}
-        </div>
       </section>
 
       <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-7">
@@ -236,8 +204,8 @@ export function DashboardPage() {
               <p className="text-[10px] text-[var(--subtext)]">{weekLabel}</p>
             </div>
             <div className="flex gap-2">
-              <Link to="/planner" className="text-[10px] font-semibold text-[var(--accent)]">
-                Planner
+              <Link to="/scheduling" className="text-[10px] font-semibold text-[var(--accent)]">
+                Schedule
               </Link>
               <Link to="/meeting-prep" className="text-[10px] font-semibold text-[var(--accent)]">
                 Meeting Prep
@@ -248,7 +216,7 @@ export function DashboardPage() {
           <div className="mt-3 rounded-xl tint-lav p-3">
             <p className="text-xs font-bold">
               {weekMeetings.total === 0
-                ? 'No meetings or sessions on the planner this week'
+                ? 'No meetings or sessions this week'
                 : `You have ${weekMeetings.total} meeting${weekMeetings.total === 1 ? '' : 's'} / sessions this week`}
             </p>
             <div className="mt-2 space-y-2">
@@ -278,15 +246,13 @@ export function DashboardPage() {
           </div>
 
           <div className="mt-3 rounded-xl tint-sun p-3">
-            <p className="text-xs font-bold">
-              Due this week · {weekDues.length}
-            </p>
+            <p className="text-xs font-bold">Due this week · {weekDues.length}</p>
             {weekDues.length === 0 ? (
               <p className="mt-1 text-[10px] text-[var(--subtext)]">
                 No annuals or progress probes due Mon–Fri.
               </p>
             ) : (
-              <ul className="mt-2 space-y-1.5">
+              <ul className={`mt-2 space-y-1.5 overflow-y-auto pr-1 ${DUE_LIST_MAX_H}`}>
                 {weekDues.map((d) => (
                   <li key={d.id}>
                     <Link
@@ -308,121 +274,57 @@ export function DashboardPage() {
           </div>
         </section>
 
-        <section
-          className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
-          style={{ borderTop: '4px solid var(--accent-h)' }}
-        >
-          <h2 className="font-heading text-sm font-bold">Jump in</h2>
-          <p className="mt-0.5 text-[10px] text-[var(--subtext)]">
-            Core modules — external tools live in Quick Links above.
-          </p>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
-            {[
-              { to: '/scheduling', label: '📅 Scheduling', tint: 'tint-mint' },
-              { to: '/creation', label: '🎨 Creation Station', tint: 'tint-lav' },
-              { to: '/resources', label: '📚 Resource Hub', tint: 'tint-sky' },
-              { to: '/meeting-prep', label: '📋 Meeting Prep', tint: 'tint-sun' },
-              { to: '/progress', label: '📈 Progress', tint: 'tint-softorange' },
-              { to: '/caseload', label: '👤 Caseload', tint: 'tint-pink' },
-              { to: '/binder', label: '📁 Print Center', tint: 'tint-sky' },
-              { to: '/students', label: '🧩 Student Tiles', tint: 'tint-mint' },
-            ].map((l) => (
-              <Link
-                key={l.to}
-                to={l.to}
-                className={`rounded-xl border border-[var(--border)] px-3 py-3 text-xs font-semibold text-[var(--text)] hover:border-[var(--accent)] ${l.tint}`}
+        <VirtualMeetingsPanel />
+      </div>
+
+      <section
+        className="mb-3 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
+        style={{ borderTop: '4px solid var(--accent)' }}
+      >
+        <h2 className="font-heading text-sm font-bold">My to-do</h2>
+        <div className="mt-2 flex max-w-xl gap-2">
+          <input
+            className="flex-1 rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
+            placeholder="Add a task…"
+            value={todoDraft}
+            onChange={(e) => setTodoDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') addTodo()
+            }}
+          />
+          <button
+            type="button"
+            className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white"
+            onClick={addTodo}
+          >
+            Add
+          </button>
+        </div>
+        <ul className="mt-3 max-w-xl space-y-2">
+          {!todos.length && (
+            <li className="text-xs text-[var(--subtext)]">No tasks yet — add NOM, probes, or calls.</li>
+          )}
+          {todos.map((t) => (
+            <li key={t.id} className="flex items-center gap-2 text-xs">
+              <input
+                type="checkbox"
+                checked={t.done}
+                onChange={() =>
+                  persistTodos(todos.map((x) => (x.id === t.id ? { ...x, done: !x.done } : x)))
+                }
+              />
+              <span className={t.done ? 'text-[var(--subtext)] line-through' : ''}>{t.text}</span>
+              <button
+                type="button"
+                className="ml-auto text-[10px] text-red-600"
+                onClick={() => persistTodos(todos.filter((x) => x.id !== t.id))}
               >
-                {l.label}
-              </Link>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      <div className="mb-3 grid gap-3 lg:grid-cols-2">
-        <section
-          className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
-          style={{ borderTop: '4px solid #F59E0B' }}
-        >
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="font-heading text-sm font-bold">Compliance watch</h2>
-            <span className="text-[10px] text-[var(--subtext)]">{alerts.length} active</span>
-          </div>
-          <p className="mt-0.5 text-[10px] text-[var(--subtext)]">
-            Beyond this week — overdue annuals, NOM windows, open FBAs
-          </p>
-          <div className="mt-3 max-h-56 space-y-2 overflow-y-auto">
-            {alerts.length === 0 ? (
-              <p className="text-xs text-[var(--subtext)]">Nothing else on the watch list.</p>
-            ) : (
-              alerts.slice(0, 12).map((a) => (
-                <Link
-                  key={a.id}
-                  to={a.href}
-                  className={`block rounded-lg border-l-4 p-2 text-xs hover:opacity-90 ${
-                    a.tone === 'danger'
-                      ? 'border-l-red-500 tint-coral'
-                      : a.tone === 'warn'
-                        ? 'border-l-amber-500 tint-sun'
-                        : 'border-l-sky-500 tint-sky'
-                  }`}
-                >
-                  {a.text}
-                </Link>
-              ))
-            )}
-          </div>
-        </section>
-
-        <section
-          className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
-          style={{ borderTop: '4px solid var(--accent)' }}
-        >
-          <h2 className="font-heading text-sm font-bold">My to-do</h2>
-          <div className="mt-2 flex gap-2">
-            <input
-              className="flex-1 rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
-              placeholder="Add a task…"
-              value={todoDraft}
-              onChange={(e) => setTodoDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') addTodo()
-              }}
-            />
-            <button
-              type="button"
-              className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white"
-              onClick={addTodo}
-            >
-              Add
-            </button>
-          </div>
-          <ul className="mt-3 space-y-2">
-            {!todos.length && (
-              <li className="text-xs text-[var(--subtext)]">No tasks yet — add NOM, probes, or calls.</li>
-            )}
-            {todos.map((t) => (
-              <li key={t.id} className="flex items-center gap-2 text-xs">
-                <input
-                  type="checkbox"
-                  checked={t.done}
-                  onChange={() =>
-                    persistTodos(todos.map((x) => (x.id === t.id ? { ...x, done: !x.done } : x)))
-                  }
-                />
-                <span className={t.done ? 'text-[var(--subtext)] line-through' : ''}>{t.text}</span>
-                <button
-                  type="button"
-                  className="ml-auto text-[10px] text-red-600"
-                  onClick={() => persistTodos(todos.filter((x) => x.id !== t.id))}
-                >
-                  ×
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section
         className="overflow-x-auto rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"

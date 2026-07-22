@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { APP_TABS, PRIMARY_TAB_IDS, getTabByPath } from '../app/tabs'
+import { APP_TABS, PRIMARY_TAB_IDS, getTabByPath, isTabFeatureVisible } from '../app/tabs'
 import { useDistrictProfile } from '../lib/district-profiles/useDistrictProfile'
 import { useAdminRole } from '../lib/admin/admin-role-context'
 
@@ -16,16 +16,16 @@ export function TabNavigation() {
       APP_TABS.filter((t) => {
         if (t.hideInNav) return false
         if (t.adminOnly && !isAdmin) return false
-        if (!t.featureId) return true
-        return isFeatureEnabled(t.featureId)
+        return isTabFeatureVisible(t, isFeatureEnabled)
       }),
     [isFeatureEnabled, isAdmin],
   )
 
-  const primaryTabs = visibleTabs.filter((t) =>
-    (PRIMARY_TAB_IDS as readonly string[]).includes(t.id),
-  )
-  const drawerTabs = visibleTabs.filter((t) => !(PRIMARY_TAB_IDS as readonly string[]).includes(t.id))
+  const primaryOrder = PRIMARY_TAB_IDS as readonly string[]
+  const primaryTabs = primaryOrder
+    .map((id) => visibleTabs.find((t) => t.id === id))
+    .filter(Boolean) as typeof visibleTabs
+  const drawerTabs = visibleTabs.filter((t) => !primaryOrder.includes(t.id))
 
   const closeDrawer = () => setDrawerOpen(false)
 
@@ -49,7 +49,7 @@ export function TabNavigation() {
               className={({ isActive }) => pillClass(isActive)}
             >
               <span className="mr-0 sm:mr-1">{tab.icon}</span>
-              <span className="hidden sm:inline">{tab.shortLabel}</span>
+              <span className="hidden lg:inline">{tab.shortLabel}</span>
             </NavLink>
           ))}
         </div>

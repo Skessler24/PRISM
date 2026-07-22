@@ -8,6 +8,8 @@ export type AppTab = {
   icon: string
   /** When set, tab is hidden unless district feature is on */
   featureId?: FeatureName
+  /** Show if ANY of these district features is on (e.g. Creation Station) */
+  featureAny?: FeatureName[]
   /** When true, tab only shows for Admin role */
   adminOnly?: boolean
   /** Hide from hamburger (still routable) — used for Creation Station children */
@@ -15,14 +17,28 @@ export type AppTab = {
 }
 
 /**
- * Primary strip (after Evals → ☰): Dashboard · Students · Caseload · MTSS · Evals
- * Drawer: Scheduling, Creation Station, Resources, and the rest.
+ * Core module pills (district-togglable where featureId/featureAny is set):
+ * Dashboard · Students · Caseload · Evals · MTSS · Scheduling · Progress · Creation Station · Resource Hub
+ * ☰ = extra apps (Print, FBA, Contacts, …)
  */
 export const APP_TABS: AppTab[] = [
   { id: 'dashboard', path: '/', label: 'Dashboard', shortLabel: 'Dashboard', icon: '🏠' },
-  { id: 'students', path: '/students', label: 'Student Tiles', shortLabel: 'Students', icon: '🧩' },
-  { id: 'caseload', path: '/caseload', label: 'My Caseload', shortLabel: 'Caseload', icon: '👤' },
-  { id: 'mtss', path: '/mtss', label: 'MTSS Hub', shortLabel: 'MTSS', icon: '📋', featureId: 'mtss' },
+  {
+    id: 'students',
+    path: '/students',
+    label: 'Student Tiles',
+    shortLabel: 'Students',
+    icon: '🧩',
+    featureId: 'students',
+  },
+  {
+    id: 'caseload',
+    path: '/caseload',
+    label: 'My Caseload',
+    shortLabel: 'Caseload',
+    icon: '👤',
+    featureId: 'caseload',
+  },
   {
     id: 'evaluations',
     path: '/evaluations',
@@ -31,27 +47,14 @@ export const APP_TABS: AppTab[] = [
     icon: '📊',
     featureId: 'eval',
   },
+  { id: 'mtss', path: '/mtss', label: 'MTSS Hub', shortLabel: 'MTSS', icon: '📋', featureId: 'mtss' },
   {
     id: 'scheduling',
     path: '/scheduling',
     label: 'Scheduling',
     shortLabel: 'Schedule',
     icon: '📅',
-  },
-  {
-    id: 'creation',
-    path: '/creation',
-    label: 'Creation Station',
-    shortLabel: 'Create',
-    icon: '🎨',
-  },
-  {
-    id: 'resources',
-    path: '/resources',
-    label: 'Resource Hub',
-    shortLabel: 'Resources',
-    icon: '📚',
-    featureId: 'resources',
+    featureId: 'scheduling',
   },
   {
     id: 'progress',
@@ -60,6 +63,22 @@ export const APP_TABS: AppTab[] = [
     shortLabel: 'Progress',
     icon: '📈',
     featureId: 'progress',
+  },
+  {
+    id: 'creation',
+    path: '/creation',
+    label: 'Creation Station',
+    shortLabel: 'Create',
+    icon: '🎨',
+    featureAny: ['templates', 'accessibility', 'ai'],
+  },
+  {
+    id: 'resources',
+    path: '/resources',
+    label: 'Resource Hub',
+    shortLabel: 'Resources',
+    icon: '📚',
+    featureId: 'resources',
   },
   {
     id: 'binder',
@@ -144,7 +163,6 @@ export const APP_TABS: AppTab[] = [
     shortLabel: 'Tools',
     icon: '🧮',
   },
-  // Deep links under Creation Station — hidden from ☰ to avoid duplication
   {
     id: 'accessibility',
     path: '/accessibility',
@@ -175,11 +193,32 @@ export const APP_TABS: AppTab[] = [
   { id: 'district', path: '/district', label: 'District Admin', shortLabel: 'Admin', icon: '⚙️', adminOnly: true },
 ]
 
-/** First 5 = top bar pills; ☰ sits after Evals. */
-export const PRIMARY_TAB_IDS = ['dashboard', 'students', 'caseload', 'mtss', 'evaluations'] as const
+/** Core module strip — order matches Admin district toggles for those modules. */
+export const PRIMARY_TAB_IDS = [
+  'dashboard',
+  'students',
+  'caseload',
+  'evaluations',
+  'mtss',
+  'scheduling',
+  'progress',
+  'creation',
+  'resources',
+] as const
 
 export function getTabByPath(pathname: string): AppTab {
   if (pathname === '/') return APP_TABS[0]
   const match = APP_TABS.find((t) => t.path !== '/' && pathname.startsWith(t.path))
   return match ?? APP_TABS[0]
+}
+
+export function isTabFeatureVisible(
+  tab: AppTab,
+  isFeatureEnabled: (name: FeatureName) => boolean,
+): boolean {
+  if (tab.featureAny?.length) {
+    return tab.featureAny.some((f) => isFeatureEnabled(f))
+  }
+  if (tab.featureId) return isFeatureEnabled(tab.featureId)
+  return true
 }

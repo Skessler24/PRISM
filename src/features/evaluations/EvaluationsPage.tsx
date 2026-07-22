@@ -15,6 +15,10 @@ import { readSuiteMode } from '../../lib/templates/catalog'
 import { EvalCalendarPanel } from './EvalCalendarPanel'
 import { EvalValidationPanel } from './EvalValidationPanel'
 import { EsyWizard, TransportWizard } from './EsyTransportWizards'
+import {
+  loadMeetingSummaries,
+  type MeetingSummaryRecord,
+} from '../../lib/meeting-session/store'
 
 const FILTERS = ['All', 'Initial', 'Annual', 'Reevaluation', 'Transfer'] as const
 type Tab = 'dashboard' | 'checklist' | 'calendar' | 'transfer' | 'actions' | 'validate'
@@ -109,6 +113,10 @@ export function EvaluationsPage() {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>('All')
   const [selected, setSelected] = useState<string>('')
   const [toast, setToast] = useState('')
+  const [meetingSummaries, setMeetingSummaries] = useState<MeetingSummaryRecord[]>(() =>
+    loadMeetingSummaries(),
+  )
+  const [appliedSummary, setAppliedSummary] = useState('')
 
   // Transfer wizard
   const [transferName, setTransferName] = useState('')
@@ -355,6 +363,68 @@ Include sections: incident summary placeholder, IEP/BIP review prompts, manifest
               ))}
             </div>
           </div>
+
+          <section
+            className="mb-3 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
+            style={{ borderTop: '4px solid #1E3A5F' }}
+          >
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h2 className="font-heading text-sm font-bold">Meeting summaries → eval workflow</h2>
+                <p className="text-[10px] text-[var(--subtext)]">
+                  From Dashboard Meeting Timer / Virtual Meetings — apply to Action Builder notes
+                </p>
+              </div>
+              <button
+                type="button"
+                className="text-[10px] font-semibold text-[var(--accent)]"
+                onClick={() => setMeetingSummaries(loadMeetingSummaries())}
+              >
+                Refresh
+              </button>
+            </div>
+            {!meetingSummaries.length ? (
+              <p className="mt-2 text-xs text-[var(--subtext)]">
+                No summaries yet. Use ⏱ Meeting Timer in the header, or Record on a Virtual Meeting.
+              </p>
+            ) : (
+              <ul className="mt-3 max-h-56 space-y-2 overflow-y-auto">
+                {meetingSummaries.slice(0, 12).map((m) => (
+                  <li
+                    key={m.id}
+                    className="rounded-xl border border-[var(--border)] bg-[var(--slate)] px-3 py-2"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="truncate text-xs font-semibold">{m.title}</p>
+                        <p className="text-[10px] text-[var(--subtext)]">
+                          {m.duration} · {new Date(m.endedAt).toLocaleString()}
+                          {m.pushedToEvals ? ' · pushed' : ''}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        className="rounded-lg bg-[var(--accent)] px-2.5 py-1.5 text-[10px] font-semibold text-white"
+                        onClick={() => {
+                          setAppliedSummary(m.summary)
+                          setActionOut(`## From meeting: ${m.title}\n\n${m.summary}`)
+                          setTab('actions')
+                          flash('Summary loaded into Action Builder')
+                        }}
+                      >
+                        Apply to actions
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {appliedSummary && tab === 'dashboard' && (
+              <pre className="mt-3 max-h-32 overflow-y-auto whitespace-pre-wrap rounded-lg border border-[var(--border)] p-2 text-[10px]">
+                {appliedSummary}
+              </pre>
+            )}
+          </section>
 
           <div className="mb-3 flex flex-wrap gap-2">
             {FILTERS.map((f) => (

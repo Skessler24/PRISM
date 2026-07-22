@@ -12,6 +12,39 @@ export type FormTemplate = {
 
 export const BUILTIN_FORMS: FormTemplate[] = [
   {
+    id: 'meeting-summary',
+    name: 'Summarize This Meeting',
+    cat: 'IEP',
+    status: 'Ready',
+    genType: 'Meeting Summary',
+    body: `TEAM MEETING SUMMARY
+
+Meeting: {{title}}
+Date: {{date}}
+Duration: {{duration}}
+Platform: {{provider}}
+
+AGENDA (completed / needs review)
+{{agenda}}
+
+DISCUSSION NOTES
+{{notes}}
+
+SUMMARY
+Write a concise professional SPED team meeting summary that includes:
+1. What the team discussed (by topic / discipline)
+2. Decisions made
+3. Timeline or meeting-date changes (student · old → new)
+4. Parent / guardian contacts completed or still needed
+5. Evaluation / IEP / eligibility implications (connect to Eval Tracker stages when relevant)
+6. Action items with owners (bulleted to-do list for the team)
+7. Items that should update Student Tiles, Parent Contact Log, or Caseload
+
+Tone: clear, FERPA-aware (use initials when possible), ready to share with the team and store in SharePoint/Drive.
+Do not invent student data that was not mentioned in the notes or agenda.
+`,
+  },
+  {
     id: 'iep-agenda',
     name: 'IEP Meeting Agenda',
     cat: 'IEP',

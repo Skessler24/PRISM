@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import { TopBar } from '../components/TopBar'
 import { TabNavigation } from '../components/TabNavigation'
 import { ThemeStudioModal } from '../components/ThemeStudioModal'
+import { MeetingSessionModal } from '../components/MeetingSessionModal'
 import { useHelpAssist } from '../lib/help-assist/help-assist-context'
 import { useDistrictProfile } from '../lib/district-profiles/useDistrictProfile'
 import { useAdminRole } from '../lib/admin/admin-role-context'
@@ -41,6 +42,7 @@ export function AppShell() {
         <Outlet />
       </main>
       <ThemeStudioModal />
+      <MeetingSessionModal />
       <footer className="shell-footer fixed inset-x-0 bottom-0 z-[900] border-t border-[var(--border)] bg-[var(--card-bg)] px-3 text-center text-[10px] text-[var(--subtext)]">
         PRISM · Reflect the Whole Human · {profile.name} ·{' '}
         {suite === 'standalone' ? 'Standalone' : 'Companion'} · {isAdmin ? 'Admin' : 'Staff'} · No
