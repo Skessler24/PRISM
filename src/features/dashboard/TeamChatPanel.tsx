@@ -362,7 +362,7 @@ export function TeamChatDock() {
 
       <button
         type="button"
-        className="pointer-events-auto relative flex h-14 w-14 touch-manipulation items-center justify-center rounded-full text-2xl text-white shadow-lg transition hover:brightness-110"
+        className="team-chat-fab pointer-events-auto relative flex h-14 w-14 touch-manipulation items-center justify-center rounded-full text-2xl text-white transition hover:brightness-110"
         style={{ background: 'var(--accent)' }}
         aria-label={open ? 'Minimize Team Chat' : 'Open Team Chat'}
         aria-expanded={open}
