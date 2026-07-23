@@ -16,6 +16,7 @@ import {
 } from '../../lib/virtual-meetings/store'
 
 const LIST_MAX_H = 'max-h-[13.5rem]'
+const LIST_MAX_H_COMPACT = 'max-h-[7.5rem]'
 
 const PROVIDER_TINT: Record<MeetingProvider, string> = {
   teams: 'tint-lav',
@@ -39,7 +40,9 @@ function formatWhen(m: VirtualMeeting) {
   }
 }
 
-export function VirtualMeetingsPanel() {
+type Props = { compact?: boolean }
+
+export function VirtualMeetingsPanel({ compact = false }: Props) {
   const { openMeetingSession } = useMeetingSession()
   const [meetings, setMeetings] = useState<VirtualMeeting[]>(() => loadVirtualMeetings())
   const [teamsHome, setTeamsHome] = useState(() => loadTeamsHomeUrl())
@@ -52,6 +55,8 @@ export function VirtualMeetingsPanel() {
   const [error, setError] = useState('')
 
   const sorted = useMemo(() => sortForDashboard(meetings), [meetings])
+  const listMax = compact ? LIST_MAX_H_COMPACT : LIST_MAX_H
+  const visible = compact ? sorted.slice(0, 3) : sorted
 
   function persist(next: VirtualMeeting[]) {
     setMeetings(next)
@@ -96,30 +101,38 @@ export function VirtualMeetingsPanel() {
 
   return (
     <section
-      className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
+      className={`rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] shadow-card ${
+        compact ? 'p-3' : 'p-4'
+      }`}
       style={{ borderTop: '4px solid #6264A7' }}
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="font-heading text-sm font-bold">Virtual meetings</h2>
-          <p className="text-[10px] text-[var(--subtext)]">
-            Jump into Teams / Zoom / Meet — paste join links until Graph calendar sync
-          </p>
+          <h2 className="font-heading text-sm font-bold">
+            {compact ? 'Teams / video' : 'Virtual meetings'}
+          </h2>
+          {!compact && (
+            <p className="text-[10px] text-[var(--subtext)]">
+              Jump into Teams / Zoom / Meet — paste join links until Graph calendar sync
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            className="rounded-lg bg-[#1E3A5F] px-2.5 py-1.5 text-[10px] font-semibold text-white"
-            onClick={() =>
-              openMeetingSession({
-                title: 'Team meeting',
-                joinUrl: teamsHome,
-                provider: 'Teams',
-              })
-            }
-          >
-            ⏱ Record meeting
-          </button>
+          {!compact && (
+            <button
+              type="button"
+              className="rounded-lg bg-[#1E3A5F] px-2.5 py-1.5 text-[10px] font-semibold text-white"
+              onClick={() =>
+                openMeetingSession({
+                  title: 'Team meeting',
+                  joinUrl: teamsHome,
+                  provider: 'Teams',
+                })
+              }
+            >
+              ⏱ Record meeting
+            </button>
+          )}
           <button
             type="button"
             className="rounded-lg bg-[#6264A7] px-2.5 py-1.5 text-[10px] font-semibold text-white"
@@ -128,37 +141,40 @@ export function VirtualMeetingsPanel() {
             Open Teams
           </button>
           <Link to="/meeting-prep" className="text-[10px] font-semibold text-[var(--accent)] self-center">
-            Meeting Prep →
+            Prep →
           </Link>
         </div>
       </div>
 
-      <div className="mt-2 flex flex-wrap items-center gap-1.5">
-        <input
-          className="min-w-0 flex-1 rounded-lg border border-[var(--border)] px-2 py-1.5 text-[10px]"
-          value={teamsHome}
-          onChange={(e) => setTeamsHome(e.target.value)}
-          onBlur={saveHome}
-          placeholder="https://teams.microsoft.com/…"
-          aria-label="Default Teams home or channel link"
-        />
-        <button
-          type="button"
-          className="rounded-lg border border-[var(--border)] px-2 py-1.5 text-[10px] font-semibold"
-          onClick={saveHome}
-        >
-          Save
-        </button>
-      </div>
+      {!compact && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <input
+            className="min-w-0 flex-1 rounded-lg border border-[var(--border)] px-2 py-1.5 text-[10px]"
+            value={teamsHome}
+            onChange={(e) => setTeamsHome(e.target.value)}
+            onBlur={saveHome}
+            placeholder="https://teams.microsoft.com/…"
+            aria-label="Default Teams home or channel link"
+          />
+          <button
+            type="button"
+            className="rounded-lg border border-[var(--border)] px-2 py-1.5 text-[10px] font-semibold"
+            onClick={saveHome}
+          >
+            Save
+          </button>
+        </div>
+      )}
 
-      <ul className={`mt-3 space-y-1.5 overflow-y-auto pr-1 ${LIST_MAX_H}`}>
-        {!sorted.length && !adding && (
-          <li className="rounded-xl tint-lav px-3 py-3 text-[11px] text-[var(--subtext)]">
-            No virtual meetings yet. Add a Teams or Zoom join link for today&apos;s IEPs and staff
-            huddles.
+      <ul className={`mt-3 space-y-1.5 overflow-y-auto pr-1 ${listMax}`}>
+        {!visible.length && !adding && (
+          <li className="rounded-xl tint-lav px-3 py-2 text-[11px] text-[var(--subtext)]">
+            {compact
+              ? 'No join links yet — add one below.'
+              : "No virtual meetings yet. Add a Teams or Zoom join link for today's IEPs and staff huddles."}
           </li>
         )}
-        {sorted.map((m) => (
+        {visible.map((m) => (
           <li
             key={m.id}
             className={`flex flex-wrap items-center gap-2 rounded-xl border border-[var(--border)] px-2.5 py-2 ${PROVIDER_TINT[m.provider]}`}
@@ -179,19 +195,21 @@ export function VirtualMeetingsPanel() {
             >
               Join
             </button>
-            <button
-              type="button"
-              className="shrink-0 rounded-lg border border-[var(--border)] bg-[var(--card-bg)] px-2.5 py-1.5 text-[10px] font-bold"
-              onClick={() =>
-                openMeetingSession({
-                  title: m.title,
-                  joinUrl: m.joinUrl,
-                  provider: PROVIDER_LABEL[m.provider],
-                })
-              }
-            >
-              Record
-            </button>
+            {!compact && (
+              <button
+                type="button"
+                className="shrink-0 rounded-lg border border-[var(--border)] bg-[var(--card-bg)] px-2.5 py-1.5 text-[10px] font-bold"
+                onClick={() =>
+                  openMeetingSession({
+                    title: m.title,
+                    joinUrl: m.joinUrl,
+                    provider: PROVIDER_LABEL[m.provider],
+                  })
+                }
+              >
+                Record
+              </button>
+            )}
             <button
               type="button"
               className="shrink-0 text-[10px] text-red-600"
@@ -205,39 +223,45 @@ export function VirtualMeetingsPanel() {
       </ul>
 
       {adding ? (
-        <div className="mt-3 space-y-2 rounded-xl border border-[var(--border)] bg-[var(--slate)] p-3">
-          <input
-            className="w-full rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
-            placeholder="Meeting title (e.g. Annual IEP — virtual)"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <div className="grid grid-cols-2 gap-2">
+        <div className={`mt-3 space-y-2 rounded-xl border border-[var(--border)] bg-[var(--slate)] ${compact ? 'p-2' : 'p-3'}`}>
+          {!compact && (
             <input
-              type="date"
-              className="rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              className="w-full rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
+              placeholder="Meeting title (e.g. Annual IEP — virtual)"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
-            <input
-              type="time"
-              className="rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-            />
-          </div>
+          )}
+          {!compact && (
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="date"
+                className="rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+              <input
+                type="time"
+                className="rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+              />
+            </div>
+          )}
           <input
             className="w-full rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
             placeholder="Paste Teams / Zoom / Meet join URL"
             value={joinUrl}
             onChange={(e) => setJoinUrl(e.target.value)}
           />
-          <input
-            className="w-full rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
-            placeholder="Student / topic (optional)"
-            value={studentName}
-            onChange={(e) => setStudentName(e.target.value)}
-          />
+          {!compact && (
+            <input
+              className="w-full rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
+              placeholder="Student / topic (optional)"
+              value={studentName}
+              onChange={(e) => setStudentName(e.target.value)}
+            />
+          )}
           {error && <p className="text-[10px] font-semibold text-red-600">{error}</p>}
           <div className="flex gap-2">
             <button
@@ -245,7 +269,7 @@ export function VirtualMeetingsPanel() {
               className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white"
               onClick={addMeeting}
             >
-              Save meeting
+              Save
             </button>
             <button
               type="button"
@@ -259,10 +283,12 @@ export function VirtualMeetingsPanel() {
       ) : (
         <button
           type="button"
-          className="mt-3 w-full rounded-xl border border-dashed border-[var(--border)] px-3 py-2.5 text-xs font-semibold text-[var(--text)] hover:border-[var(--accent)]"
+          className={`mt-2 w-full rounded-xl border border-dashed border-[var(--border)] text-xs font-semibold text-[var(--text)] hover:border-[var(--accent)] ${
+            compact ? 'px-2 py-1.5' : 'px-3 py-2.5'
+          }`}
           onClick={() => setAdding(true)}
         >
-          + Add Teams / Zoom meeting
+          + Add link
         </button>
       )}
     </section>

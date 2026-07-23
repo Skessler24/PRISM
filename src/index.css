@@ -326,7 +326,30 @@ h3,
   .dashboard-clock-date,
   .dashboard-clock-time,
   .countdown-badge-hero,
-  .countdown-emoji {
+  .countdown-emoji,
+  .team-chat-fab {
     animation: none !important;
+  }
+}
+
+/* Floating Team Chat FAB — soft accent pulse so it’s findable */
+.team-chat-fab {
+  box-shadow:
+    0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent),
+    0 8px 22px color-mix(in srgb, var(--accent) 35%, transparent);
+  animation: team-chat-glow 2.4s ease-in-out infinite;
+}
+
+@keyframes team-chat-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent),
+      0 8px 22px color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 12px color-mix(in srgb, var(--accent) 0%, transparent),
+      0 10px 28px color-mix(in srgb, var(--accent) 45%, transparent);
   }
 }

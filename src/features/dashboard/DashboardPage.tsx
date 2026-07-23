@@ -4,7 +4,7 @@ import { PageShell } from '../../components/PageShell'
 import { StudentInitials } from '../../components/StudentInitials'
 import { useDistrictProfile } from '../../lib/district-profiles/useDistrictProfile'
 import { useStudents } from '../../lib/students/useStudents'
-import { statusBadgeClass, daysUntil } from '../../lib/students/normalizeStudent'
+import { daysUntil } from '../../lib/students/normalizeStudent'
 import { buildDashboardAlerts } from '../../lib/compliance/buildDashboardAlerts'
 import { loadProbeSessions } from '../../lib/progress-monitoring/store'
 import { loadSoapNotes } from '../../lib/session-notes/store'
@@ -36,11 +36,18 @@ const STAT_TINTS = [
 /** ~5 rows visible, then scroll */
 const DUE_LIST_MAX_H = 'max-h-[13.5rem]'
 
+type SuggestedTodo = {
+  id: string
+  text: string
+  href: string
+}
+
 export function DashboardPage() {
   const { students } = useStudents()
   const { profile } = useDistrictProfile()
   const [todos, setTodos] = useState<TodoItem[]>(() => loadTodos())
   const [todoDraft, setTodoDraft] = useState('')
+  const [dismissedSuggestions, setDismissedSuggestions] = useState<string[]>([])
 
   const todayGroups = todaysGroups(loadSchedule())
   const weekMeetings = useMemo(
@@ -93,25 +100,57 @@ export function DashboardPage() {
     }
   }, [students, alerts])
 
+  const suggestedTodos = useMemo(() => {
+    const existing = new Set(todos.map((t) => t.text.toLowerCase()))
+    const out: SuggestedTodo[] = []
+
+    for (const g of todayGroups.slice(0, 3)) {
+      const text = `Run ${g.name} (${g.startTime})`
+      if (!existing.has(text.toLowerCase())) {
+        out.push({ id: `sug-grp-${g.id}`, text, href: '/scheduling' })
+      }
+    }
+
+    for (const a of alerts.slice(0, 8)) {
+      if (dismissedSuggestions.includes(a.id)) continue
+      if (existing.has(a.text.toLowerCase())) continue
+      out.push({ id: a.id, text: a.text, href: a.href })
+    }
+
+    for (const d of weekDues.slice(0, 4)) {
+      const text = `${d.studentName} — ${d.label} (${d.dueDate})`
+      if (dismissedSuggestions.includes(d.id)) continue
+      if (existing.has(text.toLowerCase())) continue
+      out.push({ id: d.id, text, href: d.href })
+    }
+
+    return out.slice(0, 6)
+  }, [todayGroups, alerts, weekDues, todos, dismissedSuggestions])
+
   function persistTodos(next: TodoItem[]) {
     setTodos(next)
     saveTodos(next)
   }
 
-  function addTodo() {
-    const text = todoDraft.trim()
+  function addTodo(textOverride?: string) {
+    const text = (textOverride ?? todoDraft).trim()
     if (!text) return
     persistTodos([
       { id: `td-${Date.now()}`, text, done: false, createdAt: new Date().toISOString() },
       ...todos,
     ])
-    setTodoDraft('')
+    if (!textOverride) setTodoDraft('')
+  }
+
+  function pinSuggestion(s: SuggestedTodo) {
+    addTodo(s.text)
+    setDismissedSuggestions((prev) => [...prev, s.id])
   }
 
   return (
     <PageShell
       title="🏠 Main Dashboard"
-      description={`This week’s meetings and dues for ${profile.name}. Core modules live in the top tabs. Team Chat is the bubble in the corner.`}
+      description={`This week’s meetings and dues for ${profile.name}. Core modules live in the top tabs. Team Chat is the glowing bubble in the corner.`}
     >
       <DashboardDateCountdown />
 
@@ -263,102 +302,111 @@ export function DashboardPage() {
           </div>
         </section>
 
-        <VirtualMeetingsPanel />
-      </div>
+        <section
+          className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
+          style={{ borderTop: '4px solid var(--accent)' }}
+        >
+          <div className="mx-auto w-full max-w-md">
+            <div className="text-center">
+              <h2 className="font-heading text-sm font-bold">My to-do</h2>
+              <p className="mt-0.5 text-[10px] text-[var(--subtext)]">
+                Pulled from today&apos;s schedule, NOMs, dues &amp; progress alerts
+              </p>
+            </div>
 
-      <section
-        className="mb-3 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
-        style={{ borderTop: '4px solid var(--accent)' }}
-      >
-        <h2 className="font-heading text-sm font-bold">My to-do</h2>
-        <div className="mt-2 flex max-w-xl gap-2">
-          <input
-            className="flex-1 rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
-            placeholder="Add a task…"
-            value={todoDraft}
-            onChange={(e) => setTodoDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') addTodo()
-            }}
-          />
-          <button
-            type="button"
-            className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white"
-            onClick={addTodo}
-          >
-            Add
-          </button>
-        </div>
-        <ul className="mt-3 max-w-xl space-y-2">
-          {!todos.length && (
-            <li className="text-xs text-[var(--subtext)]">No tasks yet — add NOM, probes, or calls.</li>
-          )}
-          {todos.map((t) => (
-            <li key={t.id} className="flex items-center gap-2 text-xs">
+            {suggestedTodos.length > 0 && (
+              <div className="mt-3 rounded-xl tint-coral p-3">
+                <p className="text-center text-[10px] font-bold uppercase tracking-wide text-[var(--subtext)]">
+                  Suggested for you
+                </p>
+                <ul className="mt-2 space-y-1.5">
+                  {suggestedTodos.map((s) => (
+                    <li
+                      key={s.id}
+                      className="flex items-start gap-2 rounded-lg border border-[var(--border)] bg-[var(--card-bg)] px-2 py-1.5 text-[11px]"
+                    >
+                      <Link to={s.href} className="min-w-0 flex-1 hover:text-[var(--accent)]">
+                        {s.text}
+                      </Link>
+                      <button
+                        type="button"
+                        className="shrink-0 rounded-md bg-[var(--accent)] px-2 py-0.5 text-[10px] font-semibold text-white"
+                        onClick={() => pinSuggestion(s)}
+                      >
+                        Pin
+                      </button>
+                      <button
+                        type="button"
+                        className="shrink-0 text-[10px] text-[var(--subtext)]"
+                        aria-label="Dismiss suggestion"
+                        onClick={() =>
+                          setDismissedSuggestions((prev) => [...prev, s.id])
+                        }
+                      >
+                        ×
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="mt-3 flex gap-2">
               <input
-                type="checkbox"
-                checked={t.done}
-                onChange={() =>
-                  persistTodos(todos.map((x) => (x.id === t.id ? { ...x, done: !x.done } : x)))
-                }
+                className="flex-1 rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
+                placeholder="Add your own task…"
+                value={todoDraft}
+                onChange={(e) => setTodoDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') addTodo()
+                }}
               />
-              <span className={t.done ? 'text-[var(--subtext)] line-through' : ''}>{t.text}</span>
               <button
                 type="button"
-                className="ml-auto text-[10px] text-red-600"
-                onClick={() => persistTodos(todos.filter((x) => x.id !== t.id))}
+                className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white"
+                onClick={() => addTodo()}
               >
-                ×
+                Add
               </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+            </div>
 
-      <section
-        className="overflow-x-auto rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
-        style={{ borderTop: '4px solid var(--accent-h)' }}
-      >
-        <h2 className="font-heading mb-3 text-sm font-bold">Caseload snapshot</h2>
-        <table className="w-full text-left text-xs">
-          <thead>
-            <tr className="border-b border-[var(--border)] text-[var(--subtext)]">
-              <th className="p-2">Student</th>
-              <th className="p-2">Programs</th>
-              <th className="p-2">Due</th>
-              <th className="p-2">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {students.slice(0, 8).map((s) => {
-              const due = s.hasIEP ? s.iepDue : s.section504Due || ''
-              return (
-                <tr key={s.id} className="border-b border-[var(--border)] last:border-0">
-                  <td className="p-2">
-                    <span className="inline-flex items-center gap-2 font-semibold">
-                      <StudentInitials name={s.name} color={s.color} />
-                      {s.name}
-                    </span>
-                  </td>
-                  <td className="p-2">
-                    {[s.hasIEP ? 'IEP' : null, s.has504 ? '504' : null, s.hasMLL ? 'MLL' : null]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </td>
-                  <td className="p-2 font-mono">{due || '—'}</td>
-                  <td className="p-2">
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusBadgeClass(s.status)}`}
-                    >
-                      {s.status}
-                    </span>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </section>
+            <ul className="mt-3 space-y-2">
+              {!todos.length && (
+                <li className="text-center text-xs text-[var(--subtext)]">
+                  Pin a suggestion above, or add NOM / probe / call tasks.
+                </li>
+              )}
+              {todos.map((t) => (
+                <li key={t.id} className="flex items-center gap-2 text-xs">
+                  <input
+                    type="checkbox"
+                    checked={t.done}
+                    onChange={() =>
+                      persistTodos(
+                        todos.map((x) => (x.id === t.id ? { ...x, done: !x.done } : x)),
+                      )
+                    }
+                  />
+                  <span className={t.done ? 'text-[var(--subtext)] line-through' : ''}>
+                    {t.text}
+                  </span>
+                  <button
+                    type="button"
+                    className="ml-auto text-[10px] text-red-600"
+                    onClick={() => persistTodos(todos.filter((x) => x.id !== t.id))}
+                  >
+                    ×
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <div className="mb-3 mx-auto w-full max-w-xl">
+        <VirtualMeetingsPanel compact />
+      </div>
 
       <TeamChatDock />
     </PageShell>
