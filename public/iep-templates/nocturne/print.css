@@ -1,0 +1,17 @@
+/* PRISM companion — light paper when printing IEP documents that use Nocturne on screen */
+@media print {
+  :root {
+    --color-bg: #ffffff;
+    --color-surface: #f7f7fa;
+    --color-text: #1a1a22;
+    --color-accent: #5d5294;
+    --color-divider: rgba(26, 26, 34, 0.18);
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+  }
+  body { background: #fff !important; color: #1a1a22 !important; }
+  .card, .dialog, .input { background: #fff !important; }
+  .btn-primary { color: #5d5294; border-color: #5d5294; }
+  .no-print { display: none !important; }
+}

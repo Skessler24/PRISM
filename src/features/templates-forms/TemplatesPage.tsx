@@ -17,6 +17,7 @@ import {
 import { FieldTip } from '../../lib/help-assist/FieldTip'
 import { storage } from '../../lib/storage'
 import { chat } from '../../lib/ai/client'
+import { downloadIepDocumentHtml, openIepDocumentWindow } from '../../lib/templates/documentStyle'
 import { ClassroomMaterialsPanel } from './ClassroomMaterialsPanel'
 
 const CATS = ['All', 'IEP', '504', 'MLL', 'Compliance', 'Behavior', 'Communication', 'Assessment', 'Custom'] as const
@@ -154,6 +155,41 @@ export function TemplatesPage({ embedded }: Props = {}) {
     setCat('Custom')
   }
 
+  function docMeta(title?: string, studentName?: string) {
+    const s = students.find((x) => x.id === studentId)
+    return {
+      title: title || active?.name || 'PRISM IEP Document',
+      studentName: studentName ?? s?.name ?? '',
+      subtitle: `Companion draft for ${profile.name} — human review required`,
+    }
+  }
+
+  function openStyled(text = body, title?: string, studentName?: string) {
+    if (!text.trim()) {
+      flash('Fill or paste a draft first')
+      return
+    }
+    try {
+      openIepDocumentWindow(text, docMeta(title, studentName))
+      flash('Styled document opened')
+    } catch (err) {
+      flash(err instanceof Error ? err.message : 'Could not open document')
+    }
+  }
+
+  async function downloadStyled(text = body, title?: string, studentName?: string) {
+    if (!text.trim()) {
+      flash('Fill or paste a draft first')
+      return
+    }
+    try {
+      await downloadIepDocumentHtml(text, docMeta(title, studentName))
+      flash('HTML downloaded')
+    } catch {
+      flash('Download failed')
+    }
+  }
+
   async function aiPolish() {
     if (!body.trim()) {
       flash('Fill or paste a draft first')
@@ -183,7 +219,7 @@ export function TemplatesPage({ embedded }: Props = {}) {
     <PageShell
       embedded={embedded}
       title="🎨 Templates & Forms"
-      description="Forms Library with student placeholder fill. Companion = Copy into SoR; Standalone = save district drafts (same localStorage keys as deploy/)."
+      description="Forms Library with student placeholder fill. Open styled document uses Claude’s Nocturne pack (documents only — Theme Studio still owns app chrome)."
     >
       <p className="mb-2 text-xs text-[var(--subtext)]">
         {mode === 'standalone' ? (
@@ -329,6 +365,20 @@ export function TemplatesPage({ embedded }: Props = {}) {
               <button
                 type="button"
                 className="rounded-lg border border-[var(--accent)] px-3 py-2 text-xs font-semibold text-[var(--accent)]"
+                onClick={() => openStyled()}
+              >
+                Open styled document
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-semibold"
+                onClick={() => void downloadStyled()}
+              >
+                Download HTML
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-[var(--accent)] px-3 py-2 text-xs font-semibold text-[var(--accent)]"
                 onClick={() => void aiPolish()}
               >
                 AI polish draft
@@ -377,6 +427,20 @@ export function TemplatesPage({ embedded }: Props = {}) {
                   onClick={() => copyBody(inst.body)}
                 >
                   Copy
+                </button>
+                <button
+                  type="button"
+                  className="rounded-lg border border-[var(--accent)] px-2 py-1 text-xs font-semibold text-[var(--accent)]"
+                  onClick={() => openStyled(inst.body, inst.title, inst.studentName)}
+                >
+                  Open styled
+                </button>
+                <button
+                  type="button"
+                  className="rounded-lg border border-[var(--border)] px-2 py-1 text-xs font-semibold"
+                  onClick={() => void downloadStyled(inst.body, inst.title, inst.studentName)}
+                >
+                  Download HTML
                 </button>
                 <button
                   type="button"
