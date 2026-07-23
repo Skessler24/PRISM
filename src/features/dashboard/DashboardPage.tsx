@@ -221,9 +221,9 @@ export function DashboardPage() {
         ))}
       </div>
 
-      <div className="mb-3 grid gap-3 lg:grid-cols-2">
+      <div className="mb-3 grid items-stretch gap-3 lg:grid-cols-2">
         <section
-          className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
+          className="h-full rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
           style={{ borderTop: '4px solid var(--accent)' }}
         >
           <div className="flex flex-wrap items-start justify-between gap-2">
@@ -303,41 +303,41 @@ export function DashboardPage() {
         </section>
 
         <section
-          className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card"
+          className="flex h-full min-h-[28rem] flex-col rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 shadow-card lg:min-h-0"
           style={{ borderTop: '4px solid var(--accent)' }}
         >
-          <div className="mx-auto w-full max-w-md">
-            <div className="text-center">
-              <h2 className="font-heading text-sm font-bold">My to-do</h2>
-              <p className="mt-0.5 text-[10px] text-[var(--subtext)]">
-                Pulled from today&apos;s schedule, NOMs, dues &amp; progress alerts
-              </p>
-            </div>
+          <div className="shrink-0 text-center">
+            <h2 className="font-heading text-base font-bold sm:text-lg">My to-do</h2>
+            <p className="mt-0.5 text-xs text-[var(--subtext)]">
+              Pulled from today&apos;s schedule, NOMs, dues &amp; progress alerts
+            </p>
+          </div>
 
+          <div className="mt-3 flex min-h-0 flex-1 flex-col gap-3">
             {suggestedTodos.length > 0 && (
-              <div className="mt-3 rounded-xl tint-coral p-3">
-                <p className="text-center text-[10px] font-bold uppercase tracking-wide text-[var(--subtext)]">
+              <div className="flex min-h-0 max-h-[45%] flex-col rounded-xl tint-coral p-3">
+                <p className="shrink-0 text-center text-[10px] font-bold uppercase tracking-wide text-[var(--subtext)]">
                   Suggested for you
                 </p>
-                <ul className="mt-2 space-y-1.5">
+                <ul className="mt-2 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
                   {suggestedTodos.map((s) => (
                     <li
                       key={s.id}
-                      className="flex items-start gap-2 rounded-lg border border-[var(--border)] bg-[var(--card-bg)] px-2 py-1.5 text-[11px]"
+                      className="flex items-start gap-2 rounded-lg border border-[var(--border)] bg-[var(--card-bg)] px-3 py-2 text-xs"
                     >
-                      <Link to={s.href} className="min-w-0 flex-1 hover:text-[var(--accent)]">
+                      <Link to={s.href} className="min-w-0 flex-1 leading-snug hover:text-[var(--accent)]">
                         {s.text}
                       </Link>
                       <button
                         type="button"
-                        className="shrink-0 rounded-md bg-[var(--accent)] px-2 py-0.5 text-[10px] font-semibold text-white"
+                        className="shrink-0 rounded-md bg-[var(--accent)] px-2.5 py-1 text-[11px] font-semibold text-white"
                         onClick={() => pinSuggestion(s)}
                       >
                         Pin
                       </button>
                       <button
                         type="button"
-                        className="shrink-0 text-[10px] text-[var(--subtext)]"
+                        className="shrink-0 text-xs text-[var(--subtext)]"
                         aria-label="Dismiss suggestion"
                         onClick={() =>
                           setDismissedSuggestions((prev) => [...prev, s.id])
@@ -351,9 +351,9 @@ export function DashboardPage() {
               </div>
             )}
 
-            <div className="mt-3 flex gap-2">
+            <div className="flex shrink-0 gap-2">
               <input
-                className="flex-1 rounded-lg border border-[var(--border)] px-2 py-2 text-xs"
+                className="flex-1 rounded-lg border border-[var(--border)] px-3 py-2.5 text-sm"
                 placeholder="Add your own task…"
                 value={todoDraft}
                 onChange={(e) => setTodoDraft(e.target.value)}
@@ -363,23 +363,27 @@ export function DashboardPage() {
               />
               <button
                 type="button"
-                className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white"
+                className="rounded-lg bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-white"
                 onClick={() => addTodo()}
               >
                 Add
               </button>
             </div>
 
-            <ul className="mt-3 space-y-2">
+            <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
               {!todos.length && (
-                <li className="text-center text-xs text-[var(--subtext)]">
+                <li className="rounded-xl border border-dashed border-[var(--border)] px-3 py-8 text-center text-sm text-[var(--subtext)]">
                   Pin a suggestion above, or add NOM / probe / call tasks.
                 </li>
               )}
               {todos.map((t) => (
-                <li key={t.id} className="flex items-center gap-2 text-xs">
+                <li
+                  key={t.id}
+                  className="flex items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--slate)] px-3 py-2.5 text-sm"
+                >
                   <input
                     type="checkbox"
+                    className="h-4 w-4"
                     checked={t.done}
                     onChange={() =>
                       persistTodos(
@@ -387,12 +391,12 @@ export function DashboardPage() {
                       )
                     }
                   />
-                  <span className={t.done ? 'text-[var(--subtext)] line-through' : ''}>
+                  <span className={`min-w-0 flex-1 leading-snug ${t.done ? 'text-[var(--subtext)] line-through' : ''}`}>
                     {t.text}
                   </span>
                   <button
                     type="button"
-                    className="ml-auto text-[10px] text-red-600"
+                    className="shrink-0 text-xs text-red-600"
                     onClick={() => persistTodos(todos.filter((x) => x.id !== t.id))}
                   >
                     ×
